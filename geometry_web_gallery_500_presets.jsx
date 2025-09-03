@@ -113,6 +113,7 @@ function CanvasCard({ preset, pixelSize = 240, onClick, dense=false }) {
     ctx.fillRect(0,0,W,H);
 
     const { family, params, renderer_hint } = preset;
+    const viewBounds = preset.view_bounds || null;
     const type = renderer_hint?.type || 'escape_time';
 
     const drawEscape = () => {
@@ -151,6 +152,7 @@ function CanvasCard({ preset, pixelSize = 240, onClick, dense=false }) {
       const points = Math.min(params.points || 150000, 200000);
       let x = 0, y = 0;
       ctx.fillStyle = 'white';
+      const bounds = viewBounds || [-3,3,-6,1];
       for (let i = 0; i < points; i++) {
         const r = Math.random();
         let acc = 0; let map = null;
@@ -160,7 +162,7 @@ function CanvasCard({ preset, pixelSize = 240, onClick, dense=false }) {
         const yn = map.c*x + map.d*y + map.f;
         x = xn; y = yn;
         if (i > (params.discard || 100)) {
-          const [px, py] = worldToViewport(x*0.05, y*0.05-2.2, [-3,3,-6,1], W, H);
+          const [px, py] = worldToViewport(x, y, bounds, W, H);
           ctx.fillRect(px, py, 1, 1);
         }
       }
@@ -173,7 +175,7 @@ function CanvasCard({ preset, pixelSize = 240, onClick, dense=false }) {
       const img = ctx.getImageData(0,0,W,H);
       const data = img.data;
       const plot = (x, y) => {
-        const [px, py] = worldToViewport(x, y, [-3,3,-3,3], W, H);
+        const [px, py] = worldToViewport(x, y, viewBounds || [-3,3,-3,3], W, H);
         const idx = 4*(py*W + px);
         const v = 220; // white ink accumulation
         data[idx] = Math.min(255, data[idx] + v);
@@ -200,7 +202,7 @@ function CanvasCard({ preset, pixelSize = 240, onClick, dense=false }) {
       const steps = Math.min(params.steps || 80000, dense ? 70000 : 50000);
       const dt = params.dt || 0.01;
       let [x,y,z] = params.xyz0 || [0.1, 0, 0];
-      const bounds = [-30,30,-30,30];
+      const bounds = viewBounds || [-30,30,-30,30];
       ctx.strokeStyle = '#ffffff';
       ctx.lineWidth = 0.7;
       ctx.beginPath();
