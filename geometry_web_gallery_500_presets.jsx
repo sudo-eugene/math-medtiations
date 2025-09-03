@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import galleryPresets from "./geometry_gallery_presets.json";
 import { Upload, Search, Filter, RefreshCw, Download, Play, ImageDown, Settings } from "lucide-react";
 
 /**
@@ -19,34 +20,7 @@ import { Upload, Search, Filter, RefreshCw, Download, Play, ImageDown, Settings 
  * 2) Filter, search, and click on any card to view/export
  */
 
-// ---------- Small starter dataset (so the UI shows something before loading the 500 JSON) ----------
-const STARTER_PRESETS = [
-  { id: "mandelbrot:01", family: "mandelbrot", preset_index: 1, params: { centre: [-0.75, 0.1], zoom: 1.2, max_iter: 500, bounds: [-2.5, 1.5, -1.5, 1.5] }, notes: "Mandelbrot escape-time view", renderer_hint: { type: "escape_time" } },
-  { id: "julia:01", family: "julia", preset_index: 1, params: { c_re: -0.4, c_im: 0.6, max_iter: 400, escape_radius: 2.0, bounds: [-1.8, 1.8, -1.8, 1.8] }, notes: "Julia set", renderer_hint: { type: "escape_time" } },
-  { id: "de_jong:01", family: "de_jong", preset_index: 1, params: { a: 1.4, b: -2.3, c: 2.4, d: -2.1, steps: 200000, discard: 1000 }, notes: "Peter de Jong", renderer_hint: { type: "iter_map" } },
-  { id: "clifford:01", family: "clifford", preset_index: 1, params: { a: 1.7, b: 1.7, c: 0.6, d: 1.2, steps: 200000, discard: 5000 }, notes: "Clifford attractor", renderer_hint: { type: "iter_map" } },
-  { id: "lorenz:01", family: "lorenz", preset_index: 1, params: { sigma: 10.0, rho: 28.0, beta: 8/3, dt: 0.005, steps: 50000, xyz0: [0.1, 0, 0] }, notes: "Lorenz", renderer_hint: { type: "ode" } },
-  { id: "rossler:01", family: "rossler", preset_index: 1, params: { a: 0.2, b: 0.2, c: 5.7, dt: 0.01, steps: 50000, xyz0: [0.1, 0, 0] }, notes: "Rössler", renderer_hint: { type: "ode" } },
-  { id: "aizawa:01", family: "aizawa", preset_index: 1, params: { a: 0.95, b: 0.7, c: 0.6, d: 3.5, e: 0.25, f: 0.1, dt: 0.01, steps: 50000, xyz0: [0.1, 0, 0] }, notes: "Aizawa", renderer_hint: { type: "ode" } },
-  { id: "halvorsen:01", family: "halvorsen", preset_index: 1, params: { a: 1.2, dt: 0.01, steps: 50000, xyz0: [1, 0, 0] }, notes: "Halvorsen", renderer_hint: { type: "ode" } },
-  { id: "ikeda:01", family: "ikeda", preset_index: 1, params: { u: 0.918, steps: 200000, discard: 5000 }, notes: "Ikeda map", renderer_hint: { type: "iter_map" } },
-  { id: "gumowski_mira:01", family: "gumowski_mira", preset_index: 1, params: { a: 0.008, b: 0.95, steps: 200000, discard: 5000 }, notes: "Gumowski–Mira", renderer_hint: { type: "iter_map" } },
-  { id: "lissajous:01", family: "lissajous", preset_index: 1, params: { A: 1, B: 1, a: 3, b: 2, delta: Math.PI / 3, samples: 4000 }, notes: "Lissajous", renderer_hint: { type: "parametric_2d" } },
-  { id: "spirograph:01", family: "spirograph", preset_index: 1, params: { R: 80, r: 35, d: 60, kind: "hypo", samples: 14000 }, notes: "Trochoid", renderer_hint: { type: "parametric_2d" } },
-  { id: "superformula:01", family: "superformula", preset_index: 1, params: { m: 7, a: 1, b: 1, n1: 2.1, n2: 0.8, n3: 1.3, samples: 3000 }, notes: "Superformula", renderer_hint: { type: "polar_2d" } },
-  { id: "rose_curve:01", family: "rose_curve", preset_index: 1, params: { k_num: 5, k_den: 2, A: 1, samples: 3000 }, notes: "Rose curve", renderer_hint: { type: "polar_2d" } },
-  { id: "phyllotaxis:01", family: "phyllotaxis", preset_index: 1, params: { divergence_deg: 137.507, n_points: 2200, scale: 0.7 }, notes: "Phyllotaxis", renderer_hint: { type: "point_polar" } },
-  { id: "ifs_fern:01", family: "ifs_fern", preset_index: 1, params: { maps: [
-      { a: 0.0, b: 0.0, c: 0.0, d: 0.16, e: 0.0, f: 0.0, p: 0.01 },
-      { a: 0.85, b: 0.04, c: -0.04, d: 0.85, e: 0.0, f: 1.6, p: 0.85 },
-      { a: 0.2, b: -0.26, c: 0.23, d: 0.22, e: 0.0, f: 1.6, p: 0.07 },
-      { a: -0.15, b: 0.28, c: 0.26, d: 0.24, e: 0.0, f: 0.44, p: 0.07 },
-    ], points: 150000, discard: 100 }, notes: "Barnsley fern", renderer_hint: { type: "ifs" } },
-  { id: "gray_scott:01", family: "gray_scott", preset_index: 1, params: { Du: 0.16, Dv: 0.08, F: 0.036, k: 0.064, steps: 1000, dt: 1.0, grid: 128, init: "small_square" }, notes: "Gray–Scott (stub preview)", renderer_hint: { type: "reaction_diffusion" } },
-  { id: "interference:01", family: "interference", preset_index: 1, params: { k_vectors: [[1,0,1],[0.309,0.951,1],[ -0.809,0.588,1]], phases: [0,1,2], combine: "cos_sum", grid: 512 }, notes: "Interference field", renderer_hint: { type: "scalar_field" } },
-  { id: "newton:01", family: "newton", preset_index: 1, params: { polynomial: "z**3 - 1", derivative: "3*z**2", max_iter: 40, tolerance: 1e-6, bounds: [-2,2,-2,2] }, notes: "Newton basins (z^3-1)", renderer_hint: { type: "newton_basins" } },
-  { id: "ikeda:02", family: "ikeda", preset_index: 2, params: { u: 0.92, steps: 200000, discard: 5000 }, notes: "Ikeda map", renderer_hint: { type: "iter_map" } },
-];
+// Presets are now loaded directly from the JSON file.
 
 // ---------- Utilities ----------
 const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
@@ -442,7 +416,7 @@ function BigRender({ preset }) {
 
 // ---------- Main App ----------
 export default function GeometryGallery() {
-  const [presets, setPresets] = useState(STARTER_PRESETS);
+  const [presets, setPresets] = useState(galleryPresets);
   const [query, setQuery] = useState("");
   const [familyFilter, setFamilyFilter] = useState("all");
   const [sortBy, setSortBy] = useState("family");
@@ -459,19 +433,7 @@ export default function GeometryGallery() {
     return out;
   }, [presets, query, familyFilter, sortBy]);
 
-  const onLoadJSON = async (file) => {
-    try {
-      const text = await file.text();
-      const arr = JSON.parse(text);
-      if (!Array.isArray(arr)) throw new Error('JSON root must be an array');
-      const ok = arr.every(o => o && o.id && o.family && o.params && o.renderer_hint);
-      if (!ok) throw new Error('Unexpected JSON structure');
-      setPresets(arr);
-    } catch (e) {
-      alert('Failed to load presets: ' + e.message);
-    }
-  };
-
+  
   const gridCols = `grid-cols-1 sm:grid-cols-2 md:grid-cols-${grid} xl:grid-cols-${grid+1}`;
 
   return (
@@ -480,12 +442,7 @@ export default function GeometryGallery() {
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-2">
           <div className="text-lg font-semibold tracking-wide">Geometry Gallery</div>
           <div className="ml-auto flex items-center gap-2">
-            <label className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-neutral-900 border border-neutral-800 cursor-pointer hover:bg-neutral-800">
-              <Upload size={16} />
-              <span className="hidden sm:inline">Load presets</span>
-              <input type="file" accept="application/json" className="hidden" onChange={(e)=>{ if (e.target.files?.[0]) onLoadJSON(e.target.files[0]); }} />
-            </label>
-            <div className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl bg-neutral-900 border border-neutral-800">
+                        <div className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl bg-neutral-900 border border-neutral-800">
               <Search size={16} className="opacity-70" />
               <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search id or family" className="bg-transparent focus:outline-none text-sm placeholder:text-neutral-500" />
             </div>
@@ -511,7 +468,7 @@ export default function GeometryGallery() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-6">
-        <p className="text-neutral-400 text-sm mb-4">Tip: Load the full <span className="font-mono">geometry_gallery_presets.json</span> file you downloaded to browse all 500 presets. Click any tile to open a large render and export a PNG.</p>
+        <p className="text-neutral-400 text-sm mb-4">Click any tile to open a large render and export a PNG.</p>
         <div className={`grid ${gridCols} gap-4`}>
           {filtered.map(p => (
             <CanvasCard key={p.id} preset={p} onClick={setSelected} />
