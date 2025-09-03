@@ -9,9 +9,20 @@ const MoireMandalaPattern = () => {
   
   useEffect(() => {
     const canvas = canvasRef.current;
+    const container = canvas.parentElement;
     const ctx = canvas.getContext('2d');
-    canvas.width = 550;
-    canvas.height = 550;
+
+    const resizeCanvas = () => {
+      const size = Math.min(container.clientWidth, container.clientHeight);
+      if (canvas.width !== size || canvas.height !== size) {
+        canvas.width = size;
+        canvas.height = size;
+        return true; // Resized
+      }
+      return false; // Not resized
+    };
+
+    resizeCanvas();
     
     const drawPattern = (time = 0) => {
       ctx.fillStyle = '#F0EEE6';
@@ -113,8 +124,8 @@ const MoireMandalaPattern = () => {
   }, []);
   
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#F0EEE6' }}>
-      <canvas ref={canvasRef} style={{ boxShadow: '0 0 20px rgba(0,0,0,0.1)' }} />
+    <div className="w-full h-full flex justify-center items-center" style={{ backgroundColor: '#F0EEE6' }}>
+      <canvas ref={canvasRef} className="max-w-full max-h-full shadow-lg" />
     </div>
   );
 };

@@ -9,10 +9,20 @@ const FlowerOfLife = () => {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    
+    const container = canvas.parentElement;
     const ctx = canvas.getContext('2d');
-    canvas.width = 550;
-    canvas.height = 550;
+
+    const resizeCanvas = () => {
+      const size = Math.min(container.clientWidth, container.clientHeight);
+      if (canvas.width !== size || canvas.height !== size) {
+        canvas.width = size;
+        canvas.height = size;
+        return true; // Resized
+      }
+      return false; // Not resized
+    };
+
+    resizeCanvas();
     
     let time = 0;
     
@@ -105,13 +115,8 @@ const FlowerOfLife = () => {
   }, []);
   
   return (
-    <div className="flex items-center justify-center w-full h-full" style={{ backgroundColor: '#F0EEE6' }}>
-      <div className="w-[550px] h-[550px] shadow-lg rounded-lg overflow-hidden">
-        <canvas 
-          ref={canvasRef} 
-          className="w-full h-full"
-        />
-      </div>
+    <div className="w-full h-full flex justify-center items-center" style={{ backgroundColor: '#F0EEE6' }}>
+      <canvas ref={canvasRef} className="max-w-full max-h-full shadow-lg rounded-lg" />
     </div>
   );
 };

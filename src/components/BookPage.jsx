@@ -98,13 +98,11 @@ const BookPage = () => {
             className="h-[calc(100vh-57px)] flex items-center justify-center p-8"
             style={{ scrollSnapAlign: 'start' }}
           >
-            <div className="w-full max-w-4xl flex items-center">
-              <div className={`w-1/2 pr-12 ${visiblePage === quote.id ? 'animate-fade-in-quote' : 'opacity-0'}`}>
-                <div className="flex items-baseline">
-                  <p className="text-2xl font-serif text-neutral-200">{quote.quote}</p>
-                </div>
+            <div className="w-full max-w-5xl flex items-center justify-center gap-x-16">
+              <div className={`flex-1 ${visiblePage === quote.id ? 'animate-fade-in-quote' : 'opacity-0'}`}>
+                <p className="text-2xl font-serif text-neutral-200 text-center">{quote.quote}</p>
               </div>
-              <div className={`w-1/2 ${visiblePage === quote.id ? 'animate-fade-in-visual' : 'opacity-0'}`}>
+              <div className={`flex-1 ${visiblePage === quote.id ? 'animate-fade-in-visual' : 'opacity-0'}`}>
                 <div className="w-full aspect-square rounded-2xl overflow-hidden">
                   <MathVisual 
                     quoteId={quote.id} 
