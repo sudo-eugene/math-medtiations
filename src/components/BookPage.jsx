@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams, Link, Navigate, useNavigate } from 'react-router-dom';
 import quotes from '../../quotes.json';
+import MathVisual from './MathVisual';
 
 const BookPage = () => {
   const { day } = useParams();
@@ -12,6 +13,7 @@ const BookPage = () => {
   const [visiblePage, setVisiblePage] = useState(pageNumber);
   const isScrollingRef = useRef(false);
   const scrollTimeoutRef = useRef(null);
+  const [mathVisualLoaded, setMathVisualLoaded] = useState(false);
 
   if (isNaN(pageNumber) || pageNumber < 1 || pageNumber > quotes.length) {
     return <Navigate to="/book/1" replace />;
@@ -97,13 +99,23 @@ const BookPage = () => {
             style={{ scrollSnapAlign: 'start' }}
           >
             <div className="w-full max-w-4xl flex items-center">
-              <div className={`w-1/2 pr-12 ${visiblePage === quote.id ? '' : 'opacity-100'}`}>
+              <div className={`w-1/2 pr-12 ${visiblePage === quote.id ? 'animate-fade-in-quote' : 'opacity-0'}`}>
                 <div className="flex items-baseline">
                   <p className="text-2xl font-serif text-neutral-200">{quote.quote}</p>
                 </div>
               </div>
-              <div className={`w-1/2 ${visiblePage === quote.id ? '' : 'opacity-100'}`}>
-                <div className="bg-neutral-900 border border-neutral-800 w-full h-80 rounded-2xl"></div>
+              <div className={`w-1/2 ${visiblePage === quote.id ? 'animate-fade-in-visual' : 'opacity-0'}`}>
+                <div className="w-full aspect-square rounded-2xl overflow-hidden">
+                  <MathVisual 
+                    quoteId={quote.id} 
+                    isVisible={visiblePage === quote.id}
+                    onLoad={(loaded) => {
+                      if (loaded && visiblePage === quote.id) {
+                        setMathVisualLoaded(true);
+                      }
+                    }}
+                  />
+                </div>
               </div>
             </div>
           </div>

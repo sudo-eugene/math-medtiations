@@ -13,3 +13,20 @@ html, body, #root { height: 100%; }
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in-quote {
+  animation: fadeIn 1.2s ease-out 0.8s both;
+}
+
+.animate-fade-in-visual {
+  animation: fadeIn 1.2s ease-out 1.4s both;
+}
