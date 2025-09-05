@@ -384,13 +384,8 @@ const GentleWaves = () => {
 };
 
 export default GentleWaves;
-code
-JavaScript
-download
-content_copy
-expand_less
-IGNORE_WHEN_COPYING_START
-IGNORE_WHEN_COPYING_END
+
+
 import { useEffect, useRef } from 'react';
 
 // Themes: true courage, nature's wisdom, universal net
