@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams, Link, Navigate, useNavigate } from 'react-router-dom';
 import quotes from '../../quotes.json';
-import MathVisual from './MathVisual';
+import MathVisual from './MathVisual.tsx';
+
+const devMode = true;
 
 const BookPage = () => {
   const { day } = useParams();
@@ -99,10 +101,10 @@ const BookPage = () => {
             style={{ scrollSnapAlign: 'start' }}
           >
             <div className="w-full max-w-5xl flex items-center justify-center gap-x-16">
-              <div className={`flex-1 ${visiblePage === quote.id ? 'animate-fade-in-quote' : 'opacity-0'}`}>
+              <div className={`flex-1 ${!devMode && visiblePage === quote.id ? 'animate-fade-in-quote' : 'opacity-100'}`}>
                 <p className="text-2xl font-serif text-neutral-200 text-center">{quote.quote}</p>
               </div>
-              <div className={`flex-1 ${visiblePage === quote.id ? 'animate-fade-in-visual' : 'opacity-0'}`}>
+              <div className={`flex-1 ${!devMode && visiblePage === quote.id ? 'animate-fade-in-visual' : 'opacity-100'}`}>
                 <div className="w-full aspect-square rounded-2xl overflow-hidden">
                   <MathVisual 
                     quoteId={quote.id} 

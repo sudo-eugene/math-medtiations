@@ -3,8 +3,8 @@ import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
 import './index.css';
 import GeometryGallery from '../geometry_web_gallery_500_presets.jsx';
-import BookPage from './components/BookPage.jsx';
-import Root from './components/Root.jsx';
+import BookPage from './components/BookPage.tsx';
+import Root from './components/Root.tsx';
 
 const router = createBrowserRouter([
   {
