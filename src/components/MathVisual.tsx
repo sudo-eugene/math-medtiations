@@ -238,18 +238,30 @@ const MathVisual = ({ quoteId, isVisible, onLoad }) => {
   const CustomVisualComponent = customVisuals[quoteId];
 
   if (CustomVisualComponent) {
+    const [showAnimation, setShowAnimation] = useState(false);
+
     useEffect(() => {
-      if (isVisible && onLoad) {
-        onLoad(true);
+      if (isVisible) {
+        const timer = setTimeout(() => setShowAnimation(true), 50); // Small delay to ensure placeholder is seen
+        onLoad?.(true);
+        return () => clearTimeout(timer);
       }
     }, [isVisible, onLoad]);
 
-    // Get component name for dev mode
     const componentName = CustomVisualComponent.name || 'Unknown';
+    const snapshotUrl = `/assets/visuals/${quoteId}.png`;
 
     return (
       <div ref={containerRef} className="w-full h-full relative">
-        {isVisible && <CustomVisualComponent />}
+        <img 
+          src={snapshotUrl} 
+          alt={`Visual for quote ${quoteId}`} 
+          className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-500 ${showAnimation ? 'opacity-0' : 'opacity-100'}`}
+          aria-hidden={showAnimation}
+        />
+        <div className={`w-full h-full transition-opacity duration-500 ${showAnimation ? 'opacity-100' : 'opacity-0'}`}>
+          {isVisible && showAnimation && <CustomVisualComponent />}
+        </div>
         {devMode && (
           <div className="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
             {componentName}.tsx
@@ -268,8 +280,9 @@ const MathVisual = ({ quoteId, isVisible, onLoad }) => {
     if (!canvas) return;
     
     const ctx = canvas.getContext('2d');
-    const W = 320;
-    const H = 320;
+    const container = containerRef.current;
+    const W = container ? container.clientWidth : 320;
+    const H = container ? container.clientHeight : 320;
     canvas.width = W;
     canvas.height = H;
     
