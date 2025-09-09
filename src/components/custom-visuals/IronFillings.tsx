@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // Themes: wisdom beyond words, service without competition, infinite giving
 // Visualization: Particles that align with invisible forces, showing how truth manifests without being named
 
-const IronFillings = () => {
+const IronFillings: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
   const animationFrameRef = useRef(null);
   
@@ -12,8 +13,9 @@ const IronFillings = () => {
     if (!canvas) return;
     
     const ctx = canvas.getContext('2d');
-    const width = canvas.width = 550;
-    const height = canvas.height = 550;
+    if (!ctx) return;
+    canvas.width = width;
+    canvas.height = height;
     
     const PARTICLE_COUNT = 30000;
     const particles = [];
@@ -44,9 +46,9 @@ const IronFillings = () => {
       ctx.fillRect(0, 0, width, height);
       
       const circles = [
-        { cx: 275, cy: 200, r: 150 },  // Top circle
-        { cx: 275, cy: 350, r: 150 },  // Bottom circle
-        { cx: 275, cy: 275, r: 75 }    // Center circle
+        { cx: width / 2, cy: height / 2 - height * 0.15, r: height * 0.27 },  // Top circle
+        { cx: width / 2, cy: height / 2 + height * 0.15, r: height * 0.27 },  // Bottom circle
+        { cx: width / 2, cy: height / 2, r: height * 0.13 }    // Center circle
       ];
       
       particles.forEach(particle => {
@@ -111,21 +113,23 @@ const IronFillings = () => {
       particles.length = 0;
       time = 0;
     };
-  }, []);
+  }, [width, height]);
   
   return (
     <div style={{
-      width: '550px',
-      height: '550px',
+      width: `${width}px`,
+      height: `${height}px`,
       margin: 'auto',
       backgroundColor: '#f0eee6'
     }}>
       <canvas
         ref={canvasRef}
+        width={width}
+        height={height}
         style={{
           display: 'block',
-          width: '550px',
-          height: '550px'
+          width: `${width}px`,
+          height: `${height}px`
         }}
       />
     </div>

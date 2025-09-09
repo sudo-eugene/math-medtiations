@@ -1,9 +1,10 @@
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // themes: lead without force, achieve without boasting, nature's unceasing momentum
 // visualization: Forms guide each other through gentle influence, moving with nature's flow
 
-const DimensionalResonance = () => {
+const DimensionalResonance: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
   
   useEffect(() => {
@@ -54,12 +55,12 @@ const DimensionalResonance = () => {
     ];
     
     const setupCanvas = () => {
-      canvas.width = 550;
-      canvas.height = 550;
+      canvas.width = width;
+      canvas.height = height;
       
       // Recenter the forms to fit in the canvas
-      const centerAdjustX = (550 / 2) - (275 * sizeFactor);
-      const centerAdjustY = (550 / 2) - (225 * sizeFactor);
+      const centerAdjustX = (width / 2) - (275 * sizeFactor);
+      const centerAdjustY = (height / 2) - (225 * sizeFactor);
       
       baseForms.forEach(form => {
         form.centerX += centerAdjustX;
@@ -179,12 +180,17 @@ const DimensionalResonance = () => {
       // Clear layers array to prevent memory leaks
       layers.length = 0;
     }
-  }, []);
+  }, [width, height]);
   
   return (
-    <div className="w-full h-full flex items-center justify-center bg-[#F0EEE6]">
+    <div 
+      className="flex items-center justify-center bg-[#F0EEE6]"
+      style={{ width: `${width}px`, height: `${height}px` }}
+    >
       <canvas
         ref={canvasRef}
+        width={width}
+        height={height}
         className="max-w-full max-h-full shadow-lg"
       />
     </div>

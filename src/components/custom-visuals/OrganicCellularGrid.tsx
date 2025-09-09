@@ -1,9 +1,10 @@
 import { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // Themes: true courage, nature's wisdom, universal net
 // Visualization: A grid that moves with careful balance, showing how strength emerges through wise restraint
 
-const OrganicCellularGrid = () => {
+const OrganicCellularGrid: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
   
   useEffect(() => {
@@ -11,8 +12,9 @@ const OrganicCellularGrid = () => {
     if (!canvas) return;
     
     const ctx = canvas.getContext('2d');
-    canvas.width = 550;
-    canvas.height = 550;
+    if (!ctx) return;
+    canvas.width = width;
+    canvas.height = height;
     
     // Time flows with nature's rhythm
     let time = 0;
@@ -113,11 +115,14 @@ const OrganicCellularGrid = () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
       }
     };
-  }, []);
+  }, [width, height]);
   
   return (
-    <div className="flex items-center justify-center w-full h-full" style={{ backgroundColor: '#F0EEE6' }}>
-      <canvas ref={canvasRef} width={550} height={550} className="shadow-lg" />
+    <div 
+      className="flex items-center justify-center"
+      style={{ backgroundColor: '#F0EEE6', width: `${width}px`, height: `${height}px` }}
+    >
+      <canvas ref={canvasRef} width={width} height={height} className="shadow-lg" />
     </div>
   );
 };

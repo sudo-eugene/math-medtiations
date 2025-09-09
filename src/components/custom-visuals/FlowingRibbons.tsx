@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // Themes: surrender to the moment, readiness for change, natural completion
 // Visualization: A flowing grid that yields to invisible forces, showing how structure can remain while embracing constant change
 
-const FlowingRibbons = () => {
+const FlowingRibbons: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
   const ctxRef = useRef(null);
   const pointsCacheRef = useRef(null);
@@ -12,9 +13,9 @@ const FlowingRibbons = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    ctxRef.current = canvas.getContext('2d');
-    const width = 550;
-    const height = 550;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
     canvas.width = width;
     canvas.height = height;
 
@@ -67,11 +68,11 @@ const FlowingRibbons = () => {
 
     draw();
 
-  }, []);
+  }, [width, height]);
 
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <canvas ref={canvasRef} />
+    <div style={{ width: `${width}px`, height: `${height}px`, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <canvas ref={canvasRef} width={width} height={height} />
     </div>
   );
 };

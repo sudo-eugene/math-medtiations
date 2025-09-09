@@ -1,16 +1,18 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // themes: emergence from emptiness, form from formless, essence within
 // visualization: Patterns emerge from an empty center, revealing the essence that gives rise to all form
 
-const KaleidoscopeWaveCenterSquare = () => {
+const KaleidoscopeWaveCenterSquare: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    canvas.width = 550;
-    canvas.height = 550;
+    if (!ctx) return;
+    canvas.width = width;
+    canvas.height = height;
     
     let time = 0;
     const centerX = canvas.width / 2;
@@ -103,15 +105,15 @@ const KaleidoscopeWaveCenterSquare = () => {
       segmentCanvas.width = 0;
       segmentCanvas.height = 0;
     };
-  }, []);
+  }, [width, height]);
 
   return (
     <div style={{ 
-      width: '550px', 
-      height: '550px', 
+      width: `${width}px`, 
+      height: `${height}px`, 
       backgroundColor: '#F0EEE6' 
     }}>
-      <canvas ref={canvasRef} />
+      <canvas ref={canvasRef} width={width} height={height} />
     </div>
   );
 };

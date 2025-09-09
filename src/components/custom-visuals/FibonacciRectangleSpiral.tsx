@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // themes: natural silence, opening to source, trust in response
 // visualization: Forms spiral inward to silence, naturally responding to an unseen center
 
-const FibonacciRectangleSpiral = () => {
+const FibonacciRectangleSpiral: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
   
   useEffect(() => {
@@ -11,8 +12,9 @@ const FibonacciRectangleSpiral = () => {
     if (!canvas) return;
     
     const ctx = canvas.getContext('2d');
-    canvas.width = 550;
-    canvas.height = 550;
+    if (!ctx) return;
+    canvas.width = width;
+    canvas.height = height;
     
     let time = 0;
     const phi = (1 + Math.sqrt(5)) / 2; // Golden ratio
@@ -29,8 +31,8 @@ const FibonacciRectangleSpiral = () => {
       const maxRectangles = Math.min(60, Math.floor((time * 0.02) % 80));
       
       // Begin from silence at the center
-      let width = 300;
-      let height = width / phi;
+      let rectWidth = Math.min(width, height) * 0.6;
+      let rectHeight = rectWidth / phi;
       let scale = 1;
       let angle = time * 0.00025; // Half speed global rotation
       
@@ -52,16 +54,16 @@ const FibonacciRectangleSpiral = () => {
         const alpha = 0.5 - i * 0.01;  // Reduced base alpha from 0.85 to 0.5
         ctx.strokeStyle = `rgba(83, 81, 70, ${alpha})`;  // Using rubin-slate color (535146) instead of black
         ctx.lineWidth = 0.8;  // Slightly thinner lines
-        ctx.strokeRect(-width/2, -height/2, width, height);
+        ctx.strokeRect(-rectWidth/2, -rectHeight/2, rectWidth, rectHeight);
         
         // Add subtle internal divisions
         if (i % 3 === 0) {
           // Draw diagonals
           ctx.beginPath();
-          ctx.moveTo(-width/2, -height/2);
-          ctx.lineTo(width/2, height/2);
-          ctx.moveTo(width/2, -height/2);
-          ctx.lineTo(-width/2, height/2);
+          ctx.moveTo(-rectWidth/2, -rectHeight/2);
+          ctx.lineTo(rectWidth/2, rectHeight/2);
+          ctx.moveTo(rectWidth/2, -rectHeight/2);
+          ctx.lineTo(-rectWidth/2, rectHeight/2);
           ctx.strokeStyle = `rgba(50, 50, 50, ${alpha * 0.2})`;
           ctx.lineWidth = 0.5;
           ctx.stroke();
@@ -71,8 +73,8 @@ const FibonacciRectangleSpiral = () => {
         
         // Update for next rectangle
         // Scale down by the golden ratio
-        width *= 0.95;
-        height *= 0.95;
+        rectWidth *= 0.95;
+        rectHeight *= 0.95;
         scale *= 0.98;
       }
       
@@ -112,16 +114,19 @@ const FibonacciRectangleSpiral = () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
       }
     };
-  }, []);
+  }, [width, height]);
   
   return (
-    <div className="flex items-center justify-center w-full h-full">
-      <div className="w-[550px] h-[550px] bg-[#F0EEE6]">
-        <canvas 
-          ref={canvasRef} 
-          className="w-full h-full"
-        />
-      </div>
+    <div 
+      className="flex items-center justify-center bg-[#F0EEE6]"
+      style={{ width: `${width}px`, height: `${height}px` }}
+    >
+      <canvas 
+        ref={canvasRef} 
+        width={width} 
+        height={height} 
+        className="w-full h-full"
+      />
     </div>
   );
 };

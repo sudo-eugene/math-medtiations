@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // Themes: unseen forces, underlying structure, harmony in flow
 // Visualization: A vector field that shows the unseen forces guiding particles, revealing the underlying structure of space
 
-const VectorFieldLines = () => {
+const VectorFieldLines: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -13,8 +14,6 @@ const VectorFieldLines = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const width = 550;
-    const height = 550;
     canvas.width = width;
     canvas.height = height;
 
@@ -22,6 +21,7 @@ const VectorFieldLines = () => {
     const gridSize = 20;
     const noiseScale = 0.02;
 
+    let animationFrameId: number;
     const draw = () => {
       ctx.fillStyle = '#F0EEE6';
       ctx.fillRect(0, 0, width, height);
@@ -45,16 +45,20 @@ const VectorFieldLines = () => {
       }
 
       time += 0.01;
-      requestAnimationFrame(draw);
+      animationFrameId = requestAnimationFrame(draw);
     };
 
     draw();
 
-  }, []);
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
+
+  }, [width, height]);
 
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <canvas ref={canvasRef} />
+    <div style={{ width: `${width}px`, height: `${height}px`, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <canvas ref={canvasRef} width={width} height={height} />
     </div>
   );
 };

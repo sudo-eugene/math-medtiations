@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // themes: source follows itself, ever-flowing nature, return to source
 // visualization: Particles flow in an eternal cycle, always returning to their origin
 
-const EtherealTorusFlow = () => {
+const EtherealTorusFlow: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -11,8 +12,8 @@ const EtherealTorusFlow = () => {
     const ctx = canvas.getContext('2d');
     
     // Set canvas size according to project requirements
-    canvas.width = 550;
-    canvas.height = 550;
+    canvas.width = width;
+    canvas.height = height;
     
     // Set initial background
     ctx.fillStyle = '#F0EEE6';
@@ -140,27 +141,22 @@ const EtherealTorusFlow = () => {
       // Clear particles array to prevent memory leaks
       particles.length = 0;
     };
-  }, []);
+  }, [width, height]);
 
   return (
     <div style={{ 
+      width: `${width}px`,
+      height: `${height}px`,
       display: 'flex', 
       justifyContent: 'center', 
       alignItems: 'center',
       backgroundColor: '#F0EEE6',
-      width: '100%',
-      height: '100%'
+      border: '1px solid rgba(0, 0, 0, 0.1)',
+      boxShadow: '0 0 20px rgba(0, 0, 0, 0.05)',
+      borderRadius: '8px',
+      overflow: 'hidden'
     }}>
-      <div style={{
-        width: '550px',
-        height: '550px',
-        border: '1px solid rgba(0, 0, 0, 0.1)',
-        boxShadow: '0 0 20px rgba(0, 0, 0, 0.05)',
-        borderRadius: '8px',
-        overflow: 'hidden'
-      }}>
-        <canvas ref={canvasRef} />
-      </div>
+      <canvas ref={canvasRef} width={width} height={height} />
     </div>
   );
 };

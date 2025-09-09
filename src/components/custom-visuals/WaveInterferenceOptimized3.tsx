@@ -1,17 +1,17 @@
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // Themes: power through humility, leading from below, non-competition
 // Visualization: Waves that influence each other without domination, showing how strength emerges from yielding
 
-const WaveInterferenceOptimized3 = () => {
+const WaveInterferenceOptimized3: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
   const animationFrameRef = useRef(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d', { alpha: false });
-    const width = 550;
-    const height = 550;
+    if (!ctx) return;
     canvas.width = width;
     canvas.height = height;
 
@@ -130,44 +130,25 @@ const WaveInterferenceOptimized3 = () => {
     animate();
 
     return () => {
-      // Cancel the animation frame
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
-        animationFrameRef.current = null;
       }
-      
-      // Clear the canvas
-      if (canvas && ctx) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-      }
-      
-      // Clear the buffer canvas
-      if (bufferCanvas && bufferCtx) {
-        bufferCtx.clearRect(0, 0, bufferCanvas.width, bufferCanvas.height);
-        bufferCanvas.width = 0; // Force garbage collection
-        bufferCanvas.height = 0;
-      }
-      
-      // Clear arrays
-      field.fill(0);
     };
-  }, []);
+  }, [width, height]);
 
   return (
     <div style={{ 
       display: 'flex', 
       justifyContent: 'center', 
       alignItems: 'center',
-      width: '100%', 
-      height: '100%', 
+      width: `${width}px`, 
+      height: `${height}px`, 
       backgroundColor: '#F0EEE6' 
     }}>
       <canvas 
         ref={canvasRef} 
-        style={{ 
-          width: '550px',
-          height: '550px'
-        }} 
+        width={width}
+        height={height}
       />
     </div>
   );

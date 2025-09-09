@@ -1,19 +1,20 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // themes: success equals failure, hope equals fear, finding balance in self
 // visualization: A double helix where opposing forces dance in perfect equilibrium
 
-const Artwork33 = () => {
-  const canvasRef = useRef(null);
-  const animationFrameRef = useRef(null);
+const Artwork33: React.FC<VisualProps> = ({ width, height }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationFrameRef = useRef<number>();
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
-    const width = canvas.width = 800;
-    const height = canvas.height = 600;
+    canvas.width = width;
+    canvas.height = height;
 
     // Core variables
     let time = 0;
@@ -200,7 +201,7 @@ const Artwork33 = () => {
   return (
     <div className="w-full h-full flex flex-col items-center justify-center bg-[#F0EEE6]">
       <div className="border-0 overflow-hidden">
-        <canvas ref={canvasRef} width={800} height={600} />
+        <canvas ref={canvasRef} />
       </div>
     </div>
   );

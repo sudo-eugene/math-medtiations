@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // Themes: potential in emptiness, form from formlessness, subtle influence
 // Visualization: An implicit surface that shifts and changes, revealing the potential for form within what appears to be empty space
 
-const ImplicitDreams = () => {
+const ImplicitDreams: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -13,8 +14,6 @@ const ImplicitDreams = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const width = 550;
-    const height = 550;
     canvas.width = width;
     canvas.height = height;
 
@@ -51,11 +50,11 @@ const ImplicitDreams = () => {
 
     draw();
 
-  }, []);
+  }, [width, height]);
 
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <canvas ref={canvasRef} />
+    <div style={{ width: `${width}px`, height: `${height}px`, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <canvas ref={canvasRef} width={width} height={height} />
     </div>
   );
 };

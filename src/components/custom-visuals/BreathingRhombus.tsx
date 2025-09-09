@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // Themes: emptiness as potential, stillness in motion, unity of form
 // Visualization: A rhombus that breathes and expands from a central point, showing how form arises from emptiness and returns to it
 
-const BreathingRhombus = () => {
+const BreathingRhombus: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -12,11 +13,6 @@ const BreathingRhombus = () => {
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-
-    const width = 550;
-    const height = 550;
-    canvas.width = width;
-    canvas.height = height;
 
     let time = 0;
 
@@ -45,11 +41,11 @@ const BreathingRhombus = () => {
 
     draw();
 
-  }, []);
+  }, [width, height]);
 
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <canvas ref={canvasRef} />
+    <div style={{ width: `${width}px`, height: `${height}px`, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <canvas ref={canvasRef} width={width} height={height} />
     </div>
   );
 };

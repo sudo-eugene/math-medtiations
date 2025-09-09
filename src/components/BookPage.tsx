@@ -104,8 +104,8 @@ const BookPage = () => {
               <div className={`flex-1 ${!devMode && visiblePage === quote.id ? 'animate-fade-in-quote' : 'opacity-100'}`}>
                 <p className="text-2xl font-serif text-neutral-200 text-center">{quote.quote}</p>
               </div>
-              <div className={`flex-none ${!devMode && visiblePage === quote.id ? 'animate-fade-in-visual' : 'opacity-100'}`}>
-                <div className="w-[448px] h-[448px] rounded-2xl overflow-hidden">
+              <div className={`flex-none w-[90vmin] h-[90vmin] max-w-[448px] max-h-[448px] ${!devMode && visiblePage === quote.id ? 'animate-fade-in-visual' : 'opacity-100'}`}>
+                <div className="w-full h-full rounded-2xl overflow-hidden">
                   <MathVisual 
                     quoteId={quote.id} 
                     isVisible={visiblePage === quote.id}

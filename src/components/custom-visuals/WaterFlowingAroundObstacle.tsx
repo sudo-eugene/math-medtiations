@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // Themes: yielding to overcome, softness over hardness, finding the path of least resistance
 // Visualization: Particles that flow like water around a central obstacle, demonstrating how yielding allows for progress
 
-const WaterFlowingAroundObstacle = () => {
+const WaterFlowingAroundObstacle: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
   const animationFrameRef = useRef(null);
 
@@ -12,8 +13,8 @@ const WaterFlowingAroundObstacle = () => {
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
-    const width = canvas.width = 550;
-    const height = canvas.height = 550;
+    canvas.width = width;
+    canvas.height = height;
     const centerX = width / 2;
     const centerY = height / 2;
 
@@ -94,31 +95,24 @@ const WaterFlowingAroundObstacle = () => {
     return () => {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
-        animationFrameRef.current = null;
       }
-
-      if (canvas && ctx) {
-        ctx.clearRect(0, 0, width, height);
-      }
-
-      particles.length = 0;
     };
-  }, []);
+  }, [width, height]);
 
   return (
     <div style={{
-      width: '550px',
-      height: '550px',
+      width: `${width}px`,
+      height: `${height}px`,
       margin: 'auto',
       backgroundColor: '#F0EEE6',
       overflow: 'hidden'
     }}>
       <canvas
         ref={canvasRef}
+        width={width}
+        height={height}
         style={{
           display: 'block',
-          width: '550px',
-          height: '550px'
         }}
       />
     </div>

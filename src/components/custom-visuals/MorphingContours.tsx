@@ -1,16 +1,18 @@
 import { useRef, useEffect } from 'react';
+import { VisualProps } from '../../types';
 
 // themes: emptying of everything, return to source, peace through stillness
 // visualization: Organic forms continuously empty and return to their source in peaceful cycles
 
-const MorphingContours = () => {
+const MorphingContours: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
   
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    const width = canvas.width;
-    const height = canvas.height;
+    if (!ctx) return;
+    canvas.width = width;
+    canvas.height = height;
     
     // Parameters
     const numShapes = 3;
@@ -104,14 +106,17 @@ const MorphingContours = () => {
         cancelAnimationFrame(animationId);
       }
     };
-  }, []);
+  }, [width, height]);
   
   return (
-    <div className="flex justify-center items-center h-full w-full bg-[#F0EEE6]">
+    <div 
+      className="flex justify-center items-center bg-[#F0EEE6]"
+      style={{ width: `${width}px`, height: `${height}px` }}
+    >
       <canvas 
         ref={canvasRef} 
-        width={550} 
-        height={550} 
+        width={width} 
+        height={height} 
         className="shadow-lg"
       />
     </div>

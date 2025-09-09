@@ -1,20 +1,19 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // Themes: simplicity through non-action, natural unfolding, letting things take their course
 // Visualization: A tree that grows through simple rules, demonstrating how complexity naturally emerges when we step back and let things develop
 
-const SwayingBranches = () => {
-  const canvasRef = React.useRef(null);
+const SwayingBranches: React.FC<VisualProps> = ({ width, height }) => {
+  const canvasRef = useRef(null);
   
-  React.useEffect(() => {
+  useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const width = 550;
-    const height = 550;
     canvas.width = width;
     canvas.height = height;
 
@@ -38,6 +37,7 @@ const SwayingBranches = () => {
       drawBranch(endX, endY, length * 0.8, angle + 0.3 + sway, depth + 1);
     };
 
+    let animationFrameId: number;
     const animate = () => {
       ctx.fillStyle = '#F0EEE6';
       ctx.fillRect(0, 0, width, height);
@@ -45,16 +45,20 @@ const SwayingBranches = () => {
       drawBranch(width / 2, height, 100, -Math.PI / 2, 0);
 
       time += 0.02;
-      requestAnimationFrame(animate);
+      animationFrameId = requestAnimationFrame(animate);
     };
 
     animate();
 
-  }, []);
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
+
+  }, [width, height]);
 
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <canvas ref={canvasRef} />
+    <div style={{ width: `${width}px`, height: `${height}px`, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <canvas ref={canvasRef} width={width} height={height} />
     </div>
   );
 };

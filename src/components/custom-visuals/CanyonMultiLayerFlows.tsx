@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // themes: excess leads to loss, detachment after completion, the way of heaven
 // visualization: Particles flow naturally downward, neither clinging nor overflowing
 
-const CanyonMultiLayerFlows = () => {
+const CanyonMultiLayerFlows: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
   const animationFrameRef = useRef(null);
   
@@ -12,8 +13,9 @@ const CanyonMultiLayerFlows = () => {
     if (!canvas) return;
     
     const ctx = canvas.getContext('2d');
-    const width = canvas.width = 550;
-    const height = canvas.height = 550;
+    if (!ctx) return;
+    canvas.width = width;
+    canvas.height = height;
     const centerX = width / 2;
     const centerY = height / 2;
     
@@ -138,22 +140,24 @@ const CanyonMultiLayerFlows = () => {
       }
       particles.length = 0;
     };
-  }, []);
+  }, [width, height]);
   
   return (
     <div style={{
-      width: '550px',
-      height: '550px',
+      width: `${width}px`,
+      height: `${height}px`,
       margin: 'auto',
       backgroundColor: '#F0EEE6',
       overflow: 'hidden'
     }}>
       <canvas
         ref={canvasRef}
+        width={width}
+        height={height}
         style={{
           display: 'block',
-          width: '550px',
-          height: '550px'
+          width: `${width}px`,
+          height: `${height}px`
         }}
       />
     </div>

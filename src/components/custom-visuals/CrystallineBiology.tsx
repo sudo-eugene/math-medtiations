@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // themes: balance of opposites, return to wholeness, keep to the block
 // visualization: Crystalline forms grow in perfect balance, always returning to their core structure
 
-const CrystallineBiology = () => {
+const CrystallineBiology: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -11,8 +12,9 @@ const CrystallineBiology = () => {
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
-    canvas.width = 550;
-    canvas.height = 550;
+    if (!ctx) return;
+    canvas.width = width;
+    canvas.height = height;
 
     let time = 0;
     let crystals = [];
@@ -284,25 +286,21 @@ const CrystallineBiology = () => {
       // Clear crystals array to prevent memory leaks
       crystals.length = 0;
     };
-  }, []);
+  }, [width, height]);
 
   return (
     <div style={{ 
+      width: `${width}px`, 
+      height: `${height}px`, 
       display: 'flex', 
       justifyContent: 'center', 
       alignItems: 'center', 
-      height: '100%', 
-      backgroundColor: '#F0EEE6' 
+      backgroundColor: '#F0EEE6',
+      overflow: 'hidden',
+      border: '1px solid #ddd',
+      borderRadius: '8px'
     }}>
-      <div style={{ 
-        width: '550px', 
-        height: '550px', 
-        overflow: 'hidden',
-        border: '1px solid #ddd',
-        borderRadius: '8px'
-      }}>
-        <canvas ref={canvasRef} />
-      </div>
+      <canvas ref={canvasRef} width={width} height={height} />
     </div>
   );
 };

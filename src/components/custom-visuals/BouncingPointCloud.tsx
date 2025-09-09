@@ -1,16 +1,17 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // themes: following intuition, no fixed path, open mind leads forward
 // visualization: Points freely follow an unpredictable leader, finding their way through openness
 
-const BouncingPointCloud = () => {
+const BouncingPointCloud: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
   
   useEffect(() => {
     const canvas = canvasRef.current;
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const width = canvas.width;
-    const height = canvas.height;
+    if (!ctx) return;
     
     // Setup
     ctx.fillStyle = '#F0EEE6'; // cream background
@@ -251,14 +252,17 @@ const BouncingPointCloud = () => {
       // Clear points array to prevent memory leaks
       points.length = 0;
     };
-  }, []);
+  }, [width, height]);
   
   return (
-    <div className="flex justify-center items-center w-full h-full bg-gray-100">
+    <div 
+      className="flex justify-center items-center bg-gray-100"
+      style={{ width: `${width}px`, height: `${height}px` }}
+    >
       <canvas 
         ref={canvasRef} 
-        width={550} 
-        height={550} 
+        width={width} 
+        height={height} 
         className="shadow-lg"
       />
     </div>

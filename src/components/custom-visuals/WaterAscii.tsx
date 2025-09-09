@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { VisualProps } from '../../types';
 
 // themes: water as highest good, finding low places, grace without force
 // visualization: ASCII characters flow like water, seeking their natural level without effort
@@ -32,12 +33,12 @@ const useAnimationFrame = (callback: (deltaTime: number) => void, isRunning = tr
   }, [animate, isRunning]);
 };
 
-const WaterAscii: React.FC = () => {
+const WaterAscii: React.FC<VisualProps> = ({ width, height }) => {
   const [frame, setFrame] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const characters = '~≈≋⋿⊰⊱◟◝';
-  const rows = 25;
-  const cols = 52; // Adjusted for better fit in container
+  const cols = Math.floor(width / 10);
+  const rows = Math.floor(height / 10);
   
   // Pre-calculate constants
   const centerPos = { x: 0.5, y: 0.5 };
@@ -121,26 +122,16 @@ const WaterAscii: React.FC = () => {
   // Calculate ASCII art on frame changes
   const ascii = useMemo(() => generateAscii(), [generateAscii]);
 
-  // Memoize styles to prevent recalculation
   const containerStyle = useMemo(() => ({ 
+    width: `${width}px`,
+    height: `${height}px`,
     margin: 0,
     background: '#F0EEE6',
     overflow: 'hidden',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    height: '100%'
-  }), []);
-
-  const innerContainerStyle = useMemo(() => ({
-    padding: '30px',
-    position: 'relative' as const,
-    width: '100%',
-    height: '100%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center'
-  }), []);
+  }), [width, height]);
 
   const preStyle = useMemo(() => ({
     fontFamily: 'monospace',
@@ -153,26 +144,21 @@ const WaterAscii: React.FC = () => {
   }), []);
 
   return (
-    <div style={containerStyle}>
-      <div 
-        ref={containerRef}
-        style={innerContainerStyle}
-      >
-        <pre style={preStyle}>
-          {ascii.map((row, i) => (
-            <div 
-              key={i} 
-              style={{ 
-                opacity: row.opacity, 
-                margin: 0,
-                lineHeight: '1' 
-              }}
-            >
-              {row.text}
-            </div>
-          ))}
-        </pre>
-      </div>
+    <div style={containerStyle} ref={containerRef}>
+      <pre style={preStyle}>
+        {ascii.map((row, i) => (
+          <div 
+            key={i} 
+            style={{ 
+              opacity: row.opacity, 
+              margin: 0,
+              lineHeight: '1' 
+            }}
+          >
+            {row.text}
+          </div>
+        ))}
+      </pre>
     </div>
   );
 };

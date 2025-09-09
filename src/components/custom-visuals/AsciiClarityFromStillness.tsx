@@ -1,11 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // Themes: freedom from control, trust in people, natural prosperity
 // Visualization: ASCII patterns that emerge from stillness, showing how clarity arises when interference falls away
 
-const AsciiClarityFromStillness = () => {
+const AsciiClarityFromStillness: React.FC<VisualProps> = ({ width: containerWidth, height: containerHeight }) => {
   const containerRef = useRef(null);
-  const [mousePos, setMousePos] = useState({ x: 275, y: 275 });
+  const [mousePos, setMousePos] = useState({ x: containerWidth / 2, y: containerHeight / 2 });
   const [asciiArt, setAsciiArt] = useState([]);
   const [time, setTime] = useState(0);
 
@@ -54,12 +55,20 @@ const AsciiClarityFromStillness = () => {
         cancelAnimationFrame(animationFrameId);
       }
     };
-  }, []);
+  }, [containerWidth, containerHeight]);
 
   useEffect(() => {
     // Generate dynamic ASCII art based on mouse position
-    const width = 50;
-    const height = 35;
+    const fontSize = 12;
+    const charWidth = fontSize * 0.7;
+    const charHeight = fontSize * 1.2;
+    const width = Math.floor(containerWidth / charWidth);
+    const height = Math.floor(containerHeight / charHeight);
+
+    if (!width || !height) {
+      setAsciiArt([]);
+      return;
+    }
     const art = [];
     const centerX = width / 2;
     const centerY = height / 2;
@@ -71,8 +80,8 @@ const AsciiClarityFromStillness = () => {
       let line = '';
       for (let x = 0; x < width; x++) {
         // Calculate distance from mouse (centered in canvas)
-        const mouseX = (mousePos.x / 550) * width;
-        const mouseY = (mousePos.y / 550) * height;
+        const mouseX = (mousePos.x / containerWidth) * width;
+        const mouseY = (mousePos.y / containerHeight) * height;
         
         // Add gentle autonomous movement
         const autoX = mouseX + Math.sin(time * 0.25) * 2;  // Halved speed
@@ -122,14 +131,14 @@ const AsciiClarityFromStillness = () => {
     }
 
     setAsciiArt(art);
-  }, [mousePos, time]);
+  }, [mousePos, time, containerWidth, containerHeight]);
 
   return (
     <div
       ref={containerRef}
       style={{
-        width: '550px',
-        height: '550px',
+        width: `${containerWidth}px`,
+        height: `${containerHeight}px`,
         backgroundColor: '#F0EEE6',
         display: 'flex',
         justifyContent: 'center',

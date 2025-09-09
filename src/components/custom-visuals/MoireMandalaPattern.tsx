@@ -1,28 +1,21 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // Themes: leadership through non-control, natural organization, peace through letting go
 // Visualization: Circles that organize themselves into complex patterns, demonstrating how order emerges without force
 
-const MoireMandalaPattern = () => {
+const MoireMandalaPattern: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
   const animationFrameId = useRef(null);
   
   useEffect(() => {
     const canvas = canvasRef.current;
-    const container = canvas.parentElement;
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-    const resizeCanvas = () => {
-      const size = Math.min(container.clientWidth, container.clientHeight);
-      if (canvas.width !== size || canvas.height !== size) {
-        canvas.width = size;
-        canvas.height = size;
-        return true; // Resized
-      }
-      return false; // Not resized
-    };
-
-    resizeCanvas();
+    canvas.width = width;
+    canvas.height = height;
     
     const drawPattern = (time = 0) => {
       ctx.fillStyle = '#F0EEE6';
@@ -121,11 +114,19 @@ const MoireMandalaPattern = () => {
       animationFrameId.current = null;
     };
 
-  }, []);
+  }, [width, height]);
   
   return (
-    <div className="w-full h-full flex justify-center items-center" style={{ backgroundColor: '#F0EEE6' }}>
-      <canvas ref={canvasRef} className="max-w-full max-h-full shadow-lg" />
+    <div 
+      className="flex justify-center items-center bg-[#F0EEE6]"
+      style={{ width: `${width}px`, height: `${height}px` }}
+    >
+      <canvas 
+        ref={canvasRef} 
+        width={width} 
+        height={height} 
+        className="shadow-lg"
+      />
     </div>
   );
 };

@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // themes: knowledge brings wisdom, control requires strength, staying centered endures
 // visualization: A centered form gains strength through understanding its own nature
 
-const TorusFieldDynamics = () => {
+const TorusFieldDynamics: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
   useEffect(() => {
@@ -13,8 +14,8 @@ const TorusFieldDynamics = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     
-    canvas.width = 550;
-    canvas.height = 550;
+    canvas.width = width;
+    canvas.height = height;
     
     let time = 0;
     let animationFrameId: number;
@@ -126,25 +127,19 @@ const TorusFieldDynamics = () => {
     
     animate();
     
-    // Cleanup function that cancels the animation frame
     return () => {
       cancelAnimationFrame(animationFrameId);
-      
-      // Clear the canvas
-      if (ctx) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-      }
     };
-  }, []);
+  }, [width, height]);
   
   return (
-    <div className="flex items-center justify-center w-full h-full" style={{ backgroundColor: '#F0EEE6' }}>
-      <div className="w-[550px] h-[550px] shadow-lg rounded-lg overflow-hidden">
-        <canvas 
-          ref={canvasRef} 
-          className="w-full h-full"
-        />
-      </div>
+    <div className="flex items-center justify-center" style={{ width: `${width}px`, height: `${height}px`, backgroundColor: '#F0EEE6' }}>
+      <canvas 
+        ref={canvasRef} 
+        width={width}
+        height={height}
+        className="shadow-lg rounded-lg"
+      />
     </div>
   );
 };

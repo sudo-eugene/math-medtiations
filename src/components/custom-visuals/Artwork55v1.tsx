@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from 'react';
+import { VisualProps } from '../../types';
 import * as THREE from 'three';
 
 const metadata = {
@@ -278,7 +279,7 @@ class FractalSystem {
   }
 }
 
-const Artwork55v1: React.FC = () => {
+const Artwork55v1: React.FC<VisualProps> = ({ width, height }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const cleanupRef = useRef<() => void>(null);
 
@@ -289,12 +290,12 @@ const Artwork55v1: React.FC = () => {
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(
       75,
-      containerRef.current.clientWidth / containerRef.current.clientHeight,
+      width / height,
       0.1,
       1000
     );
     const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
+    renderer.setSize(width, height);
     renderer.setClearColor(new THREE.Color('rgb(240, 238, 231)'));
     containerRef.current.appendChild(renderer.domElement);
 
@@ -393,9 +394,9 @@ const Artwork55v1: React.FC = () => {
     const handleResize = () => {
       if (!containerRef.current) return;
       
-      camera.aspect = containerRef.current.clientWidth / containerRef.current.clientHeight;
+      camera.aspect = width / height;
       camera.updateProjectionMatrix();
-      renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
+      renderer.setSize(width, height);
     };
 
     window.addEventListener('resize', handleResize);
@@ -455,9 +456,9 @@ const Artwork55v1: React.FC = () => {
         cleanupRef.current();
       }
     };
-  }, []);
+  }, [width, height]);
 
-  return <div ref={containerRef} style={{ width: '100%', height: '100%' }} />;
+  return <div ref={containerRef} style={{ width: `${width}px`, height: `${height}px` }} />;
 };
 
 (Artwork55v1 as any).metadata = metadata;

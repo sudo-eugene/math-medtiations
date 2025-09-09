@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react'
+import React, { useRef, useEffect } from 'react'
 import * as THREE from 'three'
 
 // themes: duality, eternal vs temporal, form vs formlessness, mystery of origin, essence vs manifestation
@@ -18,13 +18,14 @@ interface WaveSourceProps {
   phase: number
 }
 
-interface HankiesInTheWindProps {
+import { VisualProps } from '../../types';
+
+interface HankiesInTheWindProps extends VisualProps {
   initialZoom?: number;
 }
 
-const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) => {
+const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ width, height, initialZoom = 6 }) => {
   const containerRef = useRef<HTMLDivElement>(null)
-  const [currentZoom, setCurrentZoom] = useState(initialZoom)
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -34,7 +35,7 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
     let camera: any = null
     let renderer: any = null
     let lineGroups: any[] = []
-    let cameraZoom = currentZoom // Control camera zoom distance (lower number = closer)
+    let cameraZoom = initialZoom // Control camera zoom distance (lower number = closer)
 
     // Create wave sources
     const createWaveSources = (time: number, scale: number): WaveSourceProps[] => {
@@ -174,9 +175,7 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
       return linesGroup
     }
 
-    const container = containerRef.current
-    const width = container.clientWidth
-    const height = container.clientHeight
+    const container = containerRef.current;
     const dpr = window.devicePixelRatio || 1
 
     // Scene, camera, renderer setup
@@ -254,25 +253,9 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
     
     animate()
 
-    // Handle resize
-    const handleResize = () => {
-      if (!containerRef.current) return
-      
-      const width = containerRef.current.clientWidth
-      const height = containerRef.current.clientHeight
-      const dpr = window.devicePixelRatio || 1
-      
-      camera.aspect = width / height
-      camera.updateProjectionMatrix()
-      renderer.setPixelRatio(Math.min(dpr, 2))
-      renderer.setSize(width, height)
-    }
-    
-    window.addEventListener('resize', handleResize)
 
     // Cleanup function
     return () => {
-      window.removeEventListener('resize', handleResize)
       
       if (animationFrameId) {
         cancelAnimationFrame(animationFrameId)
@@ -303,20 +286,20 @@ const HankiesInTheWind: React.FC<HankiesInTheWindProps> = ({ initialZoom = 6 }) 
         })
       }
     }
-  }, [])
+  }, [width, height, initialZoom])
 
   return (
     <div 
       ref={containerRef}
       style={{
+        width: `${width}px`,
+        height: `${height}px`,
         margin: 0,
         background: '#F0EEE6',
         overflow: 'hidden',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        height: '100%',
-        width: '100%',
         position: 'relative'
       }}
     />

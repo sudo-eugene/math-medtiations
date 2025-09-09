@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useMemo } from 'react'
-import * as THREE from 'three'
+import React, { useEffect, useRef } from 'react'
+import * as THREE from 'three';
+import { VisualProps } from '../../types';
 
 // themes: abandonment of the way, rise of rigid rules, loss of intuition
 // visualization: Geometric structures that reveal how natural flow becomes constrained by rigid patterns
@@ -10,7 +11,7 @@ const metadata = {
   promptSuggestion: "1. Enhance recursive depth\n2. Add more structural layers\n3. Develop clearer pattern progression\n4. Create stronger unity between elements\n5. Increase sense of order"
 }
 
-const HashArchitecture: React.FC = () => {
+const HashArchitecture: React.FC<VisualProps> = ({ width, height }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const sceneRef = useRef<any>(null)
   const cameraRef = useRef<any>(null)
@@ -94,7 +95,7 @@ const HashArchitecture: React.FC = () => {
     // Setup camera
     cameraRef.current = new THREE.PerspectiveCamera(
       50,
-      container.clientWidth / container.clientHeight,
+      width / height,
       0.1,
       1000
     )
@@ -102,7 +103,7 @@ const HashArchitecture: React.FC = () => {
     
     // Setup renderer
     rendererRef.current = new THREE.WebGLRenderer({ antialias: true })
-    rendererRef.current.setSize(container.clientWidth, container.clientHeight)
+    rendererRef.current.setSize(width, height)
     container.appendChild(rendererRef.current.domElement)
     
     // Create main group
@@ -148,20 +149,9 @@ const HashArchitecture: React.FC = () => {
     
     animate()
     
-    // Handle resize
-    const handleResize = () => {
-      if (container && cameraRef.current && rendererRef.current) {
-        cameraRef.current.aspect = container.clientWidth / container.clientHeight
-        cameraRef.current.updateProjectionMatrix()
-        rendererRef.current.setSize(container.clientWidth, container.clientHeight)
-      }
-    }
-    
-    window.addEventListener('resize', handleResize)
     
     // Cleanup
     return () => {
-      window.removeEventListener('resize', handleResize)
       
       if (animationIdRef.current) {
         cancelAnimationFrame(animationIdRef.current)
@@ -189,14 +179,14 @@ const HashArchitecture: React.FC = () => {
         })
       }
     }
-  }, [])
+  }, [width, height])
 
   return (
     <div 
       ref={containerRef}
-      style={{ 
-        width: '100%',
-        height: '100%',
+      style={{
+        width: `${width}px`,
+        height: `${height}px`,
         margin: 0,
         background: '#F0EEE6',
         overflow: 'hidden',

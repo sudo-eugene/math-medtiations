@@ -1,19 +1,20 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import { VisualProps } from '../../types';
 
 // Themes: emptiness as potential, stillness in motion, unity of form
 // Visualization: An hourglass spiral that shows how form arises from emptiness and returns to it
 
-const HourglassSpiral = () => {
+const HourglassSpiral: React.FC<VisualProps> = ({ width, height }) => {
   const mountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!mountRef.current) return;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, mountRef.current.clientWidth / mountRef.current.clientHeight, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
+    renderer.setSize(width, height);
     renderer.setClearColor(0xF0EEE6);
     mountRef.current.appendChild(renderer.domElement);
 
@@ -62,24 +63,15 @@ const HourglassSpiral = () => {
 
     animate();
 
-    const handleResize = () => {
-      if (!mountRef.current) return;
-      camera.aspect = mountRef.current.clientWidth / mountRef.current.clientHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
-    };
-
-    window.addEventListener('resize', handleResize);
 
     return () => {
-      window.removeEventListener('resize', handleResize);
-      if (mountRef.current) {
+      if (mountRef.current && renderer.domElement) {
         mountRef.current.removeChild(renderer.domElement);
       }
     };
-  }, []);
+  }, [width, height]);
 
-  return <div ref={mountRef} style={{ width: '100%', height: '100%' }} />;
+  return <div ref={mountRef} style={{ width: `${width}px`, height: `${height}px` }} />;
 };
 
 export default HourglassSpiral;

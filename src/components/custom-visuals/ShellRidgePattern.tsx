@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // Themes: inner knowing, direct perception, effortless understanding
 // Visualization: A shell pattern that reveals the universe's structure through its simple, repeating forms
 
-const ShellRidgePattern = () => {
+const ShellRidgePattern: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
   const animationFrameId = useRef<number>(null);
 
@@ -14,8 +15,6 @@ const ShellRidgePattern = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const width = 550;
-    const height = 550;
     canvas.width = width;
     canvas.height = height;
 
@@ -52,11 +51,11 @@ const ShellRidgePattern = () => {
         cancelAnimationFrame(animationFrameId.current);
       }
     };
-  }, []);
+  }, [width, height]);
 
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <canvas ref={canvasRef} />
+    <div style={{ width: `${width}px`, height: `${height}px`, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <canvas ref={canvasRef} width={width} height={height} />
     </div>
   );
 };

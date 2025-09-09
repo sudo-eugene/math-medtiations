@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // themes: silent leadership, trust in the team, working unseen
 // visualization: Each segment silently guides the others, creating harmony through invisible influence
 
-const KaleidoscopeVariation3 = () => {
+const KaleidoscopeVariation3: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
   const animationFrameId = useRef<number>(null);
 
@@ -12,8 +13,6 @@ const KaleidoscopeVariation3 = () => {
     const ctx = canvas.getContext('2d');
     // Set higher DPI for sharper rendering
     const dpr = window.devicePixelRatio || 1;
-    const width = 550;
-    const height = 550;
     canvas.width = width * dpr;
     canvas.height = height * dpr;
     canvas.style.width = `${width}px`;
@@ -110,29 +109,20 @@ const KaleidoscopeVariation3 = () => {
         segmentCanvas.height = 0;
       }
     };
-  }, []);
+  }, [width, height]);
 
   return (
     <div style={{ 
+      width: `${width}px`,
+      height: `${height}px`,
       margin: 0,
       background: '#F0EEE6',
       overflow: 'hidden',
       display: 'flex',
       alignItems: 'center',
-      justifyContent: 'center',
-      height: '100%'
+      justifyContent: 'center'
     }}>
-      <div style={{
-        padding: '30px',
-        position: 'relative',
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
-        <canvas ref={canvasRef} style={{ backgroundColor: '#F0EEE6', borderRadius: '8px' }} />
-      </div>
+      <canvas ref={canvasRef} width={width} height={height} style={{ backgroundColor: '#F0EEE6', borderRadius: '8px' }} />
     </div>
   );
 };

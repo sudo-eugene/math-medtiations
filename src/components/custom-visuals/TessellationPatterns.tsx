@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // themes: duality of opposites, quiet example, cycles of creation/dissolution
 // visualization: Geometric patterns that emerge and dissolve naturally, illustrating how opposites define and transform each other
 
-const TessellationPatterns = () => {
+const TessellationPatterns: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
   
   useEffect(() => {
@@ -11,8 +12,9 @@ const TessellationPatterns = () => {
     if (!canvas) return;
     
     const ctx = canvas.getContext('2d');
-    const width = canvas.width = 550;
-    const height = canvas.height = 550;
+    if (!ctx) return;
+    canvas.width = width;
+    canvas.height = height;
     
     let time = 0;
     const SCALE = 60;
@@ -142,37 +144,26 @@ const TessellationPatterns = () => {
     animate();
     
     return () => {
-      
       if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
-        animationFrameId = null;
-      }
-      
-      if (ctx) {
-        ctx.clearRect(0, 0, width, height);
-      }
-      
-      if (canvas) {
-        canvas.width = 0;
-        canvas.height = 0;
       }
     };
-  }, []);
+  }, [width, height]);
   
   return (
     <div style={{
-      width: '550px',
-      height: '550px',
+      width: `${width}px`,
+      height: `${height}px`,
       margin: 'auto',
       backgroundColor: '#F0EEE6',
       overflow: 'hidden'
     }}>
       <canvas
         ref={canvasRef}
+        width={width}
+        height={height}
         style={{
           display: 'block',
-          width: '550px',
-          height: '550px'
         }}
       />
     </div>

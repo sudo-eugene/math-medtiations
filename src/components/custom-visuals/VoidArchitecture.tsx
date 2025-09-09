@@ -1,19 +1,16 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 import * as THREE from 'three';
 
 // themes: emptiness creates utility, space enables function, usefulness through void
 // visualization: Three structures defined by their empty spaces - a wheel's hub, a vessel's cavity, a room's openings
 
-const VoidArchitecture = () => {
-  const mountRef = useRef(null);
+const VoidArchitecture: React.FC<VisualProps> = ({ width, height }) => {
+  const mountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const container = mountRef.current;
     if (!container) return;
-
-    // Get container dimensions
-    const width = container.clientWidth;
-    const height = container.clientHeight;
     const dpr = window.devicePixelRatio || 1;
 
     // Set up scene
@@ -209,60 +206,38 @@ const VoidArchitecture = () => {
     };
     animate();
 
-    // Handle resize
-    const handleResize = () => {
-      const width = container.clientWidth;
-      const height = container.clientHeight;
-      const dpr = window.devicePixelRatio || 1;
-      
-      camera.aspect = width / height;
-      camera.updateProjectionMatrix();
-      renderer.setPixelRatio(Math.min(dpr, 2)); // Update pixel ratio on resize
-      renderer.setSize(width, height);
-    };
-    window.addEventListener('resize', handleResize);
 
-    // Cleanup function
     return () => {
-      window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(frameId);
-      
-      // Clean up Three.js resources
-      if (renderer) {
-        renderer.dispose();
-        if (container.contains(renderer.domElement)) {
-          container.removeChild(renderer.domElement);
-        }
+      if (container && renderer.domElement) {
+        container.removeChild(renderer.domElement);
       }
-      
-      // Clean up geometry materials
       scene.traverse((object) => {
-        if (object instanceof THREE.Mesh) {
-          if (object.geometry) object.geometry.dispose();
-          if (object.material) {
-            if (Array.isArray(object.material)) {
-              object.material.forEach(material => material.dispose());
-            } else {
-              object.material.dispose();
-            }
+        if (object instanceof THREE.LineSegments) {
+          object.geometry.dispose();
+          if (Array.isArray(object.material)) {
+            object.material.forEach(m => m.dispose());
+          } else {
+            object.material.dispose();
           }
         }
       });
+      renderer.dispose();
     };
-  }, []);
+  }, [width, height]);
 
   return (
     <div 
       ref={mountRef}
       style={{ 
+        width: `${width}px`,
+        height: `${height}px`,
         margin: 0,
         background: '#F0EEE6',
         overflow: 'hidden',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        height: '100%',
-        width: '100%',
         position: 'relative'
       }}
     />

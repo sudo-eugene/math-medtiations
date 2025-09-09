@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 import * as THREE from 'three';
 
 // Themes: effortless action, natural development, finding strength in yielding
@@ -10,16 +11,16 @@ const metadata = {
   promptSuggestion: "1. Adjust growth speed\n2. Change color palette\n3. Modify fractal depth\n4. Add more rotation\n5. Alter lighting"
 };
 
-const Artwork63v2: React.FC = () => {
+const Artwork63v2: React.FC<VisualProps> = ({ width, height }) => {
   const mountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!mountRef.current) return;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, mountRef.current.clientWidth / mountRef.current.clientHeight, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
+    renderer.setSize(width, height);
     renderer.setClearColor(0xF0EEE6);
     mountRef.current.appendChild(renderer.domElement);
 
@@ -66,9 +67,9 @@ const Artwork63v2: React.FC = () => {
 
     const handleResize = () => {
       if (!mountRef.current) return;
-      camera.aspect = mountRef.current.clientWidth / mountRef.current.clientHeight;
+      camera.aspect = width / height;
       camera.updateProjectionMatrix();
-      renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
+      renderer.setSize(width, height);
     };
 
     window.addEventListener('resize', handleResize);
@@ -79,9 +80,9 @@ const Artwork63v2: React.FC = () => {
         mountRef.current.removeChild(renderer.domElement);
       }
     };
-  }, []);
+  }, [width, height]);
 
-  return <div ref={mountRef} style={{ width: '100%', height: '100%' }} />;
+  return <div ref={mountRef} style={{ width: `${width}px`, height: `${height}px` }} />;
 };
 
 Artwork63v2.metadata = metadata;

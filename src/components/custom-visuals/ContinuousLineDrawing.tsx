@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // Themes: perfection in imperfection, wisdom in simplicity, natural authenticity
 // Visualization: A single continuous line that appears unrefined yet creates perfect harmony through its natural movement
 
-const ContinuousLineDrawing = () => {
+const ContinuousLineDrawing: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
   const animationRef = useRef(null);
   
@@ -14,8 +15,6 @@ const ContinuousLineDrawing = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const width = 550;
-    const height = 550;
     canvas.width = width;
     canvas.height = height;
 
@@ -63,11 +62,11 @@ const ContinuousLineDrawing = () => {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, []);
+  }, [width, height]);
 
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <canvas ref={canvasRef} />
+    <div style={{ width: `${width}px`, height: `${height}px`, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <canvas ref={canvasRef} width={width} height={height} />
     </div>
   );
 };

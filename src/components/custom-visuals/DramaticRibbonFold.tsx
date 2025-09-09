@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // Themes: yielding to overcome, softness over hardness, finding strength in adaptability
 // Visualization: A ribbon that folds and yields to unseen forces, demonstrating how softness can overcome rigidity
@@ -16,7 +17,7 @@ interface RibbonSegment {
   draw: (ctx: CanvasRenderingContext2D) => void;
 }
 
-const DramaticRibbonFold = () => {
+const DramaticRibbonFold: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -26,8 +27,6 @@ const DramaticRibbonFold = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const width = 550;
-    const height = 550;
     canvas.width = width;
     canvas.height = height;
 
@@ -95,11 +94,11 @@ const DramaticRibbonFold = () => {
 
     animate();
 
-  }, []);
+  }, [width, height]);
 
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <canvas ref={canvasRef} />
+    <div style={{ width: `${width}px`, height: `${height}px`, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <canvas ref={canvasRef} width={width} height={height} />
     </div>
   );
 };

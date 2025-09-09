@@ -1,4 +1,5 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
+import { VisualProps } from '../../types';
 
 interface Scale {
   x: number;
@@ -18,14 +19,13 @@ interface Scale {
   shouldStart(totalTime: number, isReversing: boolean): boolean;
 }
 
-const OrganicGrowth: React.FC = () => {
+const OrganicGrowth: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const animationRef = useRef<number | null>(null);
   const timeRef = useRef<number>(0);
   const totalTimeRef = useRef<number>(0);
   const scalesRef = useRef<Scale[]>([]);
   const isReversingRef = useRef<boolean>(false);
-  const [dimensions, setDimensions] = useState({ width: window.innerWidth, height: window.innerHeight });
 
   class ScaleImpl implements Scale {
     x: number;
@@ -103,27 +103,6 @@ const OrganicGrowth: React.FC = () => {
     }
   }
 
-  useEffect(() => {
-    const handleResize = () => {
-      const container = canvasRef.current?.parentElement;
-      if (!container) return;
-      
-      const containerWidth = container.clientWidth;
-      const containerHeight = container.clientHeight;
-      
-      // Use square dimensions based on the smaller container dimension
-      const size = Math.min(containerWidth, containerHeight);
-      
-      setDimensions({
-        width: size,
-        height: size
-      });
-    };
-
-    handleResize(); // Initial size
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -133,9 +112,9 @@ const OrganicGrowth: React.FC = () => {
     if (!ctx) return;
 
     // Keep the base scale relative to a 800x800 design
-    const scale = dimensions.width / 800;
-    canvas.width = dimensions.width;
-    canvas.height = dimensions.height;
+    const scale = width / 800;
+    canvas.width = width;
+    canvas.height = height;
 
     // Initialize scales
     const scales: Scale[] = [];
@@ -201,7 +180,7 @@ const OrganicGrowth: React.FC = () => {
       totalTimeRef.current = 0;
       isReversingRef.current = false;
     };
-  }, [dimensions]);
+  }, [width, height]);
 
   return (
     <div style={{ 
@@ -211,36 +190,17 @@ const OrganicGrowth: React.FC = () => {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      height: '100%'
+      width: `${width}px`,
+      height: `${height}px`
     }}>
-      <div style={{
-        padding: '30px',
-        position: 'relative',
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
-        <div style={{
-          position: 'relative',
-          width: '100%',
-          paddingBottom: '100%' // Force 1:1 aspect ratio
-        }}>
-          <canvas 
-            ref={canvasRef}
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              filter: 'contrast(1.1) brightness(1.05)',
-              maxWidth: '100%',
-              maxHeight: '100%'
-            }}
-          />
-        </div>
-      </div>
+      <canvas 
+        ref={canvasRef}
+        width={width}
+        height={height}
+        style={{
+          filter: 'contrast(1.1) brightness(1.05)',
+        }}
+      />
     </div>
   );
 };

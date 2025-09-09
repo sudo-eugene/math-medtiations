@@ -1,4 +1,5 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect } from 'react';
+import { VisualProps } from '../../types';
 import * as THREE from 'three'
 
 const metadata = {
@@ -7,19 +8,19 @@ const metadata = {
   promptSuggestion: "1. Add subtle radiance variations\n2. Create source-centered waves\n3. Vary emanation patterns naturally\n4. Introduce gentle pulse rhythms\n5. Make radiance follow natural flows"
 }
 
-const ParticleCylinder = () => {
-  const containerRef = useRef(null)
+const ParticleCylinder: React.FC<VisualProps> = ({ width, height }) => {
+  const mountRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
-    if (!containerRef.current) return
-    const container = containerRef.current
+    if (!mountRef.current) return;
+    const container = mountRef.current;
     
     // Setup scene, camera, and renderer
     const scene = new THREE.Scene()
-    const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000)
-    const renderer = new THREE.WebGLRenderer({ antialias: true })
+    const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
     
-    renderer.setSize(container.clientWidth, container.clientHeight)
+    renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.setClearColor(0xF0EEE6)
     container.appendChild(renderer.domElement)
@@ -150,22 +151,10 @@ const ParticleCylinder = () => {
     
     animate()
     
-    // Handle resize
-    const handleResize = () => {
-      const width = container.clientWidth
-      const height = container.clientHeight
-      
-      camera.aspect = width / height
-      camera.updateProjectionMatrix()
-      renderer.setSize(width, height)
-    }
-    
-    window.addEventListener('resize', handleResize)
     
     // Cleanup
     return () => {
-      window.removeEventListener('resize', handleResize)
-      cancelAnimationFrame(animationFrameId)
+      cancelAnimationFrame(animationFrameId);
       
       if (renderer) {
         renderer.dispose()
@@ -177,11 +166,11 @@ const ParticleCylinder = () => {
       if (geometry) geometry.dispose()
       if (particleMaterial) particleMaterial.dispose()
     }
-  }, [])
+  }, [width, height]);
   
   return (
     <div 
-      ref={containerRef}
+      ref={mountRef}
       style={{ 
         margin: 0,
         background: '#F0EEE6',
@@ -189,8 +178,8 @@ const ParticleCylinder = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        height: '100%',
-        width: '100%',
+        height: `${height}px`,
+        width: `${width}px`,
         position: 'relative'
       }}
     />

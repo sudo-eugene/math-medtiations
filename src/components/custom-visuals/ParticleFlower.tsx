@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // themes: feminine creative force, eternal fertility, root energy
 // visualization: Particles bloom and flow from a central source, embodying the eternal creative feminine
 
-const ParticleFlower = () => {
+const ParticleFlower: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
   const animationFrameRef = useRef(null);
   const particlesRef = useRef([]);
@@ -15,9 +16,10 @@ const ParticleFlower = () => {
     if (!canvas) return;
     
     const ctx = canvas.getContext('2d');
+    if (!ctx) return;
     ctxRef.current = ctx;
-    const width = canvas.width = 550;
-    const height = canvas.height = 550;
+    canvas.width = width;
+    canvas.height = height;
     const centerX = width / 2;
     const centerY = height / 2;
     
@@ -151,22 +153,24 @@ const ParticleFlower = () => {
       timeRef.current = 0;
       ctxRef.current = null;
     };
-  }, []);
+  }, [width, height]);
   
   return (
     <div style={{
-      width: '550px',
-      height: '550px',
+      width: `${width}px`,
+      height: `${height}px`,
       margin: 'auto',
       backgroundColor: '#F0EEE6',
       overflow: 'hidden'
     }}>
       <canvas
         ref={canvasRef}
+        width={width}
+        height={height}
         style={{
           display: 'block',
-          width: '550px',
-          height: '550px'
+          width: `${width}px`,
+          height: `${height}px`
         }}
       />
     </div>

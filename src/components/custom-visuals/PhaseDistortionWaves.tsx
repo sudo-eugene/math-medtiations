@@ -1,18 +1,21 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // themes: source flows everywhere, silent fulfillment, humble greatness
 // visualization: Waves flow silently in all directions, achieving greatness without recognition
 
-export default function PhaseDistortionWaves() {
+const PhaseDistortionWaves: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
   
   useEffect(() => {
     const canvas = canvasRef.current;
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
+    if (!ctx) return;
     
     // Set canvas dimensions
-    canvas.width = 550;
-    canvas.height = 550;
+    canvas.width = width;
+    canvas.height = height;
     
     let t = 0;
     
@@ -103,22 +106,21 @@ export default function PhaseDistortionWaves() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
       }
     };
-  }, []);
+  }, [width, height]);
   
   return (
     <div 
-      className="w-full h-screen flex items-center justify-center"
-      style={{ backgroundColor: '#F0EEE6' }}
+      className="flex items-center justify-center"
+      style={{ backgroundColor: '#F0EEE6', width: `${width}px`, height: `${height}px` }}
     >
-      <div 
-        style={{ width: '550px', height: '550px' }}
+      <canvas 
+        ref={canvasRef} 
+        width={width}
+        height={height}
         className="border border-gray-200 rounded-md shadow-md"
-      >
-        <canvas 
-          ref={canvasRef} 
-          className="w-full h-full rounded-md"
-        />
-      </div>
+      />
     </div>
   );
-}
+};
+
+export default PhaseDistortionWaves;

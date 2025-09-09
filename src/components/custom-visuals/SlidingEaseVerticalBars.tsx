@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // themes: excess leads to failure, power undermines itself, let go of clinging
 // visualization: Bars rise and fall naturally, finding balance by letting go of extremes
 
-const SlidingEaseVerticalBars = () => {
+const SlidingEaseVerticalBars: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
   const timeRef = useRef(0);
   const animationFrameId = useRef(null);
@@ -22,8 +23,8 @@ const SlidingEaseVerticalBars = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    canvas.width = 550;
-    canvas.height = 550;
+    canvas.width = width;
+    canvas.height = height;
     
     const numLines = 50;
     const lineSpacing = canvas.width / numLines;
@@ -151,21 +152,12 @@ const SlidingEaseVerticalBars = () => {
       if (animationFrameId.current) {
         cancelAnimationFrame(animationFrameId.current);
       }
-      
-      // Clear canvas context
-      if (ctx) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-      }
-      
-      // Reset refs to prevent memory leaks
-      timeRef.current = 0;
-      animationFrameId.current = null;
     };
-  }, []);
+  }, [width, height]);
 
   return (
-    <div style={{ width: '550px', height: '550px', backgroundColor: '#F0EEE6' }}>
-      <canvas ref={canvasRef} style={{ display: 'block' }} />
+    <div style={{ width: `${width}px`, height: `${height}px`, backgroundColor: '#F0EEE6' }}>
+      <canvas ref={canvasRef} width={width} height={height} style={{ display: 'block' }} />
     </div>
   );
 };

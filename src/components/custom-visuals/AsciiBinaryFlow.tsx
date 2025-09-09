@@ -1,17 +1,21 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // themes: emptiness vs expectation, natural self-sufficiency, action through non-action
 // visualization: Binary patterns that naturally erode and flow, demonstrating how emptiness enables movement
 
-const AsciiBinaryFlow: React.FC = () => {
+const AsciiBinaryFlow: React.FC<VisualProps> = ({ width: containerWidth, height: containerHeight }) => {
     const canvasRef = useRef<HTMLDivElement>(null);
+    const fontSize = 10;
 
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
+        const charWidth = fontSize * 0.6;
+        const charHeight = fontSize * 1.2;
 
-        let width = 65;
-        let height = 65;
+        let width = Math.floor(containerWidth / charWidth);
+        let height = Math.floor(containerHeight / charHeight);
         let grid: string[][] = [];
         let time = 0;
         let animationFrameId: number;
@@ -138,7 +142,7 @@ const AsciiBinaryFlow: React.FC = () => {
             grid = [];
             time = 0;
         };
-    }, []);
+    }, [containerWidth, containerHeight]);
 
     return (
         <div style={{ 
@@ -149,7 +153,8 @@ const AsciiBinaryFlow: React.FC = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            height: '100%'
+            width: `${containerWidth}px`,
+            height: `${containerHeight}px`
         }}>
             <div style={{
                 padding: '30px',
@@ -163,6 +168,7 @@ const AsciiBinaryFlow: React.FC = () => {
                 <div 
                     ref={canvasRef}
                     style={{
+                        fontSize: `${fontSize}px`,
                         lineHeight: '0.85',
                         letterSpacing: '0.05em',
                         color: 'rgba(0,0,0,0.85)',

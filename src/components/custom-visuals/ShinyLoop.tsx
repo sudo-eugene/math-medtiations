@@ -1,4 +1,5 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect } from 'react';
+import { VisualProps } from '../../types';
 import * as THREE from 'three'
 
 const metadata = {
@@ -7,7 +8,7 @@ const metadata = {
   promptSuggestion: "1. Adjust the twist rate\n2. Change the ribbon dimensions\n3. Alter the motion dynamics\n4. Add more wireframe density\n5. Change the rotation speed"
 }
 
-const ShinyLoop: React.FC = () => {
+const ShinyLoop: React.FC<VisualProps> = ({ width, height }) => {
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -61,8 +62,6 @@ const ShinyLoop: React.FC = () => {
       })
     }
 
-    const width = container.clientWidth
-    const height = container.clientHeight
     const dpr = window.devicePixelRatio || 1
 
     // Setup scene
@@ -222,23 +221,9 @@ const ShinyLoop: React.FC = () => {
     
     animate()
 
-    // Handle resize
-    const handleResize = () => {
-      const width = container.clientWidth
-      const height = container.clientHeight
-      const dpr = window.devicePixelRatio || 1
-      
-      camera.aspect = width / height
-      camera.updateProjectionMatrix()
-      renderer.setPixelRatio(Math.min(dpr, 2))
-      renderer.setSize(width, height)
-    }
-    
-    window.addEventListener('resize', handleResize)
 
     // Cleanup
     return () => {
-      window.removeEventListener('resize', handleResize)
       
       renderer.domElement.removeEventListener('mousedown', handlePointerDown)
       renderer.domElement.removeEventListener('mousemove', handlePointerMove)
@@ -257,25 +242,24 @@ const ShinyLoop: React.FC = () => {
       if (geometry) geometry.dispose()
       if (material) material.dispose()
     }
-  }, [])
+  }, [width, height])
 
   return (
     <div 
       ref={containerRef}
       style={{ 
+        width: `${width}px`,
+        height: `${height}px`,
         margin: 0,
         background: '#F0EEE6',
         overflow: 'hidden',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        height: '100%',
-        width: '100%',
         position: 'relative'
       }}
     />
   )
 }
 
-ShinyLoop.metadata = metadata
-export default ShinyLoop
+export default ShinyLoop;

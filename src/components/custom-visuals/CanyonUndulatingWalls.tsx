@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // Themes: embracing change, freedom from fear, natural timing
 // Visualization: Particles flowing along ever-changing walls, showing how freedom comes from accepting impermanence
 
-const CanyonUndulatingWalls = () => {
+const CanyonUndulatingWalls: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
   const animationFrameRef = useRef(null);
   
@@ -12,8 +13,9 @@ const CanyonUndulatingWalls = () => {
     if (!canvas) return;
     
     const ctx = canvas.getContext('2d');
-    const width = canvas.width = 550;
-    const height = canvas.height = 550;
+    if (!ctx) return;
+    canvas.width = width;
+    canvas.height = height;
     const centerX = width / 2;
     const centerY = height / 2;
     
@@ -133,22 +135,24 @@ const CanyonUndulatingWalls = () => {
       particles.length = 0;
       time = 0;
     };
-  }, []);
+  }, [width, height]);
   
   return (
     <div style={{
-      width: '550px',
-      height: '550px',
+      width: `${width}px`,
+      height: `${height}px`,
       margin: 'auto',
       backgroundColor: '#F0EEE6',
       overflow: 'hidden'
     }}>
       <canvas
         ref={canvasRef}
+        width={width}
+        height={height}
         style={{
           display: 'block',
-          width: '550px',
-          height: '550px'
+          width: `${width}px`,
+          height: `${height}px`
         }}
       />
     </div>

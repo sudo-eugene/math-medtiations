@@ -1,23 +1,24 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 import * as THREE from 'three';
 
 // themes: simplicity over learning, return to intuition, being the center
 // visualization: Particles naturally drawn to a center point, finding harmony in simplicity
 
-const VortexParticleSystemExact = () => {
-  const canvasRef = useRef(null);
+const VortexParticleSystemExact: React.FC<VisualProps> = ({ width, height }) => {
+  const mountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Initialize Three.js components
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     
-    renderer.setSize(550, 550);
+    renderer.setSize(width, height);
     renderer.setClearColor(0xF0EEE6, 1);
-          if (canvasRef.current) {
-        canvasRef.current.appendChild(renderer.domElement);
-      }
+    if (mountRef.current) {
+      mountRef.current.appendChild(renderer.domElement);
+    }
     
     camera.position.z = 7;
     
@@ -140,34 +141,25 @@ const VortexParticleSystemExact = () => {
     
     animationId = requestAnimationFrame(animate);
     
-    // Cleanup function
     return () => {
       if (animationId) {
         cancelAnimationFrame(animationId);
       }
-      scene.traverse((child) => {
-        if (child.geometry) {
-          child.geometry.dispose();
-        }
-        if (child.material) {
-          if (Array.isArray(child.material)) {
-            child.material.forEach((material) => material.dispose());
-          } else {
-            child.material.dispose();
-          }
-        }
-      });
-      if (canvasRef.current?.contains(renderer.domElement)) {
-        canvasRef.current.removeChild(renderer.domElement);
+      if (mountRef.current && renderer.domElement) {
+        mountRef.current.removeChild(renderer.domElement);
       }
+      particles.dispose();
+      particleMaterial.dispose();
       renderer.dispose();
     };
-  }, []);
+  }, [width, height]);
 
   return (
-    <div className="w-full h-full flex justify-center items-center bg-[#F0EEE6]">
-      <div ref={canvasRef} className="w-full h-full"></div>
-    </div>
+    <div 
+      ref={mountRef} 
+      style={{ width: `${width}px`, height: `${height}px` }} 
+      className="flex justify-center items-center bg-[#F0EEE6]"
+    />
   );
 };
 

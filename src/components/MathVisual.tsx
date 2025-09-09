@@ -77,9 +77,9 @@ import CanyonUndulatingWalls from './custom-visuals/CanyonUndulatingWalls';
 import WaveInterferenceV5 from './custom-visuals/WaveInterferenceV5';
 import EffortlessParticles from './custom-visuals/EffortlessParticles';
 
-const devMode = true;
+export const devMode = true;
 
-// Utility functions for rendering
+// Utility functions for rendering... (clamp, hslToRgb, nicePalette, worldToViewport - all remain the same)
 const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
 function hslToRgb(h, s, l) {
   s = clamp(s, 0, 1); l = clamp(l, 0, 1);
@@ -127,9 +127,8 @@ function useOnScreen(ref) {
   return isIntersecting;
 }
 
-// Map quote ID to a specific mathematical preset
-function getPresetForQuote(quoteId) {
-  // Create a deterministic mapping that cycles through different preset families
+// Map quote ID to a specific mathematical preset... (getPresetForQuote remains the same)
+export function getPresetForQuote(quoteId) {
   const families = [
     'julia', 'mandelbrot', 'newton', 'de_jong', 'clifford', 
     'ikeda', 'gumowski_mira', 'lorenz', 'rossler', 'aizawa', 
@@ -139,17 +138,15 @@ function getPresetForQuote(quoteId) {
   const familyIndex = (quoteId - 1) % families.length;
   const family = families[familyIndex];
   
-  // Get presets for this family
   const familyPresets = geometryPresets.filter(p => p.family === family);
   if (familyPresets.length === 0) return geometryPresets[0];
   
-  // Use a deterministic index within the family
   const presetIndex = Math.floor((quoteId - 1) / families.length) % familyPresets.length;
   return familyPresets[presetIndex];
 }
 
-// Map quote IDs to custom components
-const customVisuals = {
+// Map quote IDs to custom components... (customVisuals map remains the same)
+export const customVisuals = {
   1: MoireMandalaPattern,
   2: FlowerOfLife,
   3: HankiesInTheWind,
@@ -228,39 +225,57 @@ const customVisuals = {
   76: EffortlessParticles,
 };
 
+
 const MathVisual = ({ quoteId, isVisible, onLoad }) => {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
   const visible = useOnScreen(containerRef);
   const [hasRendered, setHasRendered] = useState(false);
+  
+  // --- MODIFIED PART STARTS HERE ---
+  // State to hold container dimensions
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
-  // Check for a custom visual for this quote
+  // Use ResizeObserver to get container dimensions
+  useEffect(() => {
+    const observer = new ResizeObserver(entries => {
+      if (entries[0]) {
+        const { width, height } = entries[0].contentRect;
+        setDimensions({ width, height });
+      }
+    });
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => {
+      if (containerRef.current) {
+        observer.unobserve(containerRef.current);
+      }
+    };
+  }, []);
+  // --- MODIFIED PART ENDS HERE ---
+
   const CustomVisualComponent = customVisuals[quoteId];
 
   if (CustomVisualComponent) {
-    const [showAnimation, setShowAnimation] = useState(false);
+    const { width, height } = dimensions; // Destructure dimensions
 
     useEffect(() => {
       if (isVisible) {
-        const timer = setTimeout(() => setShowAnimation(true), 50); // Small delay to ensure placeholder is seen
         onLoad?.(true);
-        return () => clearTimeout(timer);
       }
     }, [isVisible, onLoad]);
 
     const componentName = CustomVisualComponent.name || 'Unknown';
-    const snapshotUrl = `/assets/visuals/${quoteId}.png`;
 
     return (
       <div ref={containerRef} className="w-full h-full relative">
-        <img 
-          src={snapshotUrl} 
-          alt={`Visual for quote ${quoteId}`} 
-          className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-500 ${showAnimation ? 'opacity-0' : 'opacity-100'}`}
-          aria-hidden={showAnimation}
-        />
-        <div className={`w-full h-full transition-opacity duration-500 ${showAnimation ? 'opacity-100' : 'opacity-0'}`}>
-          {isVisible && showAnimation && <CustomVisualComponent />}
+        <div className="w-full h-full">
+          {isVisible && width > 0 && (
+            <CustomVisualComponent width={width} height={height} />
+          )}
         </div>
         {devMode && (
           <div className="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
@@ -271,6 +286,8 @@ const MathVisual = ({ quoteId, isVisible, onLoad }) => {
     );
   }
   
+  // The rest of the component (for non-custom visuals) remains largely the same
+  // It already uses container.clientWidth and container.clientHeight for sizing
   const preset = getPresetForQuote(quoteId);
   
   useEffect(() => {
@@ -286,8 +303,10 @@ const MathVisual = ({ quoteId, isVisible, onLoad }) => {
     canvas.width = W;
     canvas.height = H;
     
-    // Dark background
-    ctx.fillStyle = '#0a0a0a';
+    // ... (the entire fractal/math rendering logic remains unchanged)
+    
+    // Light background
+    ctx.fillStyle = '#F0EEE6';
     ctx.fillRect(0, 0, W, H);
     
     const { family, params, renderer_hint } = preset;
@@ -333,10 +352,16 @@ const MathVisual = ({ quoteId, isVisible, onLoad }) => {
               }
               
               const idx = 4 * (py * W + px);
-              const [r, g, b] = nicePalette(iter, maxIter);
-              d[idx] = r;
-              d[idx + 1] = g;
-              d[idx + 2] = b;
+              if (iter < maxIter) {
+                const intensity = 240 - Math.floor(100 * (iter / maxIter));
+                d[idx] = intensity;
+                d[idx + 1] = intensity;
+                d[idx + 2] = intensity;
+              } else {
+                d[idx] = 50;
+                d[idx + 1] = 50;
+                d[idx + 2] = 50;
+              }
               d[idx + 3] = 255;
             }
           }
@@ -346,7 +371,7 @@ const MathVisual = ({ quoteId, isVisible, onLoad }) => {
           const steps = Math.min(params.steps || 50000, 80000);
           const discard = params.discard || 1000;
           let x = 0.1, y = 0.0;
-          const imageData = ctx.createImageData(W, H);
+          const imageData = ctx.getImageData(0, 0, W, H);
           const data = imageData.data;
           const bounds = [-3, 3, -3, 3];
           
@@ -357,10 +382,10 @@ const MathVisual = ({ quoteId, isVisible, onLoad }) => {
             const py = Math.round((1 - sy) * (H - 1));
             if (px >= 0 && px < W && py >= 0 && py < H) {
               const idx = 4 * (py * W + px);
-              const v = 160;
-              data[idx] = Math.min(255, data[idx] + v);
-              data[idx + 1] = Math.min(255, data[idx + 1] + v);
-              data[idx + 2] = Math.min(255, data[idx + 2] + v);
+              const v = 30;
+              data[idx] = Math.max(0, data[idx] - v);
+              data[idx + 1] = Math.max(0, data[idx + 1] - v);
+              data[idx + 2] = Math.max(0, data[idx + 2] - v);
               data[idx + 3] = 255;
             }
           };
@@ -398,7 +423,7 @@ const MathVisual = ({ quoteId, isVisible, onLoad }) => {
           const dt = params.dt || 0.01;
           let [x, y, z] = params.xyz0 || [0.1, 0, 0];
           const bounds = [-30, 30, -30, 30];
-          ctx.strokeStyle = '#ffffff';
+          ctx.strokeStyle = 'rgba(50, 50, 50, 0.4)';
           ctx.lineWidth = 0.8;
           ctx.beginPath();
           
@@ -442,7 +467,7 @@ const MathVisual = ({ quoteId, isVisible, onLoad }) => {
           ctx.stroke();
         } else if (type === 'parametric_2d') {
           // Render Lissajous and Spirograph curves
-          ctx.strokeStyle = '#ffffff';
+          ctx.strokeStyle = 'rgba(50, 50, 50, 0.4)';
           ctx.lineWidth = 1.0;
           ctx.beginPath();
           const N = params.samples || 3000;
@@ -475,7 +500,7 @@ const MathVisual = ({ quoteId, isVisible, onLoad }) => {
           ctx.stroke();
         } else if (type === 'polar_2d') {
           // Render Superformula and Rose curves
-          ctx.strokeStyle = '#ffffff';
+          ctx.strokeStyle = 'rgba(50, 50, 50, 0.4)';
           ctx.lineWidth = 1.0;
           ctx.beginPath();
           const N = params.samples || 2000;
@@ -516,7 +541,7 @@ const MathVisual = ({ quoteId, isVisible, onLoad }) => {
           // Render Phyllotaxis patterns
           const n = Math.min(params.n_points || 1500, 3000);
           const ang = (params.divergence_deg || 137.507) * Math.PI / 180;
-          ctx.fillStyle = '#d1fae5';
+          ctx.fillStyle = 'rgba(50, 50, 50, 0.4)';
           for (let i = 0; i < n; i++) {
             const r = (params.scale || 0.7) * Math.sqrt(i) / Math.sqrt(n);
             const t = i * ang;
@@ -544,11 +569,11 @@ const MathVisual = ({ quoteId, isVisible, onLoad }) => {
                 v += Math.cos((kx * x + ky * y) * kmag * Math.PI + (ph[i] || 0));
               }
               v /= ks.length;
-              const c = Math.round(255 * (v * 0.5 + 0.5));
+              const intensity = 240 - Math.floor(190 * (v * 0.5 + 0.5));
               const idx = 4 * (py * W + px);
-              d[idx] = c;
-              d[idx + 1] = c;
-              d[idx + 2] = c;
+              d[idx] = intensity;
+              d[idx + 1] = intensity;
+              d[idx + 2] = intensity;
               d[idx + 3] = 255;
             }
           }
@@ -557,7 +582,7 @@ const MathVisual = ({ quoteId, isVisible, onLoad }) => {
           // Render Iterated Function Systems (Barnsley fern, etc.)
           const points = Math.min(params.points || 30000, 50000);
           let x = 0, y = 0;
-          ctx.fillStyle = '#90ee90';
+          ctx.fillStyle = 'rgba(50, 50, 50, 0.4)';
           const bounds = [-3, 3, -6, 1];
           
           for (let i = 0; i < points; i++) {
@@ -637,17 +662,19 @@ const MathVisual = ({ quoteId, isVisible, onLoad }) => {
               
               const idx = 4 * (py * W + px);
               if (!converged) {
-                d[idx] = d[idx + 1] = d[idx + 2] = 0;
+                d[idx] = 240;
+                d[idx+1] = 238;
+                d[idx+2] = 230;
                 d[idx + 3] = 255;
                 continue;
               }
               
               const ang = (Math.atan2(y, x) + 2 * Math.PI) % (2 * Math.PI);
               const hue = 360 * (ang / (2 * Math.PI));
-              const [r, g, b] = hslToRgb(hue, 0.7, 0.55);
-              d[idx] = r;
-              d[idx + 1] = g;
-              d[idx + 2] = b;
+              const intensity = 240 - Math.floor(190 * (k / maxIter));
+              d[idx] = intensity;
+              d[idx + 1] = intensity;
+              d[idx + 2] = intensity;
               d[idx + 3] = 255;
             }
           }

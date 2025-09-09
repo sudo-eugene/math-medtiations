@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // Themes: giving without expectation, endless abundance, natural success
 // Visualization: A form that continuously gives and receives, showing the cycle of natural abundance
 
-const ZoomedParticleAnimation: React.FC = () => {
+const ZoomedParticleAnimation: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
   useEffect(() => {
@@ -16,14 +17,8 @@ const ZoomedParticleAnimation: React.FC = () => {
     let animationFrameId: number;
     let time = 0;
    
-    // Set canvas size
-    const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerWidth; // Make it square
-    };
-    
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+    canvas.width = width;
+    canvas.height = height;
     
     // Determine if container is small
     const isSmallContainer = canvas.width < 440;
@@ -238,22 +233,15 @@ const ZoomedParticleAnimation: React.FC = () => {
     
     return () => {
       cancelAnimationFrame(animationFrameId);
-      animationFrameId = null;
-      window.removeEventListener('resize', resizeCanvas);
-      
-      if (canvas && ctx) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-      }
-      
-      particles.length = 0;
-      time = 0;
     };
-  }, []);
+  }, [width, height]);
   
   return (
     <canvas 
       ref={canvasRef}
-      style={{ width: '100%', height: 'auto', background: '#F0EEE6' }}
+      width={width}
+      height={height}
+      style={{ background: '#F0EEE6' }}
     />
   );
 };

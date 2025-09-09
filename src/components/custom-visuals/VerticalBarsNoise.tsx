@@ -1,9 +1,10 @@
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // Themes: power of softness, water's way, universal truth
 // Visualization: Bars that yield and flow like water, demonstrating how gentleness overcomes the rigid
 
-const VerticalBarsNoise = () => {
+const VerticalBarsNoise: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
   const timeRef = useRef(0);
   const animationFrameId = useRef(null);
@@ -22,8 +23,8 @@ const VerticalBarsNoise = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    canvas.width = 550;
-    canvas.height = 550;
+    canvas.width = width;
+    canvas.height = height;
     
     const numLines = 50;
     const lineSpacing = canvas.height / numLines;
@@ -71,20 +72,13 @@ const VerticalBarsNoise = () => {
     return () => {
       if (animationFrameId.current) {
         cancelAnimationFrame(animationFrameId.current);
-        animationFrameId.current = null;
       }
-      
-      if (canvas && ctx) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-      }
-      
-      timeRef.current = 0;
     };
-  }, []);
+  }, [width, height]);
 
   return (
-    <div style={{ width: '550px', height: '550px', backgroundColor: '#F0EEE6' }}>
-      <canvas ref={canvasRef} style={{ display: 'block' }} />
+    <div style={{ width: `${width}px`, height: `${height}px`, backgroundColor: '#F0EEE6' }}>
+      <canvas ref={canvasRef} width={width} height={height} style={{ display: 'block' }} />
     </div>
   );
 };

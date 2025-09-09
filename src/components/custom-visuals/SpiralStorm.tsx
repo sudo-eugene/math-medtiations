@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 import * as THREE from 'three';
 
 // Themes: yielding to overcome, softness over hardness, finding strength in adaptability
@@ -10,16 +11,16 @@ const metadata = {
   promptSuggestion: "1. Adjust particle count\n2. Change spiral tightness\n3. Modify particle speed\n4. Alter color palette\n5. Add more turbulence"
 };
 
-const SpiralStorm: React.FC = () => {
+const SpiralStorm: React.FC<VisualProps> = ({ width, height }) => {
   const mountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!mountRef.current) return;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, mountRef.current.clientWidth / mountRef.current.clientHeight, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
+    renderer.setSize(width, height);
     renderer.setClearColor(0xF0EEE6);
     mountRef.current.appendChild(renderer.domElement);
 
@@ -49,7 +50,9 @@ const SpiralStorm: React.FC = () => {
     camera.position.z = 10;
 
     let time = 0;
+    let animationFrameId: number;
     const animate = () => {
+      animationFrameId = requestAnimationFrame(animate);
       time += 0.01;
       const positions = particleSystem.geometry.attributes.position.array as Float32Array;
 
@@ -65,30 +68,21 @@ const SpiralStorm: React.FC = () => {
 
       particleSystem.geometry.attributes.position.needsUpdate = true;
       renderer.render(scene, camera);
-      requestAnimationFrame(animate);
     };
 
     animate();
 
-    const handleResize = () => {
-      if (!mountRef.current) return;
-      camera.aspect = mountRef.current.clientWidth / mountRef.current.clientHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
-    };
-
-    window.addEventListener('resize', handleResize);
 
     return () => {
-      window.removeEventListener('resize', handleResize);
+      cancelAnimationFrame(animationFrameId);
       if (mountRef.current) {
         mountRef.current.removeChild(renderer.domElement);
       }
+      renderer.dispose();
     };
-  }, []);
+  }, [width, height]);
 
-  return <div ref={mountRef} style={{ width: '100%', height: '100%' }} />;
+  return <div ref={mountRef} style={{ width: `${width}px`, height: `${height}px` }} />;
 };
 
-SpiralStorm.metadata = metadata;
 export default SpiralStorm;

@@ -1,15 +1,13 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // Themes: contentment in simplicity, community wisdom, natural satisfaction
 // Visualization: Circles that create complex patterns through simple overlapping, showing beauty in basic forms
 
-const MoireSixCircles = () => {
-  const containerRef = useRef(null);
+const MoireSixCircles: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
   
   useEffect(() => {
-    if (!containerRef.current) return;
-    const container = containerRef.current;
     const canvas = canvasRef.current;
     if (!canvas) return;
     
@@ -17,8 +15,8 @@ const MoireSixCircles = () => {
     if (!ctx) return;
     
     // Set initial size
-    canvas.width = 550;
-    canvas.height = 550;
+    canvas.width = width;
+    canvas.height = height;
     
     const drawPattern = (time = 0) => {
       ctx.fillStyle = '#F0EEE6';
@@ -85,35 +83,14 @@ const MoireSixCircles = () => {
     
     animate();
     
-    // Handle resize
-    const handleResize = () => {
-      const { width, height } = container.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
-      
-      // Update canvas size
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
-      
-      // Scale context
-      ctx.scale(dpr, dpr);
-      
-      // Update canvas style
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
-    };
-    
-    window.addEventListener('resize', handleResize);
-    
     // Cleanup
     return () => {
-      window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(animationFrameId);
     };
-  }, []);
+  }, [width, height]);
   
   return (
     <div 
-      ref={containerRef}
       style={{ 
         margin: 0,
         background: '#F0EEE6',
@@ -121,17 +98,19 @@ const MoireSixCircles = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        height: '100%',
-        width: '100%',
+        height: `${height}px`,
+        width: `${width}px`,
         position: 'relative'
       }}
     >
       <canvas 
         ref={canvasRef} 
+        width={width}
+        height={height}
         style={{ 
           display: 'block',
-          width: '100%',
-          height: '100%'
+          width: `${width}px`,
+          height: `${height}px`
         }} 
       />
     </div>

@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // themes: connection to source, universal harmony, inexhaustible use
 // visualization: Patterns emerge endlessly from source, finding harmony in constant transformation
 
 const patterns = {
   // Pattern finding harmony in connection to source
-  balance: (x, y, t) => {
-    const cx = 30;
-    const cy = 15;
+  balance: (x, y, t, cx, cy) => {
+
     const dx = x - cx;
     const dy = y - cy;
     const dist = Math.sqrt(dx * dx + dy * dy);
@@ -16,17 +16,16 @@ const patterns = {
            Math.sin(dist * 0.1 - t * 0.4);
   },
   
-  duality: (x, y, t) => {
-    const cx = 30;
+  duality: (x, y, t, cx, cy) => {
     const left = x < cx ? Math.sin(x * 0.2 + t * 0.3) : 0;
     const right = x >= cx ? Math.cos(x * 0.2 - t * 0.3) : 0;
     
     return left + right + Math.sin(y * 0.3 + t * 0.2);
   },
   
-  flow: (x, y, t) => {
-    const angle = Math.atan2(y - 15, x - 30);
-    const dist = Math.sqrt((x - 30) ** 2 + (y - 15) ** 2);
+  flow: (x, y, t, cx, cy) => {
+    const angle = Math.atan2(y - cy, x - cx);
+    const dist = Math.sqrt((x - cx) ** 2 + (y - cy) ** 2);
     
     return Math.sin(angle * 3 + t * 0.4) * Math.cos(dist * 0.1 - t * 0.3);
   },
@@ -40,7 +39,7 @@ const patterns = {
   }
 };
 
-const BlackWhiteBlobs = () => {
+const BlackWhiteBlobs: React.FC<VisualProps> = ({ width: containerWidth, height: containerHeight }) => {
   const [frame, setFrame] = useState(0);
   const [patternType, setPatternType] = useState(0);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -48,14 +47,18 @@ const BlackWhiteBlobs = () => {
   const containerRef = useRef(null);
   
   const patternTypes = ['balance', 'duality', 'flow', 'chaos'];
-  const width = 60;
-  const height = 35;
+  const fontSize = 12;
+  const charWidth = fontSize * 0.7;
+  const charHeight = fontSize * 1.2;
+  const width = Math.floor(containerWidth / charWidth);
+  const height = Math.floor(containerHeight / charHeight);
   const slowdownFactor = 12; // Quadrupled from original speed of 3
   
   // Background color as specified in requirements
   const BACKGROUND_COLOR = '#F0EEE6';
   
   useEffect(() => {
+    if (!containerWidth || !containerHeight) return;
     let animationId;
     
     const animate = () => {
@@ -74,13 +77,16 @@ const BlackWhiteBlobs = () => {
   
   // Generate inexhaustible variations from universal harmony
   const generateAsciiArt = () => {
+    if (!width || !height) return '';
     const t = (frame * Math.PI) / (60 * slowdownFactor);
+    const centerX = width / 2;
+    const centerY = height / 2;
     const currentPattern = patterns[patternTypes[patternType]];
     let result = '';
     
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
-        let value = currentPattern(x, y, t);
+        let value = currentPattern(x, y, t, centerX, centerY);
         
         if (mouseDown && containerRef.current) {
           const rect = containerRef.current.getBoundingClientRect();
@@ -137,7 +143,8 @@ const BlackWhiteBlobs = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        height: '100%'
+        width: `${containerWidth}px`,
+        height: `${containerHeight}px`
       }}
       onMouseMove={handleMouseMove}
       onMouseDown={handleMouseDown}

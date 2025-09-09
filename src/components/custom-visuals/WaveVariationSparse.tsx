@@ -1,16 +1,16 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // themes: source does nothing, natural development, peace through tranquility
 // visualization: Waves emerge naturally from an unmoving center, finding peace in their flow
 
-const WaveInterferenceV5 = () => {
+const WaveVariationSparse: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    const width = 550;
-    const height = 550;
+    if (!ctx) return;
     canvas.width = width;
     canvas.height = height;
 
@@ -208,20 +208,11 @@ const WaveInterferenceV5 = () => {
     animationFrameId = requestAnimationFrame(animate);
 
     return () => {
-      // Cancel the animation frame
       if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
       }
-      
-      // Clear main canvas
-      if (ctx) {
-        ctx.clearRect(0, 0, width, height);
-      }
-      
-      // Clear arrays to prevent memory leaks
-      sources.length = 0;
     };
-  }, []);
+  }, [width, height]);
 
   return (
     <div style={{ 
@@ -231,29 +222,12 @@ const WaveInterferenceV5 = () => {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      height: '100%',
-      width: '100%'
+      height: `${height}px`,
+      width: `${width}px`
     }}>
-      <div style={{
-        padding: '30px',
-        position: 'relative',
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
-        <canvas 
-          ref={canvasRef} 
-          style={{ 
-            display: 'block',
-            width: '550px',
-            height: '550px'
-          }} 
-        />
-      </div>
+      <canvas ref={canvasRef} width={width} height={height} />
     </div>
   );
 };
 
-export default WaveInterferenceV5;
+export default WaveVariationSparse;

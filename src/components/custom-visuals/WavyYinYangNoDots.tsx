@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // themes: present awareness, leading without control, doing without expectation
 // visualization: A meditative circle that breathes and flows while remaining centered in stillness
 
-const WavyYinYangNoDots = () => {
+const WavyYinYangNoDots: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
   const animationFrameRef = useRef(null);
 
@@ -12,8 +13,8 @@ const WavyYinYangNoDots = () => {
     if (!canvas) return;
     
     const ctx = canvas.getContext('2d');
-    const width = canvas.width;
-    const height = canvas.height;
+    canvas.width = width;
+    canvas.height = height;
     const centerX = width / 2;
     const centerY = height / 2;
     const maxRadius = width * 0.45;
@@ -64,11 +65,11 @@ const WavyYinYangNoDots = () => {
         cancelAnimationFrame(animationFrameRef.current);
       }
     }
-  }, []);
+  }, [width, height]);
   
   return (
-    <div style={{ width: '550px', height: '550px', backgroundColor: '#F0EEE6' }}>
-      <canvas ref={canvasRef} width="550" height="550" />
+    <div style={{ width: `${width}px`, height: `${height}px`, backgroundColor: '#F0EEE6' }}>
+      <canvas ref={canvasRef} width={width} height={height} />
     </div>
   );
 };

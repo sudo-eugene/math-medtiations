@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // themes: inexhaustible source, smoothing complexity, effortless flow
 // visualization: Vertical patterns that endlessly transform, showing how complexity resolves into fluid motion
 
-const ScrollingVerticalBars = () => {
+const ScrollingVerticalBars: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
   const scrollPositionRef = useRef(0);
   const animationFrameId = useRef(null);
@@ -15,8 +16,8 @@ const ScrollingVerticalBars = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    canvas.width = 550;
-    canvas.height = 550;
+    canvas.width = width;
+    canvas.height = height;
     
     const numLines = 60;
     const lineSpacing = canvas.width / numLines;
@@ -88,28 +89,15 @@ const ScrollingVerticalBars = () => {
     animate();
     
     return () => {
-      
       if (animationFrameId.current) {
         cancelAnimationFrame(animationFrameId.current);
-        animationFrameId.current = null;
       }
-      
-      if (ctx) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-      }
-      
-      if (canvas) {
-        canvas.width = 0;
-        canvas.height = 0;
-      }
-      
-      scrollPositionRef.current = 0;
     };
-  }, []);
+  }, [width, height]);
 
   return (
-    <div style={{ width: '550px', height: '550px', backgroundColor: '#F0EEE6' }}>
-      <canvas ref={canvasRef} style={{ display: 'block' }} />
+    <div style={{ width: `${width}px`, height: `${height}px`, backgroundColor: '#F0EEE6' }}>
+      <canvas ref={canvasRef} width={width} height={height} style={{ display: 'block' }} />
     </div>
   );
 };

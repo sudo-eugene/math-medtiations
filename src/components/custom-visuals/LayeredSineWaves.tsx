@@ -1,16 +1,18 @@
 import { useRef, useEffect } from 'react';
+import { VisualProps } from '../../types';
 
 // themes: the formless and intangible, merging into oneness, return to nothingness
 // visualization: Waves of varying opacity merge and dissolve, revealing the formless nature beneath form
 
-const LayeredSineWaves = () => {
+const LayeredSineWaves: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
   
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    const width = canvas.width;
-    const height = canvas.height;
+    if (!ctx) return;
+    canvas.width = width;
+    canvas.height = height;
     
     // Parameters
     const layers = 80;
@@ -101,14 +103,17 @@ const LayeredSineWaves = () => {
         cancelAnimationFrame(animationId);
       }
     };
-  }, []);
+  }, [width, height]);
   
   return (
-    <div className="flex justify-center items-center h-full w-full bg-[#F0EEE6]">
+    <div 
+      className="flex justify-center items-center bg-[#F0EEE6]"
+      style={{ width: `${width}px`, height: `${height}px` }}
+    >
       <canvas 
         ref={canvasRef} 
-        width={550} 
-        height={550} 
+        width={width} 
+        height={height} 
         className="shadow-lg"
       />
     </div>

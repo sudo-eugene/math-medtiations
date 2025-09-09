@@ -1,16 +1,16 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // themes: profound watchfulness, remaining still, presence in the moment
 // visualization: Waves ripple outward from still points, creating patterns of watchful awareness
 
-const WaveInterferenceV6 = () => {
+const WaveInterferenceV6: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    const width = 550;
-    const height = 550;
+    if (!ctx) return;
     canvas.width = width;
     canvas.height = height;
 
@@ -109,23 +109,21 @@ const WaveInterferenceV6 = () => {
         offscreenCanvas.height = 0;
       }
     };
-  }, []);
+  }, [width, height]);
 
   return (
     <div style={{ 
       display: 'flex', 
       justifyContent: 'center', 
       alignItems: 'center',
-      width: '100%', 
-      height: '100%', 
+      width: `${width}px`, 
+      height: `${height}px`, 
       backgroundColor: '#F0EEE6' 
     }}>
       <canvas 
         ref={canvasRef} 
-        style={{ 
-          width: '550px',
-          height: '550px'
-        }} 
+        width={width}
+        height={height}
       />
     </div>
   );

@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // themes: yielding overcomes, emptying brings fullness, non-attachment leads to strength
 // visualization: A vessel that disperses when touched, finding strength through yielding
 
-const Dispersing3DVase = () => {
+const Dispersing3DVase: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
       const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const mouseRef = useRef({ x: 0, y: 0 });
@@ -13,8 +14,9 @@ const Dispersing3DVase = () => {
     if (!canvas) return;
     
     const ctx = canvas.getContext('2d');
-    canvas.width = 550;
-    canvas.height = 550;
+    if (!ctx) return;
+    canvas.width = width;
+    canvas.height = height;
     
     let time = 0;
     let nodes = [];
@@ -87,7 +89,8 @@ const Dispersing3DVase = () => {
     canvas.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('resize', handleWindowResize);
     
-    function project3DPoint(x, y, z, rotationX) {
+        function project3DPoint(x, y, z, rotationX) {
+      if (!canvas) return { x: 0, y: 0, z: 0, scale: 1 };
       // 3D rotation around X axis
       const rotatedY = y * Math.cos(rotationX) - z * Math.sin(rotationX);
       const rotatedZ = y * Math.sin(rotationX) + z * Math.cos(rotationX);
@@ -235,16 +238,19 @@ const Dispersing3DVase = () => {
       nodes.length = 0;
       mouseRef.current = null;
     };
-  }, []);
+  }, [width, height]);
   
   return (
-    <div className="flex items-center justify-center w-full h-full">
-      <div className="w-[550px] h-[550px] shadow-lg rounded-lg overflow-hidden">
-        <canvas 
-          ref={canvasRef} 
-          className="w-full h-full cursor-pointer"
-        />
-      </div>
+    <div 
+      className="flex items-center justify-center shadow-lg rounded-lg overflow-hidden"
+      style={{ width: `${width}px`, height: `${height}px` }}
+    >
+      <canvas 
+        ref={canvasRef} 
+        width={width} 
+        height={height} 
+        className="w-full h-full cursor-pointer"
+      />
     </div>
   );
 };

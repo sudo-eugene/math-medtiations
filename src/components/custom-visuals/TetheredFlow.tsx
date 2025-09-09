@@ -1,16 +1,19 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // themes: quiet stillness, freedom from expectation, nourished by source
 // visualization: Nodes flow freely while remaining connected to their source, finding peace in stillness
 
-const TetheredFlow = () => {
+const TetheredFlow: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const width = canvas.width;
-    const height = canvas.height;
+    if (!ctx) return;
+    canvas.width = width;
+    canvas.height = height;
     
     let time = 0;
     let animationFrame;
@@ -375,25 +378,16 @@ const TetheredFlow = () => {
     
     // Cleanup
     return () => {
-      cancelAnimationFrame(animationFrame);
-      
-      // Clear all arrays and objects to prevent memory leaks
-      nodes.length = 0;
-      flowingPaths.length = 0;
-      
-      // Clear canvas context
-      if (ctx) {
-        ctx.clearRect(0, 0, width, height);
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
       }
     };
-  }, []);
+  }, [width, height]);
 
   return (
     <div style={{ 
-      top: 0, 
-      left: 0, 
-      width: '100%', 
-      height: '100%', 
+      width: `${width}px`, 
+      height: `${height}px`, 
       backgroundColor: '#F0EEE6',
       display: 'flex',
       justifyContent: 'center',
@@ -401,8 +395,8 @@ const TetheredFlow = () => {
     }}>
       <canvas 
         ref={canvasRef} 
-        width={800} 
-        height={600} 
+        width={width} 
+        height={height} 
       />
     </div>
   );

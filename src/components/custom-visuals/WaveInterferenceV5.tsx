@@ -1,16 +1,16 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // themes: source does nothing, natural development, peace through tranquility
 // visualization: Waves emerge naturally from an unmoving center, finding peace in their flow
 
-const WaveInterferenceV5 = () => {
+const WaveInterferenceV5: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    const width = 550;
-    const height = 550;
+    if (!ctx) return;
     canvas.width = width;
     canvas.height = height;
 
@@ -213,7 +213,7 @@ const WaveInterferenceV5 = () => {
         cancelAnimationFrame(animationFrameId);
       }
     };
-  }, []);
+  }, [width, height]);
 
   return (
     <div style={{ 
@@ -223,10 +223,10 @@ const WaveInterferenceV5 = () => {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      height: '100%',
-      width: '100%'
+      height: `${height}px`,
+      width: `${width}px`
     }}>
-      <canvas ref={canvasRef} />
+      <canvas ref={canvasRef} width={width} height={height} />
     </div>
   );
 };

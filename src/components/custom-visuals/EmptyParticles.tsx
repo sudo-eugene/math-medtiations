@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useCallback } from 'react'
+import React, { useEffect, useRef, useCallback } from 'react';
+import { VisualProps } from '../../types';
 import * as THREE from 'three'
 
-const EmptyParticles = ({ count = 45000 }) => {
+const EmptyParticles: React.FC<VisualProps & { count?: number }> = ({ width, height, count = 45000 }) => {
   const mountRef = useRef(null)
   const animationRef = useRef(null)
   const sceneRef = useRef(null)
@@ -17,9 +18,7 @@ const EmptyParticles = ({ count = 45000 }) => {
     if (!mountRef.current) return
     
     // Get container dimensions
-    const container = mountRef.current
-    const width = container.clientWidth
-    const height = container.clientHeight
+    const container = mountRef.current;
     
     const scene = new THREE.Scene()
     sceneRef.current = scene
@@ -190,8 +189,6 @@ const EmptyParticles = ({ count = 45000 }) => {
         if (!mountRef.current) return
         
         const container = mountRef.current
-        const width = container.clientWidth
-        const height = container.clientHeight
         
         camera.aspect = width / height
         camera.updateProjectionMatrix()
@@ -262,13 +259,13 @@ const EmptyParticles = ({ count = 45000 }) => {
       cameraRef.current = null;
       pointsRef.current = null;
     }
-  }, [count])
+  }, [width, height, count])
   
-  return <div ref={mountRef} style={{ width: '100%', height: '100%' }} />
+  return <div ref={mountRef} style={{ width: `${width}px`, height: `${height}px` }} />
 }
 
-const ParticleVessel = () => {
-  return <EmptyParticles />
+const ParticleVessel: React.FC<VisualProps> = ({ width, height }) => {
+  return <EmptyParticles width={width} height={height} />
 }
 
 const metadata = {

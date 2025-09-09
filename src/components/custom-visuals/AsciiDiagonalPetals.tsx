@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // Themes: creation from unity, harmony of opposites, cyclical emergence
 // Visualization: ASCII patterns emerging from simple elements combining and recombining
@@ -12,15 +13,16 @@ const metadata = {
 // The One manifests through these three forms
 const CHARS = '/\\|'
 
-// The space in which the many emerge
-const GRID_SIZE = 90
 
-const AsciiDiagonalPetals: React.FC = () => {
+const AsciiDiagonalPetals: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    canvas.width = width;
+    canvas.height = height;
 
     const ctx = canvas.getContext('2d')
     if (!ctx) return
@@ -29,9 +31,10 @@ const AsciiDiagonalPetals: React.FC = () => {
     let animationFrameId: number | null = null
 
     // Calculate grid dimensions based on canvas
-    const cellSize = 15
-    const charWidth = cellSize * 0.7
-    const charHeight = cellSize
+    const cellSize = 15;
+    const GRID_SIZE = Math.floor(Math.min(width, height) / cellSize);
+    const charWidth = cellSize * 0.7;
+    const charHeight = cellSize;
 
     // Animation loop
     const animate = () => {
@@ -100,7 +103,7 @@ const AsciiDiagonalPetals: React.FC = () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height)
       }
     }
-  }, [])
+  }, [width, height])
 
   return (
     <div style={{ 
@@ -110,13 +113,11 @@ const AsciiDiagonalPetals: React.FC = () => {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      height: '100%',
-      width: '100%'
+      width: `${width}px`,
+      height: `${height}px`
     }}>
       <canvas 
         ref={canvasRef}
-        width={800}
-        height={800}
         style={{
           maxWidth: '100%',
           maxHeight: '100%',

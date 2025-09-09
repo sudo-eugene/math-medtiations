@@ -1,47 +1,29 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // Themes: natural reverence, teaching without teaching, self-trust
 // Visualization: Lines that flow and interweave naturally, showing how patterns emerge without instruction
 
-const GentleWaves = () => {
+const GentleWaves: React.FC<VisualProps> = ({ width, height }) => {
     const canvasRef = useRef(null);
     const requestIdRef = useRef(null);
-    const [dimensions, setDimensions] = useState({ width: 500, height: 500 });
     const particles = useRef([]);
     const time = useRef(0);
   
-    // Initialize canvas and handle resizing
-    useEffect(() => {
-      const handleResize = () => {
-        if (canvasRef.current) {
-          const canvas = canvasRef.current;
-          // Make canvas fill the viewport
-          const width = window.innerWidth;
-          const height = window.innerHeight;
-          
-          setDimensions({ width, height });
-          canvas.width = width;
-          canvas.height = height;
-        }
-      };
-      
-      handleResize();
-      window.addEventListener('resize', handleResize);
-      
-      return () => {
-        window.removeEventListener('resize', handleResize);
-      };
-    }, []);
-  
     // Animation loop
     useEffect(() => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
       const render = () => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-        
-        const ctx = canvas.getContext('2d');
-        const { width, height } = dimensions;
-        
+        if (!canvasRef.current) return;
+        const ctx = canvasRef.current.getContext('2d');
+        if (!ctx) return;
+
         // Clear canvas with soft background color
         ctx.fillStyle = '#F0EEE6';
         ctx.fillRect(0, 0, width, height);
@@ -186,14 +168,14 @@ const GentleWaves = () => {
         particles.current = [];
         time.current = 0;
       };
-    }, [dimensions]);
+    }, [width, height]);
     
     return (
-      <div className="w-full h-full bg-[#F0EEE6]">
+      <div style={{ width: `${width}px`, height: `${height}px` }} className="bg-[#F0EEE6]">
         <canvas 
           ref={canvasRef} 
-          width={dimensions.width} 
-          height={dimensions.height}
+          width={width} 
+          height={height}
           className="w-full h-full"
         />
       </div>

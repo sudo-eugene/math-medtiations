@@ -1,17 +1,21 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { VisualProps } from '../../types';
 
 // Themes: paradox of wisdom, hidden truth beneath appearances, embracing contradictions
 // Visualization: An ASCII mandala that reveals complex patterns through simple characters, embodying how profound wisdom often appears deceptively simple
 
-const AnimatedAsciiMandala = () => {
+const AnimatedAsciiMandala: React.FC<VisualProps> = ({ width: containerWidth, height: containerHeight }) => {
   const [frame, setFrame] = useState(0);
   const [asciiGrid, setAsciiGrid] = useState([]);
   const requestRef = useRef();
   const mountedRef = useRef(true);
   
   // The path into light begins with simple forms
-  const width = 80;  // Characters across
-  const height = 44; // Characters down
+  const fontSize = 12;
+  const charWidth = fontSize * 0.7; // Approximate character width
+  const charHeight = fontSize * 1.2; // Approximate character height
+  const width = Math.floor(containerWidth / charWidth);
+  const height = Math.floor(containerHeight / charHeight);
   const density = '.·•○●'; // From emptiness to fullness
   
   // Initialize grid on component mount
@@ -190,17 +194,16 @@ const AnimatedAsciiMandala = () => {
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
-      width: '550px',
-      height: '550px',
+      width: `${containerWidth}px`,
+      height: `${containerHeight}px`,
       backgroundColor: '#F0EEE6',
       overflow: 'hidden',
-      padding: '10px',
       borderRadius: '8px',
       boxShadow: 'inset 0 0 10px rgba(0,0,0,0.05)'
     }}>
       <pre style={{
         fontFamily: 'monospace',
-        fontSize: '12px',
+        fontSize: `${fontSize}px`,
         lineHeight: '1.2em',
         letterSpacing: '0.1em',
         textAlign: 'center',

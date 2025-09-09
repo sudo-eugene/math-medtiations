@@ -1,28 +1,20 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // Themes: universal trust, childlike openness, merging with collective wisdom
 // Visualization: A sacred geometry pattern that shows how individual circles merge into a unified whole, representing the harmony of trust and openness
 
-const FlowerOfLife = () => {
+const FlowerOfLife: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
   
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const container = canvas.parentElement;
     const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-    const resizeCanvas = () => {
-      const size = Math.min(container.clientWidth, container.clientHeight);
-      if (canvas.width !== size || canvas.height !== size) {
-        canvas.width = size;
-        canvas.height = size;
-        return true; // Resized
-      }
-      return false; // Not resized
-    };
-
-    resizeCanvas();
+    canvas.width = width;
+    canvas.height = height;
     
     let time = 0;
     
@@ -112,11 +104,14 @@ const FlowerOfLife = () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
       }
     };
-  }, []);
+  }, [width, height]);
   
   return (
-    <div className="w-full h-full flex justify-center items-center" style={{ backgroundColor: '#F0EEE6' }}>
-      <canvas ref={canvasRef} className="max-w-full max-h-full shadow-lg rounded-lg" />
+    <div 
+      className="flex justify-center items-center shadow-lg rounded-lg"
+      style={{ width: `${width}px`, height: `${height}px`, backgroundColor: '#F0EEE6' }}
+    >
+      <canvas ref={canvasRef} width={width} height={height} className="max-w-full max-h-full" />
     </div>
   );
 };

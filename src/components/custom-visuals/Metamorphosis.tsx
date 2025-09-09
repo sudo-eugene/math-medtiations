@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // themes: inner over outer, simplicity over sensation, open heart over thought
 // visualization: A form that transforms from complex to simple, revealing inner essence beneath surface appearance
 
-const Metamorphosis = () => {
+const Metamorphosis: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
   const animationFrameRef = useRef(null);
   
@@ -12,8 +13,9 @@ const Metamorphosis = () => {
     if (!canvas) return;
     
     const ctx = canvas.getContext('2d');
-    const width = canvas.width;
-    const height = canvas.height;
+    if (!ctx) return;
+    canvas.width = width;
+    canvas.height = height;
     
     // Configuration
     const numLines = 120;
@@ -259,11 +261,14 @@ const Metamorphosis = () => {
         ctx.clearRect(0, 0, width, height);
       }
     };
-  }, []);
+  }, [width, height]);
   
   return (
-    <div className="flex items-center justify-center bg-[#F0EEE6] w-full h-full">
-      <canvas ref={canvasRef} width={550} height={550} />
+    <div 
+      className="flex items-center justify-center bg-[#F0EEE6]"
+      style={{ width: `${width}px`, height: `${height}px` }}
+    >
+      <canvas ref={canvasRef} width={width} height={height} />
     </div>
   );
 };

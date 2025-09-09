@@ -1,10 +1,11 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 import * as THREE from 'three';
 
 // Themes: power of softness, entering the void, non-action's effectiveness
 // Visualization: A delicate constellation that appears through empty space, showing how the gentlest connections create the strongest patterns
 
-const PineconeConstellation = () => {
+const PineconeConstellation: React.FC<VisualProps> = ({ width, height }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -15,13 +16,13 @@ const PineconeConstellation = () => {
     scene.background = new THREE.Color('#F0EEE6');
     
     // The space through which we perceive
-    const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
     camera.position.z = 10;
     camera.position.y = 0;
     
     // The bridge between emptiness and form
     const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(550, 550);
+    renderer.setSize(width, height);
     containerRef.current.appendChild(renderer.domElement);
     
     // Create main group
@@ -118,22 +119,9 @@ const PineconeConstellation = () => {
     
     animate();
     
-    // Handle resize
-    const handleResize = () => {
-      if (!containerRef.current) return;
-      const { clientWidth, clientHeight } = containerRef.current;
-      
-      camera.aspect = clientWidth / clientHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(clientWidth, clientHeight);
-    };
-    
-    window.addEventListener('resize', handleResize);
-    handleResize();
 
     // Cleanup function
     return () => {
-      window.removeEventListener('resize', handleResize);
       
       if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
@@ -154,14 +142,14 @@ const PineconeConstellation = () => {
       
       renderer.dispose();
     };
-  }, []);
+  }, [width, height]);
 
   return (
     <div 
       ref={containerRef} 
       style={{ 
-        width: '100%', 
-        height: '100%', 
+        width: `${width}px`, 
+        height: `${height}px`, 
         display: 'flex', 
         justifyContent: 'center', 
         alignItems: 'center' 

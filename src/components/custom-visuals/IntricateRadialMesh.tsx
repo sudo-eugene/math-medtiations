@@ -1,11 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // Themes: true contentment vs. attachment, value of inner wealth, freedom through acceptance
 // Visualization: A radial pattern that finds harmony in simplicity, showing how contentment emerges from accepting what is
 
-const IntricateRadialMesh = () => {
-  const [dimensions, setDimensions] = useState({ width: 600, height: 600 });
-  const { width, height } = dimensions;
+const IntricateRadialMesh: React.FC<VisualProps> = ({ width, height }) => {
   const radius = Math.min(width, height) * 0.25;
   const numRings = 12;
   const numSegments = 36;
@@ -84,7 +83,7 @@ const IntricateRadialMesh = () => {
   }, [width, height, radius]);
 
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+    <div style={{ width: `${width}px`, height: `${height}px`, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <canvas ref={canvasRef} width={width} height={height} />
     </div>
   );

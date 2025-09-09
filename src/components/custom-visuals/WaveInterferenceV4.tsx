@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
+import { VisualProps } from '../../types';
 
 // Themes: harmony in complexity, underlying unity, patterns in chaos
 // Visualization: Multiple wave sources interfering to create complex patterns, revealing the underlying unity that governs them
 
-const WaveInterferenceV4 = () => {
+const WaveInterferenceV4: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -13,8 +14,6 @@ const WaveInterferenceV4 = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const width = 550;
-    const height = 550;
     canvas.width = width;
     canvas.height = height;
 
@@ -25,6 +24,7 @@ const WaveInterferenceV4 = () => {
       { x: width * 0.5, y: height * 0.8, phase: Math.PI / 2 },
     ];
 
+    let animationFrameId: number;
     const draw = () => {
       ctx.fillStyle = '#F0EEE6';
       ctx.fillRect(0, 0, width, height);
@@ -54,16 +54,20 @@ const WaveInterferenceV4 = () => {
       ctx.putImageData(imageData, 0, 0);
 
       time += 0.05;
-      requestAnimationFrame(draw);
+      animationFrameId = requestAnimationFrame(draw);
     };
 
     draw();
 
-  }, []);
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
+
+  }, [width, height]);
 
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <canvas ref={canvasRef} />
+    <div style={{ width: `${width}px`, height: `${height}px`, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <canvas ref={canvasRef} width={width} height={height} />
     </div>
   );
 };
