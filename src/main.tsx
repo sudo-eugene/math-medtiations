@@ -5,6 +5,8 @@ import './index.css';
 import GeometryGallery from '../geometry_web_gallery_500_presets.jsx';
 import BookPage from './components/BookPage.tsx';
 import Root from './components/Root.tsx';
+import PrintableBook from './components/PrintableBook.tsx';
+import Snapshot from './components/Snapshot.tsx';
 
 const router = createBrowserRouter([
   {
@@ -23,7 +25,15 @@ const router = createBrowserRouter([
         path: 'gallery',
         element: <GeometryGallery />,
       },
+      {
+        path: 'print',
+        element: <PrintableBook />,
+      },
     ],
+  },
+  {
+    path: '/snapshot/:quoteId',
+    element: <Snapshot />,
   },
 ]);
 

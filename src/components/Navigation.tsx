@@ -16,6 +16,9 @@ const Navigation = () => {
           <NavLink to="/gallery" className={getLinkClassName}>
             Gallery
           </NavLink>
+          <NavLink to="/print" className={getLinkClassName}>
+            Print
+          </NavLink>
         </nav>
       </div>
     </header>
