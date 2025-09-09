@@ -47,22 +47,15 @@ const PrintableBook = () => {
     setLoading(false);
   };
 
-  // Ensure even page count for binding. 365 days -> 365 quotes. 365*2 = 730 pages. Add a blank spread if odd.
-  const quotesWithEvenPages = [...quotes];
-  if ((quotes.length * 2) % 2 !== 0) {
-    quotesWithEvenPages.push({ id: 'blank', quote: '', author: '' });
-  }
-  // The user's spec says 365 is odd and to add a page. 365 pages is odd. But we have quote+visual, so 365 quotes = 730 pages, which is even.
-  // Let's handle the case of 365 pages total. If we have 365 items, we need to add one.
-  if (quotesWithEvenPages.length % 2 !== 0) {
-      // This logic is tricky. Let's assume one quote per page for a moment.
-      // If we have 365 quotes, we have 365 pages. That's odd. We need 366.
-      // But we have a quote AND a visual. So 365 quotes = 730 pages. That's even.
-      // The user's example adds a quote if quote length is odd. Let's stick to that for now.
-  }
+  // Convert string array to objects with index-based IDs (starting from 1)
+  const quotesWithIds = quotes.map((quote, index) => ({
+    id: index + 1,
+    quote: quote,
+    author: ''
+  }));
 
-  // Let's follow user's example of ensuring quote array is even.
-  const quotesWithBacking = [...quotes];
+  // Ensure even page count for binding
+  const quotesWithBacking = [...quotesWithIds];
   if (quotesWithBacking.length % 2 !== 0) {
     quotesWithBacking.push({ id: 'blank', quote: '', author: '' });
   }
@@ -100,7 +93,7 @@ const PrintableBook = () => {
                       />
                     ) : (
                       <MathVisual 
-                        quoteId={p.id} 
+                        quoteIndex={p.id} 
                         isVisible={true} 
                         onLoad={() => {}}
                       />
