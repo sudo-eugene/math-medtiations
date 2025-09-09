@@ -127,106 +127,106 @@ function useOnScreen(ref) {
   return isIntersecting;
 }
 
-// Map quote ID to a specific mathematical preset... (getPresetForQuote remains the same)
-export function getPresetForQuote(quoteId) {
+// Map quote index to a specific mathematical preset
+export function getPresetForQuote(quoteIndex) {
   const families = [
     'julia', 'mandelbrot', 'newton', 'de_jong', 'clifford', 
     'ikeda', 'gumowski_mira', 'lorenz', 'rossler', 'aizawa', 
     'halvorsen', 'lissajous', 'spirograph', 'superformula', 
     'rose_curve', 'phyllotaxis', 'scalar_field', 'ifs'
   ];
-  const familyIndex = (quoteId - 1) % families.length;
+  const familyIndex = quoteIndex % families.length;
   const family = families[familyIndex];
   
   const familyPresets = geometryPresets.filter(p => p.family === family);
   if (familyPresets.length === 0) return geometryPresets[0];
   
-  const presetIndex = Math.floor((quoteId - 1) / families.length) % familyPresets.length;
+  const presetIndex = Math.floor(quoteIndex / families.length) % familyPresets.length;
   return familyPresets[presetIndex];
 }
 
-// Map quote IDs to custom components... (customVisuals map remains the same)
-export const customVisuals = {
-  1: MoireMandalaPattern,
-  2: FlowerOfLife,
-  3: HankiesInTheWind,
-  4: TessellationPatterns,
-  5: AsciiBinaryFlow,
-  6: ScrollingVerticalBars,
-  7: EmptyParticles,
-  8: ParticleVessel,
-  9: ParticleFlower,
-  10: PineconeDelicate,
-  11: WaterAscii,
-  12: CanyonMultiLayerFlows,
-  13: WavyYinYangNoDots,
-  14: TorusFieldDynamics,
-  15: PhaseDistortionWaves,
-  16: BlackWhiteBlobs,
-  17: ParticleReverie,
-  18: WaveVariationSparse,
-  19: OrganicCellularGrid,
-  20: ZoomedParticleAnimation,
-  21: VerticalBarsNoise,
-  22: TangledLines,
-  23: MoireSixCircles,
-  24: IronFillings,
-  25: WaterFlowingAroundObstacle,
-  26: WaveInterferenceOptimized3,
-  27: GentleWaves,
-  28: OrganicGrowth,
-  29: AsciiClarityFromStillness,
-  30: VoidArchitecture,
-  31: Metamorphosis,
-  32: Artwork33,
-  33: LayeredSineWaves,
-  34: WaveInterferenceV6,
-  35: MorphingContours,
-  36: KaleidoscopeVariation3,
-  37: HashArchitecture,
-  38: VortexParticleSystemExact,
-  39: TetheredFlow,
-  40: KaleidoscopeWaveCenterSquare,
-  41: Dispersing3DVase,
-  42: FibonacciRectangleSpiral,
-  43: SlidingEaseVerticalBars,
-  44: EtherealTorusFlow,
-  45: ParticleCylinder,
-  46: BouncingPointCloud,
-  47: CrystallineBiology,
-  48: Artwork55v1,
-  49: DimensionalResonance,
-  50: ShinyLoop,
-  51: AnimatedAsciiMandala,
-  52: AsciiDiagonalPetals,
-  53: PineconeConstellation,
-  54: IntricateRadialMesh,
-  55: ContinuousLineDrawing,
-  56: DramaticRibbonFold,
-  57: ShellRidgePattern,
-  58: SwayingBranches,
-  59: FlowingRibbons,
-  60: CanyonStratifiedUndulations,
-  61: AsciiBlob,
-  62: RadialGrowth,
-  63: VectorFieldLines,
-  64: OscillatingHatching,
-  65: WaveInterferenceV4,
-  66: BreathingRhombus,
-  67: ImplicitDreams,
-  68: SpiralStorm,
-  69: FlowingLattice,
-  70: Artwork63v2,
-  71: DelicateTorusKnot,
-  72: HourglassSpiral,
-  73: RadialMeshFlower,
-  74: CanyonUndulatingWalls,
-  75: WaveInterferenceV5,
-  76: EffortlessParticles,
-};
+// Map quote indices to custom components (0-based indexing)
+export const customVisuals = [
+  MoireMandalaPattern,
+  FlowerOfLife,
+  HankiesInTheWind,
+  TessellationPatterns,
+  AsciiBinaryFlow,
+  ScrollingVerticalBars,
+  RadialMeshFlower,
+  ParticleVessel,
+  ParticleFlower,
+  PineconeDelicate,
+  WaterAscii,
+  CanyonMultiLayerFlows,
+  WavyYinYangNoDots,
+  TorusFieldDynamics,
+  PhaseDistortionWaves,
+  BlackWhiteBlobs,
+  ParticleReverie,
+  WaveVariationSparse,
+  OrganicCellularGrid,
+  ZoomedParticleAnimation,
+  VerticalBarsNoise,
+  TangledLines,
+  MoireSixCircles,
+  IronFillings,
+  WaterFlowingAroundObstacle,
+  WaveInterferenceOptimized3,
+  GentleWaves,
+  OrganicGrowth,
+  AsciiClarityFromStillness,
+  VoidArchitecture,
+  Metamorphosis,
+  Artwork33,
+  LayeredSineWaves,
+  WaveInterferenceV6,
+  MorphingContours,
+  KaleidoscopeVariation3,
+  HashArchitecture,
+  VortexParticleSystemExact,
+  TetheredFlow,
+  KaleidoscopeWaveCenterSquare,
+  Dispersing3DVase,
+  FibonacciRectangleSpiral,
+  SlidingEaseVerticalBars,
+  EtherealTorusFlow,
+  ParticleCylinder,
+  BouncingPointCloud,
+  CrystallineBiology,
+  Artwork55v1,
+  DimensionalResonance,
+  ShinyLoop,
+  AnimatedAsciiMandala,
+  AsciiDiagonalPetals,
+  PineconeConstellation,
+  IntricateRadialMesh,
+  ContinuousLineDrawing,
+  DramaticRibbonFold,
+  ShellRidgePattern,
+  SwayingBranches,
+  FlowingRibbons,
+  CanyonStratifiedUndulations,
+  AsciiBlob,
+  RadialGrowth,
+  VectorFieldLines,
+  OscillatingHatching,
+  WaveInterferenceV4,
+  BreathingRhombus,
+  ImplicitDreams,
+  SpiralStorm,
+  FlowingLattice,
+  Artwork63v2,
+  DelicateTorusKnot,
+  HourglassSpiral,
+  EmptyParticles,
+  CanyonUndulatingWalls,
+  WaveInterferenceV5,
+  EffortlessParticles,
+];
 
 
-const MathVisual = ({ quoteId, isVisible, onLoad }) => {
+const MathVisual = ({ quoteIndex, isVisible, onLoad }) => {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
   const visible = useOnScreen(containerRef);
@@ -257,7 +257,7 @@ const MathVisual = ({ quoteId, isVisible, onLoad }) => {
   }, []);
   // --- MODIFIED PART ENDS HERE ---
 
-  const CustomVisualComponent = customVisuals[quoteId];
+  const CustomVisualComponent = customVisuals[quoteIndex];
 
   if (CustomVisualComponent) {
     const { width, height } = dimensions; // Destructure dimensions
@@ -288,7 +288,7 @@ const MathVisual = ({ quoteId, isVisible, onLoad }) => {
   
   // The rest of the component (for non-custom visuals) remains largely the same
   // It already uses container.clientWidth and container.clientHeight for sizing
-  const preset = getPresetForQuote(quoteId);
+  const preset = getPresetForQuote(quoteIndex);
   
   useEffect(() => {
     if (!visible || !isVisible || hasRendered) return;
@@ -699,7 +699,7 @@ const MathVisual = ({ quoteId, isVisible, onLoad }) => {
     // Small delay to allow for smooth transitions
     const timer = setTimeout(renderMath, 200);
     return () => clearTimeout(timer);
-  }, [visible, isVisible, hasRendered, preset, quoteId, onLoad]);
+  }, [visible, isVisible, hasRendered, preset, quoteIndex, onLoad]);
   
   return (
     <div ref={containerRef} className="w-full h-full">

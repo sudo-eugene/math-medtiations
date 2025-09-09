@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import quotes from '../../quotes.json';
+import quotes from '../../quotes-easy.json';
 import MathVisual, { customVisuals, devMode, getPresetForQuote } from './MathVisual';
 
 const PrintableBook = () => {
