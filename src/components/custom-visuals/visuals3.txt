@@ -1,0 +1,2122 @@
+import { useEffect, useRef } from 'react';
+
+// Themes: power through humility, leading from below, non-competition
+// Visualization: Waves that influence each other without domination, showing how strength emerges from yielding
+
+const WaveInterferenceOptimized3 = () => {
+  const canvasRef = useRef(null);
+  const animationFrameRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d', { alpha: false });
+    const width = 550;
+    const height = 550;
+    canvas.width = width;
+    canvas.height = height;
+
+    // Optimized resolution
+    const resolution = 5;
+    const rows = Math.floor(height / resolution);
+    const cols = Math.floor(width / resolution);
+    
+    // Begin with a central source that serves all others
+    const sources = [
+      { x: width/2, y: height/2, wavelength: 60, phase: 0, amplitude: 1.5 }, // Gentle influence
+    ];
+    
+    // Each source finds its place in the whole
+    const numRadialSources = 6;  // Balance in relationship
+    const radius = 150;          // Space to unfold
+    for (let i = 0; i < numRadialSources; i++) {
+      const angle = (i / numRadialSources) * Math.PI * 2;
+      sources.push({
+        x: width/2 + Math.cos(angle) * radius,
+        y: height/2 + Math.sin(angle) * radius,
+        wavelength: 50, // Doubled wavelength for slower waves
+        phase: angle,
+        amplitude: 0.8
+      });
+    }
+
+    let time = 0;
+    
+    // Pre-allocate arrays
+    const field = new Float32Array(rows * cols);
+    
+    // Create offscreen canvas for double buffering
+    const bufferCanvas = document.createElement('canvas');
+    bufferCanvas.width = width;
+    bufferCanvas.height = height;
+    const bufferCtx = bufferCanvas.getContext('2d', { alpha: false });
+
+    const animate = () => {
+      // Clear buffer
+      bufferCtx.fillStyle = '#F0EEE6';
+      bufferCtx.fillRect(0, 0, width, height);
+
+      // Calculate interference pattern
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          const x = j * resolution;
+          const y = i * resolution;
+          let amplitude = 0;
+
+          // Optimized source calculation
+          for (let s = 0; s < sources.length; s++) {
+            const source = sources[s];
+            const dx = x - source.x;
+            const dy = y - source.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            // Simplified falloff
+            const falloff = Math.max(0, 1 - distance / 400);
+            amplitude += source.amplitude * falloff * 
+              Math.sin((distance / source.wavelength - time) * 2 * Math.PI + source.phase);
+          }
+
+          field[i * cols + j] = amplitude;
+        }
+      }
+
+      // Optimized contour drawing
+      bufferCtx.strokeStyle = '#333';
+      bufferCtx.lineWidth = 1;
+      bufferCtx.beginPath();
+      
+      // Single contour level for performance
+      const level = 0;
+      
+      for (let i = 0; i < rows - 1; i++) {
+        for (let j = 0; j < cols - 1; j++) {
+          const idx = i * cols + j;
+          const x = j * resolution;
+          const y = i * resolution;
+          
+          // Simplified marching squares (only 4 cases)
+          const v00 = field[idx] > level;
+          const v10 = field[idx + 1] > level;
+          const v11 = field[idx + cols + 1] > level;
+          const v01 = field[idx + cols] > level;
+          
+          if (v00 && !v10) {
+            bufferCtx.moveTo(x + resolution / 2, y);
+            bufferCtx.lineTo(x + resolution, y + resolution / 2);
+          }
+          if (v10 && !v11) {
+            bufferCtx.moveTo(x + resolution, y + resolution / 2);
+            bufferCtx.lineTo(x + resolution / 2, y + resolution);
+          }
+          if (v11 && !v01) {
+            bufferCtx.moveTo(x + resolution / 2, y + resolution);
+            bufferCtx.lineTo(x, y + resolution / 2);
+          }
+          if (v01 && !v00) {
+            bufferCtx.moveTo(x, y + resolution / 2);
+            bufferCtx.lineTo(x + resolution / 2, y);
+          }
+        }
+      }
+      
+      bufferCtx.stroke();
+      
+      // Draw buffer to main canvas
+      ctx.drawImage(bufferCanvas, 0, 0);
+
+      time += 0.000625; // 1/32 speed
+      animationFrameRef.current = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      // Cancel the animation frame
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+      
+      // Clear the canvas
+      if (canvas && ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      
+      // Clear the buffer canvas
+      if (bufferCanvas && bufferCtx) {
+        bufferCtx.clearRect(0, 0, bufferCanvas.width, bufferCanvas.height);
+        bufferCanvas.width = 0; // Force garbage collection
+        bufferCanvas.height = 0;
+      }
+      
+      // Clear arrays
+      field.fill(0);
+    };
+  }, []);
+
+  return (
+    <div style={{ 
+      display: 'flex', 
+      justifyContent: 'center', 
+      alignItems: 'center',
+      width: '100vw', 
+      height: '100vh', 
+      backgroundColor: '#F0EEE6' 
+    }}>
+      <canvas 
+        ref={canvasRef} 
+        style={{ 
+          width: '550px',
+          height: '550px'
+        }} 
+      />
+    </div>
+  );
+};
+
+export default WaveInterferenceOptimized3;
+code
+JavaScript
+download
+content_copy
+expand_less
+IGNORE_WHEN_COPYING_START
+IGNORE_WHEN_COPYING_END
+import { useEffect, useRef, useState } from 'react';
+
+// Themes: natural reverence, teaching without teaching, self-trust
+// Visualization: Lines that flow and interweave naturally, showing how patterns emerge without instruction
+
+const GentleWaves = () => {
+    const canvasRef = useRef(null);
+    const requestIdRef = useRef(null);
+    const [dimensions, setDimensions] = useState({ width: 500, height: 500 });
+    const particles = useRef([]);
+    const time = useRef(0);
+  
+    // Initialize canvas and handle resizing
+    useEffect(() => {
+      const handleResize = () => {
+        if (canvasRef.current) {
+          const canvas = canvasRef.current;
+          // Make canvas fill the viewport
+          const width = window.innerWidth;
+          const height = window.innerHeight;
+          
+          setDimensions({ width, height });
+          canvas.width = width;
+          canvas.height = height;
+        }
+      };
+      
+      handleResize();
+      window.addEventListener('resize', handleResize);
+      
+      return () => {
+        window.removeEventListener('resize', handleResize);
+      };
+    }, []);
+  
+    // Animation loop
+    useEffect(() => {
+      const render = () => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        
+        const ctx = canvas.getContext('2d');
+        const { width, height } = dimensions;
+        
+        // Clear canvas with soft background color
+        ctx.fillStyle = '#F0EEE6';
+        ctx.fillRect(0, 0, width, height);
+        
+        // Update time
+        time.current += 0.005;
+        
+        // The underlying structure reveals itself
+        ctx.strokeStyle = 'rgba(80, 80, 80, 0.033)';
+        ctx.lineWidth = 0.3;
+        
+        // Each line finds its own path
+        for (let y = 0; y < height; y += 40) {
+          const offsetY = 5 * Math.sin(time.current + y * 0.01);  // Natural movement
+          
+          ctx.beginPath();
+          ctx.moveTo(0, y + offsetY);
+          ctx.lineTo(width, y + offsetY);
+          ctx.stroke();
+        }
+        
+        // Vertical lines with subtle wave
+        for (let x = 0; x < width; x += 40) {
+          const offsetX = 5 * Math.sin(time.current + x * 0.01);
+          
+          ctx.beginPath();
+          ctx.moveTo(x + offsetX, 0);
+          ctx.lineTo(x + offsetX, height);
+          ctx.stroke();
+        }
+        
+        // Long horizontal flowing lines - "the formless"
+        const numHorizontalLines = 30;
+        
+        for (let i = 0; i < numHorizontalLines; i++) {
+          const yPos = (i / numHorizontalLines) * height;
+          const amplitude = 40 + 20 * Math.sin(time.current * 0.2 + i * 0.1);
+          const frequency = 0.008 + 0.004 * Math.sin(time.current * 0.1 + i * 0.05);
+          const speed = time.current * (0.5 + 0.3 * Math.sin(i * 0.1));
+          const thickness = 0.8 + 0.6 * Math.sin(time.current + i * 0.2);
+          const opacity = 0.132 + 0.088 * Math.abs(Math.sin(time.current * 0.3 + i * 0.15));
+          
+          ctx.beginPath();
+          ctx.lineWidth = thickness;
+          ctx.strokeStyle = `rgba(60, 60, 60, ${opacity})`;
+          
+          // Draw a flowing line
+          for (let x = 0; x < width; x += 2) {
+            const y = yPos + amplitude * Math.sin(x * frequency + speed);
+            
+            if (x === 0) {
+              ctx.moveTo(x, y);
+            } else {
+              ctx.lineTo(x, y);
+            }
+          }
+          
+          ctx.stroke();
+        }
+        
+        // Long diagonal flowing lines - "crossing patterns"
+        const numDiagonalLines = 35;
+        
+        for (let i = 0; i < numDiagonalLines; i++) {
+          const offset = (i / numDiagonalLines) * width * 2 - width * 0.5;
+          const amplitude = 30 + 20 * Math.cos(time.current * 0.25 + i * 0.1);
+          const frequency = 0.01 + 0.005 * Math.sin(time.current * 0.15 + i * 0.08);
+          const phase = time.current * (0.3 + 0.2 * Math.sin(i * 0.1));
+          const thickness = 0.7 + 0.5 * Math.sin(time.current + i * 0.25);
+          const opacity = 0.11 + 0.077 * Math.abs(Math.sin(time.current * 0.2 + i * 0.1));
+          
+          ctx.beginPath();
+          ctx.lineWidth = thickness;
+          ctx.strokeStyle = `rgba(50, 50, 50, ${opacity})`;
+          
+          // Draw diagonal flowing line
+          const steps = 100;
+          for (let j = 0; j <= steps; j++) {
+            const progress = j / steps;
+            const x = offset + progress * width;
+            const y = progress * height + amplitude * Math.sin(progress * 8 + phase);
+            
+            if (j === 0) {
+              ctx.moveTo(x, y);
+            } else {
+              ctx.lineTo(x, y);
+            }
+          }
+          
+          ctx.stroke();
+        }
+        
+        // Long vertical flowing lines
+        const numVerticalLines = 25;
+        
+        for (let i = 0; i < numVerticalLines; i++) {
+          const xPos = (i / numVerticalLines) * width;
+          const amplitude = 35 + 15 * Math.sin(time.current * 0.15 + i * 0.12);
+          const frequency = 0.009 + 0.004 * Math.cos(time.current * 0.12 + i * 0.07);
+          const speed = time.current * (0.4 + 0.25 * Math.cos(i * 0.15));
+          const thickness = 0.6 + 0.4 * Math.sin(time.current + i * 0.3);
+          const opacity = 0.099 + 0.066 * Math.abs(Math.sin(time.current * 0.25 + i * 0.18));
+          
+          ctx.beginPath();
+          ctx.lineWidth = thickness;
+          ctx.strokeStyle = `rgba(70, 70, 70, ${opacity})`;
+          
+          // Draw a flowing vertical line
+          for (let y = 0; y < height; y += 2) {
+            const x = xPos + amplitude * Math.sin(y * frequency + speed);
+            
+            if (y === 0) {
+              ctx.moveTo(x, y);
+            } else {
+              ctx.lineTo(x, y);
+            }
+          }
+          
+          ctx.stroke();
+        }
+        
+        // Request next frame
+        requestIdRef.current = requestAnimationFrame(render);
+      };
+      
+      render();
+      
+      return () => {
+        if (requestIdRef.current) {
+          cancelAnimationFrame(requestIdRef.current);
+          requestIdRef.current = null;
+        }
+        
+        const canvas = canvasRef.current;
+        if (canvas) {
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+          }
+        }
+        
+        particles.current = [];
+        time.current = 0;
+      };
+    }, [dimensions]);
+    
+    return (
+      <div className="w-full h-full bg-[#F0EEE6]">
+        <canvas 
+          ref={canvasRef} 
+          width={dimensions.width} 
+          height={dimensions.height}
+          className="w-full h-full"
+        />
+      </div>
+    );
+};
+
+export default GentleWaves;
+
+
+import { useEffect, useRef } from 'react';
+
+// Themes: true courage, nature's wisdom, universal net
+// Visualization: A grid that moves with careful balance, showing how strength emerges through wise restraint
+
+const OrganicCellularGrid = () => {
+  const canvasRef = useRef(null);
+  
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    canvas.width = 550;
+    canvas.height = 550;
+    
+    // Time flows with nature's rhythm
+    let time = 0;
+    const cellSize = 50;  // Each cell knows its bounds
+    const cellsX = Math.ceil(canvas.width / cellSize) + 2;   // The net extends
+    const cellsY = Math.ceil(canvas.height / cellSize) + 2;  // in all directions
+    
+    function drawCell(x, y, seed) {
+      // Movement with careful restraint
+      const noise1 = Math.sin(seed * 1.3 + time * 0.25) * 0.2;  // Gentle pulse
+      const noise2 = Math.cos(seed * 0.7 + time * 0.15) * 0.2;  // Steady breath
+      
+      const width = cellSize + noise1 * cellSize * 0.4;
+      const height = cellSize + noise2 * cellSize * 0.4;
+      
+      // Create organic distortion for rectangle
+      const corner1 = {
+        x: x + Math.sin(seed + time) * cellSize * 0.2,
+        y: y + Math.cos(seed + time) * cellSize * 0.2
+      };
+      
+      const corner2 = {
+        x: x + width + Math.sin(seed + 1 + time) * cellSize * 0.2,
+        y: y + Math.cos(seed + 1 + time) * cellSize * 0.2
+      };
+      
+      const corner3 = {
+        x: x + width + Math.sin(seed + 2 + time) * cellSize * 0.2,
+        y: y + height + Math.cos(seed + 2 + time) * cellSize * 0.2
+      };
+      
+      const corner4 = {
+        x: x + Math.sin(seed + 3 + time) * cellSize * 0.2,
+        y: y + height + Math.cos(seed + 3 + time) * cellSize * 0.2
+      };
+      
+      // Create path with rounded corners
+      const roundness = Math.sin(seed + time * 0.5) * cellSize * 0.15 + cellSize * 0.3;
+      
+      ctx.beginPath();
+      
+      // Top-left to top-right
+      ctx.moveTo(corner1.x + roundness, corner1.y);
+      ctx.lineTo(corner2.x - roundness, corner2.y);
+      ctx.quadraticCurveTo(corner2.x, corner2.y, corner2.x, corner2.y + roundness);
+      
+      // Top-right to bottom-right
+      ctx.lineTo(corner3.x, corner3.y - roundness);
+      ctx.quadraticCurveTo(corner3.x, corner3.y, corner3.x - roundness, corner3.y);
+      
+      // Bottom-right to bottom-left
+      ctx.lineTo(corner4.x + roundness, corner4.y);
+      ctx.quadraticCurveTo(corner4.x, corner4.y, corner4.x, corner4.y - roundness);
+      
+      // Bottom-left to top-left
+      ctx.lineTo(corner1.x, corner1.y + roundness);
+      ctx.quadraticCurveTo(corner1.x, corner1.y, corner1.x + roundness, corner1.y);
+      
+      ctx.closePath();
+      
+      ctx.strokeStyle = 'rgba(80, 80, 80, 0.6)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+    
+    let animationFrameId;
+    
+    function animate() {
+      ctx.fillStyle = '#F0EEE6';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      time += 0.0025; // Halved speed for even more subtle movement
+      
+      // Create grid with overlapping cells
+      for (let i = -1; i < cellsX - 1; i++) {
+        for (let j = -1; j < cellsY - 1; j++) {
+          const baseX = i * cellSize - cellSize / 2;
+          const baseY = j * cellSize - cellSize / 2;
+          
+          // Add slight offset based on position and time
+          const offsetX = Math.sin(i * 0.5 + time * 0.5) * cellSize * 0.2;  // Halved speed
+          const offsetY = Math.cos(j * 0.5 + time * 0.5) * cellSize * 0.2;  // Halved speed
+          
+          drawCell(baseX + offsetX, baseY + offsetY, i + j * cellsX + time);
+        }
+      }
+      
+      animationFrameId = requestAnimationFrame(animate);
+    }
+    
+    animate();
+    
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
+      
+      if (canvas && ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    };
+  }, []);
+  
+  return (
+    <div className="flex items-center justify-center w-full h-full" style={{ backgroundColor: '#F0EEE6' }}>
+      <canvas ref={canvasRef} width={550} height={550} className="shadow-lg" />
+    </div>
+  );
+};
+
+export default OrganicCellularGrid;
+code
+JavaScript
+download
+content_copy
+expand_less
+IGNORE_WHEN_COPYING_START
+IGNORE_WHEN_COPYING_END
+import { useEffect, useRef } from 'react';
+
+// Themes: embracing change, freedom from fear, natural timing
+// Visualization: Particles flowing along ever-changing walls, showing how freedom comes from accepting impermanence
+
+const CanyonUndulatingWalls = () => {
+  const canvasRef = useRef(null);
+  const animationFrameRef = useRef(null);
+  
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width = 550;
+    const height = canvas.height = 550;
+    const centerX = width / 2;
+    const centerY = height / 2;
+    
+    // Each particle represents a moment in constant flow
+    const PARTICLE_COUNT = 18000;
+    const particles = [];
+    
+    // Create particles that embrace change
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      // Each finds its own path
+      const side = Math.random() < 0.5 ? -1 : 1;
+      const y = Math.random() * height;
+      
+      // Create sine wave walls with varying thickness
+      const wavePhase = y * 0.01;
+      const waveAmount = Math.sin(wavePhase) * 60 + Math.sin(wavePhase * 3) * 20;
+      const wallThickness = 30 + Math.sin(wavePhase * 2) * 15;
+      
+      const baseX = centerX + side * (60 + waveAmount);
+      const offsetX = (Math.random() - 0.5) * wallThickness;
+      
+      particles.push({
+        x: baseX + offsetX,
+        y: y,
+        z: (Math.random() - 0.5) * 100,
+        side: side,
+        wavePhase: wavePhase,
+        initialY: y,
+        drift: Math.random() * Math.PI * 2,
+        speed: 0.1 + Math.random() * 0.3
+      });
+    }
+    
+    let time = 0;
+    let isRunning = true;
+    let lastTime = 0;
+    const FPS = 15; // Set to 15 frames per second
+    const frameDelay = 1000 / FPS; // milliseconds between frames
+    
+    function animate(currentTime) {
+      if (!isRunning) return;
+      
+      // Calculate time elapsed since last frame
+      if (!lastTime) lastTime = currentTime;
+      const elapsed = currentTime - lastTime;
+      
+      // Only update if enough time has passed for next frame
+      if (elapsed > frameDelay) {
+        // Update time with fixed increment (reduced from 0.016 to 0.008)
+        time += 0.008;
+        lastTime = currentTime;
+        
+        // Gentle clearing for flowing effect
+        ctx.fillStyle = 'rgba(240, 238, 230, 0.06)';
+        ctx.fillRect(0, 0, width, height);
+      
+      particles.forEach(particle => {
+        // Update wave position
+        const currentWavePhase = particle.y * 0.01 + time * 0.1;
+        const waveAmount = Math.sin(currentWavePhase) * 60 + Math.sin(currentWavePhase * 3) * 20;
+        const wallThickness = 30 + Math.sin(currentWavePhase * 2) * 15;
+        
+        // Calculate target X position
+        const targetX = centerX + particle.side * (60 + waveAmount);
+        const offset = (Math.sin(particle.drift + time) - 0.5) * wallThickness;
+        
+        // Smooth movement toward wall position
+        particle.x = particle.x * 0.95 + (targetX + offset) * 0.05;
+        
+        // Vertical movement with slight flow
+        particle.y += particle.speed;
+        
+        // Add depth movement
+        particle.z += Math.sin(time * 0.5 + particle.drift) * 0.3;
+        
+        // Reset particle at bottom
+        if (particle.y > height + 20) {
+          particle.y = -20;
+          particle.drift = Math.random() * Math.PI * 2;
+        }
+        
+        // Draw particle with depth effects
+        const depthFactor = 1 + particle.z * 0.01;
+        const opacity = 0.4 - Math.abs(particle.z) * 0.0025;
+        const size = 0.8 + particle.z * 0.015;
+        
+        if (opacity > 0 && size > 0) {
+          // Create subtle glow for depth
+          ctx.beginPath();
+          ctx.arc(particle.x, particle.y, size * 2, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(51, 51, 51, ${opacity * 0.1})`;
+          ctx.fill();
+          
+          // Main particle
+          ctx.beginPath();
+          ctx.arc(particle.x, particle.y, size, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(51, 51, 51, ${opacity})`;
+          ctx.fill();
+        }
+      });
+      }
+      
+      animationFrameRef.current = requestAnimationFrame(animate);
+    }
+    
+    animate();
+    
+    return () => {
+      isRunning = false;
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+      if (ctx) {
+        ctx.clearRect(0, 0, width, height);
+      }
+      particles.length = 0;
+      time = 0;
+    };
+  }, []);
+  
+  return (
+    <div style={{
+      width: '550px',
+      height: '550px',
+      margin: 'auto',
+      backgroundColor: '#F0EEE6',
+      overflow: 'hidden'
+    }}>
+      <canvas
+        ref={canvasRef}
+        style={{
+          display: 'block',
+          width: '550px',
+          height: '550px'
+        }}
+      />
+    </div>
+  );
+};
+
+export default CanyonUndulatingWalls;
+code
+JavaScript
+download
+content_copy
+expand_less
+IGNORE_WHEN_COPYING_START
+IGNORE_WHEN_COPYING_END
+import { useState, useEffect, useRef } from 'react';
+
+// Themes: freedom from control, trust in people, natural prosperity
+// Visualization: ASCII patterns that emerge from stillness, showing how clarity arises when interference falls away
+
+const AsciiClarityFromStillness = () => {
+  const containerRef = useRef(null);
+  const [mousePos, setMousePos] = useState({ x: 275, y: 275 });
+  const [asciiArt, setAsciiArt] = useState([]);
+  const [time, setTime] = useState(0);
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        setMousePos({
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top
+        });
+      }
+    };
+
+    // Animation control variables
+    let animationFrameId = null;
+    let lastFrameTime = 0;
+    const targetFPS = 60; // Equivalent to 16ms interval
+    const frameInterval = 1000 / targetFPS;
+
+    // Add gentle autonomous movement using requestAnimationFrame
+    const animate = (currentTime) => {
+      animationFrameId = requestAnimationFrame(animate);
+      
+      const deltaTime = currentTime - lastFrameTime;
+      
+      // Only update if enough time has passed
+      if (deltaTime >= frameInterval) {
+        // Calculate remainder to prevent drift
+        const remainder = deltaTime % frameInterval;
+        
+        // Update lastFrameTime with the time that's been processed
+        lastFrameTime = currentTime - remainder;
+        
+        setTime(t => t + 0.008);  // Halved speed
+      }
+    };
+    
+    // Start animation
+    animationFrameId = requestAnimationFrame(animate);
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    // Generate dynamic ASCII art based on mouse position
+    const width = 50;
+    const height = 35;
+    const art = [];
+    const centerX = width / 2;
+    const centerY = height / 2;
+
+    // Characters used for visualization
+    const chars = [' ', '·', '+', '*', '※', '◊', '○', '●'];
+    
+    for (let y = 0; y < height; y++) {
+      let line = '';
+      for (let x = 0; x < width; x++) {
+        // Calculate distance from mouse (centered in canvas)
+        const mouseX = (mousePos.x / 550) * width;
+        const mouseY = (mousePos.y / 550) * height;
+        
+        // Add gentle autonomous movement
+        const autoX = mouseX + Math.sin(time * 0.25) * 2;  // Halved speed
+        const autoY = mouseY + Math.cos(time * 0.15) * 2;  // Halved speed
+        
+        const mouseDist = Math.sqrt(
+          Math.pow(x - autoX, 2) + Math.pow(y - autoY, 2)
+        );
+
+        // Calculate distance from center
+        const centerDist = Math.sqrt(
+          Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2)
+        );
+
+        // Create concentric patterns that respond to mouse
+        const angle = Math.atan2(y - centerY, x - centerX) + Math.PI;
+        const pulse = Math.sin(centerDist * 0.5 - Date.now() * 0.001) * 0.5 + 0.5;  // Halved speed
+        
+        // Blend between stillness at center and movement near mouse
+        const clarity = Math.sin(angle + centerDist * 0.2 + mouseDist * 0.1);
+        
+        // Select character based on intensity
+        let intensity = 0;
+        
+        if (centerDist < 3) {
+          // Center remains still - the point of clarity
+          intensity = 7;
+        } else if (centerDist < 8) {
+          // Inner circle - stable awareness
+          intensity = Math.floor(pulse * 2) + 4;
+        } else {
+          // Outer area - responsive to movement
+          intensity = Math.floor((clarity * 0.5 + 0.5) * 3);
+          if (mouseDist < 10) {
+            intensity += 2;
+          }
+        }
+
+        // Create radial patterns
+        if (Math.abs(Math.floor(centerDist) % 5) < 1) {
+          intensity = Math.min(intensity + 2, 7);
+        }
+
+        line += chars[Math.max(0, Math.min(intensity, chars.length - 1))];
+      }
+      art.push(line);
+    }
+
+    setAsciiArt(art);
+  }, [mousePos, time]);
+
+  return (
+    <div
+      ref={containerRef}
+      style={{
+        width: '550px',
+        height: '550px',
+        backgroundColor: '#F0EEE6',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        fontFamily: 'monospace',
+        fontSize: '12px',
+        lineHeight: '12px',
+        color: '#333333',
+        cursor: 'none',
+        overflow: 'hidden'
+      }}
+    >
+      <pre style={{ margin: 0 }}>
+        {asciiArt.map((line, i) => (
+          <div key={i}>{line}</div>
+        ))}
+      </pre>
+    </div>
+  );
+};
+
+export default AsciiClarityFromStillness;
+code
+JavaScript
+download
+content_copy
+expand_less
+IGNORE_WHEN_COPYING_START
+IGNORE_WHEN_COPYING_END
+import React, { useRef, useEffect, useState } from 'react';
+
+interface Scale {
+  x: number;
+  y: number;
+  angle: number;
+  size: number;
+  targetSize: number;
+  delay: number;
+  reverseDelay: number;
+  birth: number;
+  opacity: number;
+  currentSize?: number;
+  isReversing?: boolean;
+  update(time: number, isReversing: boolean, totalTime: number): void;
+  draw(ctx: CanvasRenderingContext2D): void;
+  isComplete(): boolean;
+  shouldStart(totalTime: number, isReversing: boolean): boolean;
+}
+
+export const OrganicGrowth: React.FC = () => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const animationRef = useRef<number | null>(null);
+  const timeRef = useRef<number>(0);
+  const totalTimeRef = useRef<number>(0);
+  const scalesRef = useRef<Scale[]>([]);
+  const isReversingRef = useRef<boolean>(false);
+  const [dimensions, setDimensions] = useState({ width: window.innerWidth, height: window.innerHeight });
+
+  class ScaleImpl implements Scale {
+    x: number;
+    y: number;
+    angle: number;
+    size: number;
+    targetSize: number;
+    delay: number;
+    reverseDelay: number;
+    birth: number;
+    opacity: number;
+    currentSize: number;
+
+    constructor(x: number, y: number, angle: number, delay: number, index: number, totalScales: number) {
+      this.x = x;
+      this.y = y;
+      this.angle = angle;
+      this.size = 0;
+      this.targetSize = 20;
+      this.delay = delay;
+      // Reverse delay is calculated to maintain the same sequential order, but in reverse order
+      this.reverseDelay = (totalScales - index - 1) * 120; // Reverse the sequence
+      this.birth = 0;
+      this.opacity = 0;
+      this.currentSize = 0;
+    }
+
+    shouldStart(totalTime: number, isReversing: boolean): boolean {
+      const relevantDelay = isReversing ? this.reverseDelay : this.delay;
+      return totalTime > relevantDelay;
+    }
+    
+    update(totalTime: number, isReversing: boolean, time: number) {
+      if (this.shouldStart(totalTime, isReversing)) {
+        const growthRate = 0.005;
+        if (isReversing) {
+          this.birth = Math.max(0, this.birth - growthRate);
+        } else {
+          this.birth = Math.min(Math.PI/2, this.birth + growthRate);
+        }
+        this.size = this.targetSize * Math.sin(this.birth);
+        this.opacity = Math.min(this.birth * 0.5, 1);
+      }
+      
+      // Subtle breathing
+      const breathe = Math.sin(time * 0.0008 + this.delay) * 0.05;
+      this.currentSize = this.size * (1 + breathe);
+    }
+    
+    draw(ctx: CanvasRenderingContext2D) {
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.angle);
+      ctx.globalAlpha = this.opacity * 0.8;
+      
+      ctx.beginPath();
+      ctx.moveTo(0, -this.currentSize/2);
+      ctx.quadraticCurveTo(this.currentSize/2, 0, 0, this.currentSize/2);
+      ctx.quadraticCurveTo(-this.currentSize/2, 0, 0, -this.currentSize/2);
+      ctx.closePath();
+      
+      ctx.strokeStyle = '#2a2a2a';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      
+      // Subtle fill
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.fill();
+      
+      ctx.restore();
+    }
+
+    isComplete(): boolean {
+      return this.birth >= Math.PI/2;
+    }
+  }
+
+  useEffect(() => {
+    const handleResize = () => {
+      const container = canvasRef.current?.parentElement;
+      if (!container) return;
+      
+      const containerWidth = container.clientWidth;
+      const containerHeight = container.clientHeight;
+      
+      // Use square dimensions based on the smaller container dimension
+      const size = Math.min(containerWidth, containerHeight);
+      
+      setDimensions({
+        width: size,
+        height: size
+      });
+    };
+
+    handleResize(); // Initial size
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Keep the base scale relative to a 800x800 design
+    const scale = dimensions.width / 800;
+    canvas.width = dimensions.width;
+    canvas.height = dimensions.height;
+
+    // Initialize scales
+    const scales: Scale[] = [];
+    const numScales = 80;
+    const centerX = canvas.width / 2;
+    
+    // Create scales in a spiral pattern
+    for (let i = 0; i < numScales; i++) {
+      const t = i / numScales;
+      const y = canvas.height - 50 - (t * (canvas.height - 100));
+      const angle = t * Math.PI * 8; // Spiral twist
+      const radius = (30 + Math.sin(t * Math.PI * 2) * 20) * scale; // S-curve
+      
+      const x = centerX + Math.cos(angle) * radius;
+      const scaleAngle = angle + Math.PI/2;
+      const delay = i * 120; // Slower sequence
+      
+      scales.push(new ScaleImpl(x, y, scaleAngle, delay, i, numScales));
+    }
+    
+    scalesRef.current = scales;
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Check if all scales are complete
+      const allComplete = scalesRef.current.every(scale => scale.isComplete());
+      const allReversed = scalesRef.current.every(scale => scale.birth <= 0);
+      
+      // Switch direction if needed
+      if (allComplete && !isReversingRef.current) {
+        isReversingRef.current = true;
+        totalTimeRef.current = 0; // Reset total time for reverse sequence
+      } else if (allReversed && isReversingRef.current) {
+        isReversingRef.current = false;
+        totalTimeRef.current = 0; // Reset total time for forward sequence
+      }
+      
+      scalesRef.current.forEach(scale => {
+        scale.update(totalTimeRef.current, isReversingRef.current, timeRef.current);
+        scale.draw(ctx);
+      });
+      
+      timeRef.current += 8; // For breathing animation
+      totalTimeRef.current += 8; // For growth timing
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
+      
+      if (canvas && ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      
+      scalesRef.current = [];
+      timeRef.current = 0;
+      totalTimeRef.current = 0;
+      isReversingRef.current = false;
+    };
+  }, [dimensions]);
+
+  return (
+    <div style={{ 
+      margin: 0,
+      background: '#F0EEE6',
+      overflow: 'hidden',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: '100%'
+    }}>
+      <div style={{
+        padding: '30px',
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <div style={{
+          position: 'relative',
+          width: '100%',
+          paddingBottom: '100%' // Force 1:1 aspect ratio
+        }}>
+          <canvas 
+            ref={canvasRef}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              filter: 'contrast(1.1) brightness(1.05)',
+              maxWidth: '100%',
+              maxHeight: '100%'
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default OrganicGrowth;
+code
+JavaScript
+download
+content_copy
+expand_less
+IGNORE_WHEN_COPYING_START
+IGNORE_WHEN_COPYING_END
+import React, { useEffect, useRef } from 'react';
+
+// Themes: giving without expectation, endless abundance, natural success
+// Visualization: A form that continuously gives and receives, showing the cycle of natural abundance
+
+const ZoomedParticleAnimation: React.FC = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    let animationFrameId: number;
+    let time = 0;
+   
+    // Set canvas size
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerWidth; // Make it square
+    };
+    
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    
+    // Determine if container is small
+    const isSmallContainer = canvas.width < 440;
+    
+    // Zoomed parameters - focusing on a specific region
+    const zoomLevel = isSmallContainer ? 2.5 : 2.5; // Increased zoom by 25% (from original 2.0)
+    const zoomOffsetX = canvas.width / 18; // Adjust these to change the focus point
+    const zoomOffsetY = canvas.height / 18 - 60;
+    
+    const particles: Array<{
+      x: number;
+      y: number;
+      speedX: number;
+      speedY: number;
+      size: number;
+      connections: Array<{ particle: any; distance: number; alpha: number }>;
+      noiseOffset: number;
+      idealSpace: number;
+      allowClustering: boolean;
+    }> = [];
+    
+    // Reduce particles for small containers
+    const numParticles = isSmallContainer ? 15 : 50;
+    const centerX = canvas.width / (2 * zoomLevel) + zoomOffsetX;
+    const centerY = canvas.height / (2 * zoomLevel) + zoomOffsetY;
+    
+    // Initialize particles with adjusted positions for zoom
+    for (let i = 0; i < numParticles; i++) {
+      const angle = (i / numParticles) * Math.PI * 2;
+      const radius = Math.random() * 180 + 80;
+      const clusterChance = Math.random();
+      const clusterOffset = clusterChance < 0.2 ? 40 : (clusterChance > 0.8 ? -40 : 0);
+      
+      particles.push({
+        x: centerX + Math.cos(angle) * (radius + clusterOffset),
+        y: centerY + Math.sin(angle) * (radius + clusterOffset),
+        speedX: (Math.random() - 0.5) * 0.05,  // Quartered initial speed
+        speedY: (Math.random() - 0.5) * 0.05,  // Quartered initial speed
+        size: Math.random() * 1.5 + 0.8,
+        connections: [],
+        noiseOffset: Math.random() * 1000,
+        idealSpace: 60 + Math.random() * 20,
+        allowClustering: clusterChance < 0.35
+      });
+    }
+    
+    // Adjusted connection distance for zoomed view - reduce for small containers
+    const maxConnectionDistance = isSmallContainer ? 200 / zoomLevel : 180 / zoomLevel;
+    const fadeZoneWidth = isSmallContainer ? 40 / zoomLevel : 60 / zoomLevel;
+    
+    const animate = () => {
+      time += 0.0025;  // Quartered speed
+      
+      // Clear canvas
+      ctx.fillStyle = '#F0EEE6';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Clear connections
+      particles.forEach(particle => particle.connections = []);
+      
+      // Find connections between particles
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const distance = Math.sqrt(
+            Math.pow(particles[i].x - particles[j].x, 2) +
+            Math.pow(particles[i].y - particles[j].y, 2)
+          );
+          
+          if (distance < maxConnectionDistance * zoomLevel) {
+            let alpha;
+            
+            if (distance < (maxConnectionDistance - fadeZoneWidth) * zoomLevel) {
+              alpha = Math.min(0.24, 0.36 * (1 - distance / ((maxConnectionDistance - fadeZoneWidth) * zoomLevel)));
+            } else {
+              const fadeProgress = (distance - (maxConnectionDistance - fadeZoneWidth) * zoomLevel) / (fadeZoneWidth * zoomLevel);
+              alpha = 0.24 * Math.pow(1 - fadeProgress, 3);
+            }
+            
+            if (alpha > 0.001) {
+              particles[i].connections.push({ particle: particles[j], distance, alpha });
+              particles[j].connections.push({ particle: particles[i], distance, alpha });
+            }
+          }
+        }
+      }
+      
+      // Update particles
+      particles.forEach((particle) => {
+        const noiseScale = 0.001;
+        const noiseX = particle.x * noiseScale + particle.noiseOffset;
+        const noiseY = particle.y * noiseScale + particle.noiseOffset + 100;
+        const noiseVal = 
+          Math.sin(noiseX + time) * Math.cos(noiseY - time) + 
+          Math.sin(noiseX * 2 + time * 0.6) * Math.cos(noiseY * 2 - time * 0.6) * 0.3;
+        
+        const noiseMultiplier = isSmallContainer ? 0.0085 : 0.00125;  // Reduce noise for small containers
+        particle.speedX += Math.cos(noiseVal * Math.PI * 2) * noiseMultiplier;
+        particle.speedY += Math.sin(noiseVal * Math.PI * 2) * noiseMultiplier;
+        
+        // Attraction to center
+        const dx = centerX - particle.x;
+        const dy = centerY - particle.y;
+        const distanceToCenter = Math.sqrt(dx * dx + dy * dy);
+        
+        const centerRange = particle.allowClustering ? 130 : 200;
+        const minDistance = particle.allowClustering ? 60 : 90;
+        
+        const centerForceMultiplier = isSmallContainer ? 0.1 : 1.0;  // Reduce center forces for small containers
+        
+        if (distanceToCenter > centerRange) {
+          particle.speedX += dx / distanceToCenter * 0.002 * centerForceMultiplier;
+          particle.speedY += dy / distanceToCenter * 0.002 * centerForceMultiplier;
+        } else if (distanceToCenter < minDistance) {
+          particle.speedX -= dx / distanceToCenter * 0.0025 * centerForceMultiplier;
+          particle.speedY -= dy / distanceToCenter * 0.0025 * centerForceMultiplier;
+        }
+        
+        // Particle interactions
+        particles.forEach(other => {
+          if (other === particle) return;
+          
+          const dx = particle.x - other.x;
+          const dy = particle.y - other.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          if (distance < particle.idealSpace) {
+            const force = particle.allowClustering && other.allowClustering ? 
+              0.005 : 0.015;
+            
+            if (distance < particle.idealSpace * 0.7) {
+              particle.speedX += dx / distance * force;
+              particle.speedY += dy / distance * force;
+            }
+          }
+        });
+        
+        const damping = isSmallContainer ? 0.97 : 0.98;  // Increase damping for small containers
+        particle.speedX *= damping;
+        particle.speedY *= damping;
+        
+        particle.x += particle.speedX;
+        particle.y += particle.speedY;
+        
+        // Handle screen boundaries - use soft boundaries for small containers to prevent flickering
+        if (isSmallContainer) {
+          // Soft boundaries - push particles back instead of wrapping
+          const boundary = 50;
+          const screenWidth = canvas.width / zoomLevel;
+          const screenHeight = canvas.height / zoomLevel;
+          
+          if (particle.x < boundary) {
+            particle.speedX += (boundary - particle.x) * 0.01;
+          }
+          if (particle.x > screenWidth - boundary) {
+            particle.speedX -= (particle.x - (screenWidth - boundary)) * 0.01;
+          }
+          if (particle.y < boundary) {
+            particle.speedY += (boundary - particle.y) * 0.01;
+          }
+          if (particle.y > screenHeight - boundary) {
+            particle.speedY -= (particle.y - (screenHeight - boundary)) * 0.01;
+          }
+        } else {
+          // Original wrap around for larger containers
+          if (particle.x < 0) particle.x += canvas.width / zoomLevel;
+          if (particle.x > canvas.width / zoomLevel) particle.x -= canvas.width / zoomLevel;
+          if (particle.y < 0) particle.y += canvas.height / zoomLevel;
+          if (particle.y > canvas.height / zoomLevel) particle.y -= canvas.height / zoomLevel;
+        }
+      });
+      
+      // Apply zoom transformation
+      ctx.save();
+      ctx.translate(-zoomOffsetX * zoomLevel, -zoomOffsetY * zoomLevel);
+      ctx.scale(zoomLevel, zoomLevel);
+      
+      // Draw connections
+      ctx.lineWidth = 1 / zoomLevel;
+      ctx.lineCap = 'round';
+      
+      particles.forEach(particle => {
+        particle.connections.forEach(conn => {
+          ctx.strokeStyle = `rgba(0, 0, 0, ${conn.alpha})`;
+          ctx.beginPath();
+          ctx.moveTo(particle.x, particle.y);
+          ctx.lineTo(conn.particle.x, conn.particle.y);
+          ctx.stroke();
+        });
+      });
+      
+      // Draw particles
+      particles.forEach(particle => {
+        const distanceToCenter = Math.sqrt(
+          Math.pow(particle.x - centerX, 2) +
+          Math.pow(particle.y - centerY, 2)
+        );
+        const alphaVariation = isSmallContainer ? 0.4 : 0.5;  // Reduce alpha variation for small containers
+        const alpha = Math.max(0.3, Math.min(0.7, 1 - distanceToCenter / (500 + alphaVariation * 100)));
+        
+        ctx.fillStyle = `rgba(0, 0, 0, ${alpha})`;
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      
+      ctx.restore();
+      
+      animationFrameId = requestAnimationFrame(animate);
+    };
+    
+    animate();
+    
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
+      window.removeEventListener('resize', resizeCanvas);
+      
+      if (canvas && ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      
+      particles.length = 0;
+      time = 0;
+    };
+  }, []);
+  
+  return (
+    <canvas 
+      ref={canvasRef}
+      style={{ width: '100%', height: 'auto', background: '#F0EEE6' }}
+    />
+  );
+};
+
+export default ZoomedParticleAnimation;
+code
+JavaScript
+download
+content_copy
+expand_less
+IGNORE_WHEN_COPYING_START
+IGNORE_WHEN_COPYING_END
+import { useEffect, useRef } from 'react';
+
+// Themes: power of softness, water's way, universal truth
+// Visualization: Bars that yield and flow like water, demonstrating how gentleness overcomes the rigid
+
+const VerticalBarsNoise = () => {
+  const canvasRef = useRef(null);
+  const timeRef = useRef(0);
+  const animationFrameId = useRef(null);
+
+  // Simple noise function
+  const noise = (x, y, t) => {
+    const n = Math.sin(x * 0.01 + t) * Math.cos(y * 0.01 + t) + 
+             Math.sin(x * 0.015 - t) * Math.cos(y * 0.005 + t);
+    return (n + 1) / 2;
+  };
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    canvas.width = 550;
+    canvas.height = 550;
+    
+    const numLines = 50;
+    const lineSpacing = canvas.height / numLines;
+    
+    const animate = () => {
+      timeRef.current += 0.0005; // Reduced from 0.001 to 0.0005
+      
+      // Clear canvas
+      ctx.fillStyle = '#F0EEE6';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Draw lines and noise-based bars
+      for (let i = 0; i < numLines; i++) {
+        const y = i * lineSpacing + lineSpacing / 2;
+        
+        // Draw horizontal line
+        ctx.beginPath();
+        ctx.strokeStyle = '#444';
+        ctx.lineWidth = 1;
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+        
+        // Draw bars based on noise
+        for (let x = 0; x < canvas.width; x += 8) {
+          const noiseVal = noise(x, y, timeRef.current);
+          
+          if (noiseVal > 0.5) {
+            const barWidth = 3 + noiseVal * 10;
+            const barHeight = 2 + noiseVal * 3;
+            const animatedX = x + Math.sin(timeRef.current + y * 0.0375) * 20 * noiseVal; // Halved wave frequency for smoother movement
+            
+            // Use solid black color without opacity variation
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(animatedX - barWidth/2, y - barHeight/2, barWidth, barHeight);
+          }
+        }
+      }
+      
+      animationFrameId.current = requestAnimationFrame(animate);
+    };
+    
+    animate();
+    
+    return () => {
+      if (animationFrameId.current) {
+        cancelAnimationFrame(animationFrameId.current);
+        animationFrameId.current = null;
+      }
+      
+      if (canvas && ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      
+      timeRef.current = 0;
+    };
+  }, []);
+
+  return (
+    <div style={{ width: '550px', height: '550px', backgroundColor: '#F0EEE6' }}>
+      <canvas ref={canvasRef} style={{ display: 'block' }} />
+    </div>
+  );
+};
+
+export default VerticalBarsNoise;
+code
+JavaScript
+download
+content_copy
+expand_less
+IGNORE_WHEN_COPYING_START
+IGNORE_WHEN_COPYING_END
+import { useRef, useEffect, useState } from 'react';
+
+// Themes: learning from failure, personal responsibility, natural service
+// Visualization: Lines that find their way through entanglement, showing how clarity emerges from confusion
+
+const TangledLines = () => {
+  const canvasRef = useRef(null);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  
+  // Zoom control - adjust this to zoom in/out
+  const zoom = 1;  // 1 = normal, 0.5 = zoomed out, 2 = zoomed in
+  
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    let animationFrameId;
+    
+    // Function to resize canvas while maintaining aspect ratio
+    const resizeCanvas = () => {
+      const container = canvas.parentElement;
+      const containerWidth = container.clientWidth;
+      const containerHeight = container.clientHeight;
+      
+      // Set canvas size to container size
+      canvas.width = containerWidth;
+      canvas.height = containerHeight;
+      
+      // Calculate the aspect ratio to use
+      const canvasAspectRatio = containerWidth / containerHeight;
+      
+      // Set canvas internal drawing size
+      canvas.style.width = containerWidth + 'px';
+      canvas.style.height = containerHeight + 'px';
+    };
+    
+    // Initial resize
+    resizeCanvas();
+    
+    // Resize canvas when window resizes
+    window.addEventListener('resize', resizeCanvas);
+    
+    let time = 0;
+    let layers = [];
+    const layerCount = 7; // Represents the hierarchical levels
+    
+    class Layer {
+      constructor(index) {
+        this.index = index;
+        this.radius = 50 + index * 35;
+        this.rotation = 0;
+        this.particles = [];
+        this.particleCount = 3 + index * 4;
+        this.thickness = 0.5 + index * 0.2;
+        this.drift = Math.random() * Math.PI * 2;
+        
+        // Create particles for each layer
+        for (let i = 0; i < this.particleCount; i++) {
+          this.particles.push({
+            angle: (i / this.particleCount) * Math.PI * 2,
+            offset: Math.random() * 10,
+            phase: Math.random() * Math.PI * 2,
+            amplitude: 3 + Math.random() * 5,
+            flowSpeed: 0.0017 + Math.random() * 0.0017  // Reduced to 1/3 of previous value
+          });
+        }
+      }
+      
+      update(mouseInfluence) {
+        this.rotation += (0.00025 / (this.index + 1)) * (1 + mouseInfluence * 0.2);  // Reduced to 1/3 of previous value
+        this.drift += 0.0008;  // Reduced to 1/3 of previous value
+        
+        // Update particle positions
+        this.particles.forEach(particle => {
+          particle.angle += particle.flowSpeed * (1 - this.index / layerCount);
+        });
+      }
+      
+      draw(ctx, centerX, centerY, mouseInfluence, scale) {
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate(this.rotation);
+        
+        // Draw main ring with 20% opacity
+        ctx.beginPath();
+        ctx.strokeStyle = `rgba(80, 80, 80, 0.20)`;
+        ctx.lineWidth = this.thickness;
+        
+        // Create more organic, flowing path using particles
+        this.particles.forEach((particle, i) => {
+          const angle = particle.angle + Math.sin(time * 0.04 + particle.phase) * 0.1;  // Reduced to 1/3 of previous value
+          const radiusOffset = Math.sin(time + particle.phase) * particle.amplitude;
+          const radius = this.radius + radiusOffset + particle.offset;
+          
+          const x = Math.cos(angle) * radius;
+          const y = Math.sin(angle) * radius;
+          
+          if (i === 0) {
+            ctx.moveTo(x, y);
+          } else {
+            ctx.lineTo(x, y);
+          }
+        });
+        
+        ctx.closePath();
+        ctx.stroke();
+        
+        ctx.restore();
+      }
+    }
+    
+    // Create hierarchical layers
+    for (let i = 0; i < layerCount; i++) {
+      layers.push(new Layer(i));
+    }
+    
+    function animate() {
+      ctx.fillStyle = '#F0EEE6';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      
+      // Calculate mouse influence
+      const dx = mousePosition.x - centerX;
+      const dy = mousePosition.y - centerY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      const mouseInfluence = Math.max(0, 1 - distance / 200);
+      
+      // Calculate scale based on canvas dimensions and zoom
+      const minDimension = Math.min(canvas.width, canvas.height);
+      const scale = (minDimension / 800) * zoom; // 800 is the base dimension
+      
+      // Draw subtle radial energy lines
+      const rayCount = 24;
+      for (let i = 0; i < rayCount; i++) {
+        const angle = (i / rayCount) * Math.PI * 2 + time * 0.004;  // Reduced to 1/3 of previous value
+        const length = 300 * scale + Math.sin(time + i) * 50 * scale;
+        
+        ctx.beginPath();
+        ctx.strokeStyle = 'rgba(80, 80, 80, 0.05)';
+        ctx.lineWidth = 0.5;
+        ctx.moveTo(centerX, centerY);
+        ctx.lineTo(
+          centerX + Math.cos(angle) * length,
+          centerY + Math.sin(angle) * length
+        );
+        ctx.stroke();
+      }
+      
+      // Update and draw layers from inner to outer
+      layers.forEach(layer => {
+        layer.update(mouseInfluence);
+      });
+      
+      // Draw layers in reverse order (outer first for proper overlap)
+      for (let i = layers.length - 1; i >= 0; i--) {
+        layers[i].draw(ctx, centerX, centerY, mouseInfluence, scale);
+      }
+      
+      time += 0.0005;  // Further reduced from 0.0015 to 0.0005
+      animationFrameId = requestAnimationFrame(animate);
+    }
+    
+    animate();
+    
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+      }
+      
+      if (canvas && ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      
+      layers.forEach(layer => {
+        if (layer.particles) {
+          layer.particles.length = 0;
+        }
+      });
+      layers.length = 0;
+      time = 0;
+    };
+  }, []);
+  
+  const handleMouseMove = (e) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const rect = canvas.getBoundingClientRect();
+    setMousePosition({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    });
+  };
+  
+  return (
+    <div style={{ 
+      backgroundColor: '#F0EEE6',
+      margin: 0,
+      padding: 0,
+      overflow: 'hidden',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center'
+    }}>
+      <canvas 
+        ref={canvasRef} 
+        onMouseMove={handleMouseMove}
+        style={{ 
+          cursor: 'crosshair',
+          display: 'block'
+        }}
+      />
+    </div>
+  );
+};
+
+export default TangledLines;
+code
+JavaScript
+download
+content_copy
+expand_less
+IGNORE_WHEN_COPYING_START
+IGNORE_WHEN_COPYING_END
+import React, { useEffect, useRef } from 'react';
+
+// Themes: contentment in simplicity, community wisdom, natural satisfaction
+// Visualization: Circles that create complex patterns through simple overlapping, showing beauty in basic forms
+
+const MoireSixCircles = () => {
+  const containerRef = useRef(null);
+  const canvasRef = useRef(null);
+  
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const container = containerRef.current;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    // Set initial size
+    canvas.width = 550;
+    canvas.height = 550;
+    
+    const drawPattern = (time = 0) => {
+      ctx.fillStyle = '#F0EEE6';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 0.8;
+      
+      // Center of the canvas
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      
+      // Create six circles in a circular arrangement
+      const numClusters = 6;
+      // Scale radius based on canvas size
+      const radius = Math.min(canvas.width, canvas.height) * 0.18;
+      
+      for (let i = 0; i < numClusters; i++) {
+        const angle = (i / numClusters) * Math.PI * 2;
+        
+        // Enhanced oscillation for more noticeable animation
+        const oscillation = Math.sin(time * 0.005 + angle) * (radius * 0.25);
+        const pulseEffect = Math.sin(time * 0.003) * (radius * 0.05);
+        
+        // Position each circle around the center with animation
+        const circleX = centerX + Math.cos(angle) * (radius + oscillation);
+        const circleY = centerY + Math.sin(angle) * (radius + oscillation);
+        
+        // Draw concentric circles for each position
+        const maxRadius = radius * 0.9;
+        for (let r = 5; r < maxRadius; r += maxRadius / 25) {
+          ctx.beginPath();
+          
+          // Enhanced distortion for more visible animation
+          for (let theta = 0; theta <= Math.PI * 2; theta += 0.05) {
+            const waveDistortion = Math.sin(theta * 6 + time * 0.01 + angle) * (r * 0.03);
+            const radiusDistortion = Math.sin(time * 0.005 + r * 0.1) * 2;
+            
+            const x = circleX + (r + waveDistortion + radiusDistortion + pulseEffect) * Math.cos(theta);
+            const y = circleY + (r + waveDistortion + radiusDistortion + pulseEffect) * Math.sin(theta);
+            
+            if (theta === 0) {
+              ctx.moveTo(x, y);
+            } else {
+              ctx.lineTo(x, y);
+            }
+          }
+          
+          ctx.closePath();
+          ctx.stroke();
+        }
+      }
+    };
+    
+    // Animation loop
+    let time = 0;
+    let animationFrameId;
+    
+    const animate = () => {
+      time += 1;
+      drawPattern(time);
+      animationFrameId = requestAnimationFrame(animate);
+    };
+    
+    animate();
+    
+    // Handle resize
+    const handleResize = () => {
+      const { width, height } = container.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      
+      // Update canvas size
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      
+      // Scale context
+      ctx.scale(dpr, dpr);
+      
+      // Update canvas style
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+  
+  return (
+    <div 
+      ref={containerRef}
+      style={{ 
+        margin: 0,
+        background: '#F0EEE6',
+        overflow: 'hidden',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh',
+        width: '100vw',
+        position: 'relative'
+      }}
+    >
+      <canvas 
+        ref={canvasRef} 
+        style={{ 
+          display: 'block',
+          width: '100%',
+          height: '100%'
+        }} 
+      />
+    </div>
+  );
+};
+
+export default MoireSixCircles;
+code
+JavaScript
+download
+content_copy
+expand_less
+IGNORE_WHEN_COPYING_START
+IGNORE_WHEN_COPYING_END
+import { useEffect, useRef } from 'react';
+
+// Themes: wisdom beyond words, service without competition, infinite giving
+// Visualization: Particles that align with invisible forces, showing how truth manifests without being named
+
+const IronFillings = () => {
+  const canvasRef = useRef(null);
+  const animationFrameRef = useRef(null);
+  
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width = 550;
+    const height = canvas.height = 550;
+    
+    const PARTICLE_COUNT = 30000;
+    const particles = [];
+    
+    // Initialize particles with depth
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        z: Math.random() * 2 - 1, // Depth from -1 to 1
+        targetX: 0,
+        targetY: 0,
+        phase: Math.random() * Math.PI * 2,
+        speed: 0.001 + Math.random() * 0.002
+      });
+    }
+    
+    let time = 0;
+    let isRunning = true;
+    
+    function animate() {
+      if (!isRunning) return;
+      
+      time += 0.016;
+      
+      // Clear with depth effect
+      ctx.fillStyle = 'rgba(240, 238, 230, 0.05)';
+      ctx.fillRect(0, 0, width, height);
+      
+      const circles = [
+        { cx: 275, cy: 200, r: 150 },  // Top circle
+        { cx: 275, cy: 350, r: 150 },  // Bottom circle
+        { cx: 275, cy: 275, r: 75 }    // Center circle
+      ];
+      
+      particles.forEach(particle => {
+        // Update depth
+        particle.z = Math.sin(time * 0.5 + particle.phase) * 0.5;
+        
+        // Find nearest circle point
+        let minDist = Infinity;
+        circles.forEach(circle => {
+          // Point on circle at angle toward particle
+          const angle = Math.atan2(particle.y - circle.cy, particle.x - circle.cx);
+          const pointX = circle.cx + circle.r * Math.cos(angle);
+          const pointY = circle.cy + circle.r * Math.sin(angle);
+          
+          const dist = Math.sqrt(
+            Math.pow(particle.x - pointX, 2) + 
+            Math.pow(particle.y - pointY, 2)
+          );
+          
+          if (dist < minDist) {
+            minDist = dist;
+            particle.targetX = pointX;
+            particle.targetY = pointY;
+          }
+        });
+        
+        // Move toward target with depth influence
+        const depthFactor = 0.5 + particle.z * 0.5;
+        particle.x += (particle.targetX - particle.x) * particle.speed * depthFactor;
+        particle.y += (particle.targetY - particle.y) * particle.speed * depthFactor;
+        
+        // Add some organic movement
+        particle.x += Math.sin(time + particle.phase) * 0.1;
+        particle.y += Math.cos(time + particle.phase) * 0.1;
+        
+        // Draw particle with depth effects
+        const size = 0.3 + particle.z * 0.2;
+        const opacity = 0.4 + particle.z * 0.3;
+        
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, Math.max(0.1, size), 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(51, 51, 51, ${Math.max(0.1, opacity)})`;
+        ctx.fill();
+      });
+      
+      animationFrameRef.current = requestAnimationFrame(animate);
+    }
+    
+    animate();
+    
+    return () => {
+      isRunning = false;
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+      
+      if (canvas && ctx) {
+        ctx.clearRect(0, 0, width, height);
+      }
+      
+      particles.length = 0;
+      time = 0;
+    };
+  }, []);
+  
+  return (
+    <div style={{
+      width: '550px',
+      height: '550px',
+      margin: 'auto',
+      backgroundColor: '#f0eee6'
+    }}>
+      <canvas
+        ref={canvasRef}
+        style={{
+          display: 'block',
+          width: '550px',
+          height: '550px'
+        }}
+      />
+    </div>
+  );
+};
+
+export default IronFillings;
+code
+JavaScript
+download
+content_copy
+expand_less
+IGNORE_WHEN_COPYING_START
+IGNORE_WHEN_COPYING_END
+import { useEffect, useRef } from 'react';
+
+// Themes: wisdom beyond words, service without competition, infinite giving
+// Visualization: Particles that align with invisible forces, showing how truth manifests without being named
+
+const IronFillings = () => {
+  const canvasRef = useRef(null);
+  const animationFrameRef = useRef(null);
+  
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width = 550;
+    const height = canvas.height = 550;
+    
+    const PARTICLE_COUNT = 30000;
+    const particles = [];
+    
+    // Initialize particles with depth
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        z: Math.random() * 2 - 1, // Depth from -1 to 1
+        targetX: 0,
+        targetY: 0,
+        phase: Math.random() * Math.PI * 2,
+        speed: 0.001 + Math.random() * 0.002
+      });
+    }
+    
+    let time = 0;
+    let isRunning = true;
+    
+    function animate() {
+      if (!isRunning) return;
+      
+      time += 0.016;
+      
+      // Clear with depth effect
+      ctx.fillStyle = 'rgba(240, 238, 230, 0.05)';
+      ctx.fillRect(0, 0, width, height);
+      
+      const circles = [
+        { cx: 275, cy: 200, r: 150 },  // Top circle
+        { cx: 275, cy: 350, r: 150 },  // Bottom circle
+        { cx: 275, cy: 275, r: 75 }    // Center circle
+      ];
+      
+      particles.forEach(particle => {
+        // Update depth
+        particle.z = Math.sin(time * 0.5 + particle.phase) * 0.5;
+        
+        // Find nearest circle point
+        let minDist = Infinity;
+        circles.forEach(circle => {
+          // Point on circle at angle toward particle
+          const angle = Math.atan2(particle.y - circle.cy, particle.x - circle.cx);
+          const pointX = circle.cx + circle.r * Math.cos(angle);
+          const pointY = circle.cy + circle.r * Math.sin(angle);
+          
+          const dist = Math.sqrt(
+            Math.pow(particle.x - pointX, 2) + 
+            Math.pow(particle.y - pointY, 2)
+          );
+          
+          if (dist < minDist) {
+            minDist = dist;
+            particle.targetX = pointX;
+            particle.targetY = pointY;
+          }
+        });
+        
+        // Move toward target with depth influence
+        const depthFactor = 0.5 + particle.z * 0.5;
+        particle.x += (particle.targetX - particle.x) * particle.speed * depthFactor;
+        particle.y += (particle.targetY - particle.y) * particle.speed * depthFactor;
+        
+        // Add some organic movement
+        particle.x += Math.sin(time + particle.phase) * 0.1;
+        particle.y += Math.cos(time + particle.phase) * 0.1;
+        
+        // Draw particle with depth effects
+        const size = 0.3 + particle.z * 0.2;
+        const opacity = 0.4 + particle.z * 0.3;
+        
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, Math.max(0.1, size), 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(51, 51, 51, ${Math.max(0.1, opacity)})`;
+        ctx.fill();
+      });
+      
+      animationFrameRef.current = requestAnimationFrame(animate);
+    }
+    
+    animate();
+    
+    return () => {
+      isRunning = false;
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+      
+      if (canvas && ctx) {
+        ctx.clearRect(0, 0, width, height);
+      }
+      
+      particles.length = 0;
+      time = 0;
+    };
+  }, []);
+  
+  return (
+    <div style={{
+      width: '550px',
+      height: '550px',
+      margin: 'auto',
+      backgroundColor: '#f0eee6'
+    }}>
+      <canvas
+        ref={canvasRef}
+        style={{
+          display: 'block',
+          width: '550px',
+          height: '550px'
+        }}
+      />
+    </div>
+  );
+};
+
+export default IronFillings;

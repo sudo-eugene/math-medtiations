@@ -1,0 +1,121 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: dark; }
+html, body, #root { height: 100%; }
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in-quote {
+  animation: fadeIn 1.2s ease-out 0.8s both;
+}
+
+.animate-fade-in-visual {
+  animation: fadeIn 1.2s ease-out 1.4s both;
+}
+
+/* Printable Book Styles */
+@media screen {
+  #book-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+}
+
+.page {
+  width: 105mm;
+  height: 148mm;
+  background-color: white;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  overflow: hidden;
+  page-break-after: always;
+  box-sizing: border-box;
+  color: black;
+}
+
+#book-container.force-render-all {
+  display: block;
+}
+
+.force-render-all .page {
+  display: block !important; /* Ensure all pages are rendered for html2canvas */
+  margin-bottom: 10px; /* Give some space in the "all" view */
+  page-break-after: avoid;
+}
+
+
+.page .content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: 12mm;
+  padding-bottom: 12mm;
+  padding-left: 18mm; /* Outside margin */
+  padding-right: 18mm; /* Inside margin (gutter) */  
+  box-sizing: border-box;
+}
+
+.quote-page .content {
+  align-items: center;
+  text-align: center;
+}
+
+.quote-text {
+  font-size: 11pt;
+  line-height: 1.5;
+  font-family: serif;
+}
+
+.quote-author {
+    font-size: 9pt;
+    margin-top: 1em;
+    font-style: italic;
+}
+
+.visual-page .content {
+  /* Reset padding for visuals that might need the full page space */
+  /* The inner container will handle centering */
+}
+
+/* B&W filter for printing */
+.printable-book-container {
+  filter: grayscale(100%);
+}
+
+/* Styles for PDF generation */
+@media print {
+  body, .printable-book-container {
+    background-color: white;
+    margin: 0;
+    padding: 0;
+  }
+  .controls {
+    display: none;
+  }
+  .page {
+    margin: 0;
+    box-shadow: none;
+    border: none;
+  }
+}
