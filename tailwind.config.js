@@ -6,7 +6,11 @@ module.exports = {
     "./geometry_web_gallery_500_presets.jsx",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        serif: ['Georgia', 'serif'],
+      },
+    },
   },
   plugins: [],
 };

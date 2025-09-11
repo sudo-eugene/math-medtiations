@@ -76,6 +76,10 @@ html, body, #root { height: 100%; }
   box-sizing: border-box;
 }
 
+.page.outer-page .content {
+  padding:0!important;
+}
+
 .quote-page .content {
   align-items: center;
   text-align: center;
