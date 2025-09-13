@@ -76,6 +76,7 @@ import RadialMeshFlower from './custom-visuals/RadialMeshFlower';
 import CanyonUndulatingWalls from './custom-visuals/CanyonUndulatingWalls';
 import WaveInterferenceV5 from './custom-visuals/WaveInterferenceV5';
 import EffortlessParticles from './custom-visuals/EffortlessParticles';
+import MobiusFlowTunnel from './custom-visuals/MobiusFlowTunnel';
 import PenroseTriangleIllusion from './custom-visuals/PenroseTriangleIllusion';
 import EmergentTreeOfVoid from './custom-visuals/EmergentTreeOfVoid';
 import NonEuclideanRippleMaze from './custom-visuals/NonEuclideanRippleMaze';
@@ -233,6 +234,7 @@ export const customVisuals = [
   CanyonUndulatingWalls,
   WaveInterferenceV5,
   EffortlessParticles,
+  MobiusFlowTunnel,
   PenroseTriangleIllusion,
   EmergentTreeOfVoid,
   NonEuclideanRippleMaze,
