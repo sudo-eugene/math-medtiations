@@ -77,6 +77,12 @@ import CanyonUndulatingWalls from './custom-visuals/CanyonUndulatingWalls';
 import WaveInterferenceV5 from './custom-visuals/WaveInterferenceV5';
 import EffortlessParticles from './custom-visuals/EffortlessParticles';
 import CharacterVortex from './custom-visuals/CharacterVortex';
+import FractalBreathTree from './custom-visuals/FractalBreathTree';
+import QuantumSilkMandala from './custom-visuals/QuantumSilkMandala';
+import HyperbolicSunburst from './custom-visuals/HyperbolicSunburst';
+import CelestialClockwork from './custom-visuals/CelestialClockwork';
+import MirrorMaze from './custom-visuals/MirrorMaze';
+import EternalAsciiWaterfall from './custom-visuals/EternalAsciiWaterfall';
 
 export const devMode = true;
 
@@ -225,6 +231,12 @@ export const customVisuals = [
   WaveInterferenceV5,
   EffortlessParticles,
   CharacterVortex,
+  FractalBreathTree,
+  QuantumSilkMandala,
+  HyperbolicSunburst,
+  CelestialClockwork,
+  MirrorMaze,
+  EternalAsciiWaterfall,
 ];
 
 
