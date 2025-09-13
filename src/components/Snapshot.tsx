@@ -77,6 +77,8 @@ import CanyonUndulatingWalls from './custom-visuals/CanyonUndulatingWalls';
 import WaveInterferenceV5 from './custom-visuals/WaveInterferenceV5';
 import EffortlessParticles from './custom-visuals/EffortlessParticles';
 import MobiusFlowTunnel from './custom-visuals/MobiusFlowTunnel';
+import PenroseTriangleIllusion from './custom-visuals/PenroseTriangleIllusion';
+import CharacterVortex from './custom-visuals/CharacterVortex';
 
 const customVisuals = {
   1: MoireMandalaPattern,
@@ -155,7 +157,9 @@ const customVisuals = {
   74: CanyonUndulatingWalls,
   75: WaveInterferenceV5,
   76: EffortlessParticles,
-  77: MobiusFlowTunnel,
+  77: PenroseTriangleIllusion,
+  78: CharacterVortex,
+  79: MobiusFlowTunnel,
 };
 
 const Snapshot = () => {

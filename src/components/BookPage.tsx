@@ -4,7 +4,7 @@ import easyQuotes from '../../quotes-easy.json';
 import advancedQuotes from '../../quotes-advanced.json';
 import MathVisual from './MathVisual.tsx';
 
-const devMode = false;
+const devMode = true;
 
 const BookPage = () => {
   const { day } = useParams();
