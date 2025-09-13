@@ -76,6 +76,26 @@ import RadialMeshFlower from './custom-visuals/RadialMeshFlower';
 import CanyonUndulatingWalls from './custom-visuals/CanyonUndulatingWalls';
 import WaveInterferenceV5 from './custom-visuals/WaveInterferenceV5';
 import EffortlessParticles from './custom-visuals/EffortlessParticles';
+import QuantumLatticeBloom from './custom-visuals/QuantumLatticeBloom';
+import FractalWaterfall from './custom-visuals/FractalWaterfall';
+import PulsatingYinYangNebula from './custom-visuals/PulsatingYinYangNebula';
+import NonEuclideanRippleMaze from './custom-visuals/NonEuclideanRippleMaze';
+import FibonacciSpiralGarden from './custom-visuals/FibonacciSpiralGarden';
+import MobiusFlowTunnel from './custom-visuals/MobiusFlowTunnel';
+import StarfieldEntanglement from './custom-visuals/StarfieldEntanglement';
+import HyperbolicMirrorSequence from './custom-visuals/HyperbolicMirrorSequence';
+import EmergentTreeOfVoid from './custom-visuals/EmergentTreeOfVoid';
+import PenroseTriangleIllusion from './custom-visuals/PenroseTriangleIllusion';
+import SierpinskiBloom from './custom-visuals/SierpinskiBloom';
+import AuroraStrings from './custom-visuals/AuroraStrings';
+import VortexSandGarden from './custom-visuals/VortexSandGarden';
+import TidalLattice from './custom-visuals/TidalLattice';
+import GossamerPathways from './custom-visuals/GossamerPathways';
+import CrystalBlooming from './custom-visuals/CrystalBlooming';
+import GravityLanterns from './custom-visuals/GravityLanterns';
+import HelicalGrove from './custom-visuals/HelicalGrove';
+import PhantomConstellations from './custom-visuals/PhantomConstellations';
+import HarmonicResonator from './custom-visuals/HarmonicResonator';
 
 export const devMode = true;
 
@@ -223,6 +243,26 @@ export const customVisuals = [
   CanyonUndulatingWalls,
   WaveInterferenceV5,
   EffortlessParticles,
+  QuantumLatticeBloom,
+  FractalWaterfall,
+  PulsatingYinYangNebula,
+  NonEuclideanRippleMaze,
+  FibonacciSpiralGarden,
+  MobiusFlowTunnel,
+  StarfieldEntanglement,
+  HyperbolicMirrorSequence,
+  EmergentTreeOfVoid,
+  PenroseTriangleIllusion,
+  SierpinskiBloom,
+  AuroraStrings,
+  VortexSandGarden,
+  TidalLattice,
+  GossamerPathways,
+  CrystalBlooming,
+  GravityLanterns,
+  HelicalGrove,
+  PhantomConstellations,
+  HarmonicResonator,
 ];
 
 
