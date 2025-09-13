@@ -76,6 +76,7 @@ import RadialMeshFlower from './custom-visuals/RadialMeshFlower';
 import CanyonUndulatingWalls from './custom-visuals/CanyonUndulatingWalls';
 import WaveInterferenceV5 from './custom-visuals/WaveInterferenceV5';
 import EffortlessParticles from './custom-visuals/EffortlessParticles';
+import PenroseTriangleIllusion from './custom-visuals/PenroseTriangleIllusion';
 
 const customVisuals = {
   1: MoireMandalaPattern,
@@ -154,6 +155,7 @@ const customVisuals = {
   74: CanyonUndulatingWalls,
   75: WaveInterferenceV5,
   76: EffortlessParticles,
+  77: PenroseTriangleIllusion,
 };
 
 const Snapshot = () => {
