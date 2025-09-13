@@ -76,6 +76,16 @@ import RadialMeshFlower from './custom-visuals/RadialMeshFlower';
 import CanyonUndulatingWalls from './custom-visuals/CanyonUndulatingWalls';
 import WaveInterferenceV5 from './custom-visuals/WaveInterferenceV5';
 import EffortlessParticles from './custom-visuals/EffortlessParticles';
+import QuantumLatticeBloom from './custom-visuals/QuantumLatticeBloom';
+import FractalWaterfall from './custom-visuals/FractalWaterfall';
+import PulsatingYinYangNebula from './custom-visuals/PulsatingYinYangNebula';
+import NonEuclideanRippleMaze from './custom-visuals/NonEuclideanRippleMaze';
+import FibonacciSpiralGarden from './custom-visuals/FibonacciSpiralGarden';
+import MobiusFlowTunnel from './custom-visuals/MobiusFlowTunnel';
+import StarfieldEntanglement from './custom-visuals/StarfieldEntanglement';
+import HyperbolicMirrorSequence from './custom-visuals/HyperbolicMirrorSequence';
+import EmergentTreeOfVoid from './custom-visuals/EmergentTreeOfVoid';
+import PenroseTriangleIllusion from './custom-visuals/PenroseTriangleIllusion';
 
 const customVisuals = {
   1: MoireMandalaPattern,
@@ -154,6 +164,16 @@ const customVisuals = {
   74: CanyonUndulatingWalls,
   75: WaveInterferenceV5,
   76: EffortlessParticles,
+  77: QuantumLatticeBloom,
+  78: FractalWaterfall,
+  79: PulsatingYinYangNebula,
+  80: NonEuclideanRippleMaze,
+  81: FibonacciSpiralGarden,
+  82: MobiusFlowTunnel,
+  83: StarfieldEntanglement,
+  84: HyperbolicMirrorSequence,
+  85: EmergentTreeOfVoid,
+  86: PenroseTriangleIllusion,
 };
 
 const Snapshot = () => {
