@@ -96,6 +96,9 @@ import GravityLanterns from './custom-visuals/GravityLanterns';
 import HelicalGrove from './custom-visuals/HelicalGrove';
 import PhantomConstellations from './custom-visuals/PhantomConstellations';
 import HarmonicResonator from './custom-visuals/HarmonicResonator';
+import MobiusFlowTunnel from './custom-visuals/MobiusFlowTunnel';
+import PenroseTriangleIllusion from './custom-visuals/PenroseTriangleIllusion';
+import CharacterVortex from './custom-visuals/CharacterVortex';
 
 const customVisuals = {
   1: MoireMandalaPattern,
@@ -194,6 +197,9 @@ const customVisuals = {
   94: HelicalGrove,
   95: PhantomConstellations,
   96: HarmonicResonator,
+  97: PenroseTriangleIllusion,
+  98: CharacterVortex,
+  99: MobiusFlowTunnel,
 };
 
 const Snapshot = () => {

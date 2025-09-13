@@ -86,6 +86,26 @@ import GravityLanterns from './custom-visuals/GravityLanterns';
 import HelicalGrove from './custom-visuals/HelicalGrove';
 import PhantomConstellations from './custom-visuals/PhantomConstellations';
 import HarmonicResonator from './custom-visuals/HarmonicResonator';
+import MobiusFlowTunnel from './custom-visuals/MobiusFlowTunnel';
+import PenroseTriangleIllusion from './custom-visuals/PenroseTriangleIllusion';
+import EmergentTreeOfVoid from './custom-visuals/EmergentTreeOfVoid';
+import NonEuclideanRippleMaze from './custom-visuals/NonEuclideanRippleMaze';
+import CharacterVortex from './custom-visuals/CharacterVortex';
+import FractalBreathTree from './custom-visuals/FractalBreathTree';
+import QuantumSilkMandala from './custom-visuals/QuantumSilkMandala';
+import HyperbolicSunburst from './custom-visuals/HyperbolicSunburst';
+import CelestialClockwork from './custom-visuals/CelestialClockwork';
+import MirrorMaze from './custom-visuals/MirrorMaze';
+import EternalAsciiWaterfall from './custom-visuals/EternalAsciiWaterfall';
+import FibonacciSpiralGarden from './custom-visuals/FibonacciSpiralGarden';
+import FractalWaterfall from './custom-visuals/FractalWaterfall';
+import HarmonicConstellations from './custom-visuals/HarmonicConstellations';
+import HyperbolicMirrorSequence from './custom-visuals/HyperbolicMirrorSequence';
+import MetamorphicTerrain from './custom-visuals/MetamorphicTerrain';
+import ParticleZenGarden from './custom-visuals/ParticleZenGarden';
+import PulsatingYinYangNebula from './custom-visuals/PulsatingYinYangNebula';
+import QuantumLatticeBloom from './custom-visuals/QuantumLatticeBloom';
+import StarfieldEntanglement from './custom-visuals/StarfieldEntanglement';
 
 export const devMode = true;
 
@@ -243,6 +263,26 @@ export const customVisuals = [
   HelicalGrove,
   PhantomConstellations,
   HarmonicResonator,
+  MobiusFlowTunnel,
+  PenroseTriangleIllusion,
+  EmergentTreeOfVoid,
+  NonEuclideanRippleMaze,
+  CharacterVortex,
+  FractalBreathTree,
+  QuantumSilkMandala,
+  HyperbolicSunburst,
+  CelestialClockwork,
+  MirrorMaze,
+  EternalAsciiWaterfall,
+  FibonacciSpiralGarden,
+  FractalWaterfall,
+  HarmonicConstellations,
+  HyperbolicMirrorSequence,
+  MetamorphicTerrain,
+  ParticleZenGarden,
+  PulsatingYinYangNebula,
+  QuantumLatticeBloom,
+  StarfieldEntanglement,
 ];
 
 
