@@ -76,6 +76,7 @@ import RadialMeshFlower from './custom-visuals/RadialMeshFlower';
 import CanyonUndulatingWalls from './custom-visuals/CanyonUndulatingWalls';
 import WaveInterferenceV5 from './custom-visuals/WaveInterferenceV5';
 import EffortlessParticles from './custom-visuals/EffortlessParticles';
+import FractalBreathTree from './custom-visuals/FractalBreathTree';
 
 export const devMode = true;
 
@@ -223,6 +224,7 @@ export const customVisuals = [
   CanyonUndulatingWalls,
   WaveInterferenceV5,
   EffortlessParticles,
+  FractalBreathTree,
 ];
 
 
