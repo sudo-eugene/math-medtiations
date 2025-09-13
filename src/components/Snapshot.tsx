@@ -76,6 +76,7 @@ import RadialMeshFlower from './custom-visuals/RadialMeshFlower';
 import CanyonUndulatingWalls from './custom-visuals/CanyonUndulatingWalls';
 import WaveInterferenceV5 from './custom-visuals/WaveInterferenceV5';
 import EffortlessParticles from './custom-visuals/EffortlessParticles';
+import PenroseTriangleIllusion from './custom-visuals/PenroseTriangleIllusion';
 import CharacterVortex from './custom-visuals/CharacterVortex';
 
 const customVisuals = {
@@ -155,7 +156,8 @@ const customVisuals = {
   74: CanyonUndulatingWalls,
   75: WaveInterferenceV5,
   76: EffortlessParticles,
-  77: CharacterVortex,
+  77: PenroseTriangleIllusion,
+  78: CharacterVortex,
 };
 
 const Snapshot = () => {
