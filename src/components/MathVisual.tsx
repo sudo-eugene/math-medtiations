@@ -76,6 +76,16 @@ import RadialMeshFlower from './custom-visuals/RadialMeshFlower';
 import CanyonUndulatingWalls from './custom-visuals/CanyonUndulatingWalls';
 import WaveInterferenceV5 from './custom-visuals/WaveInterferenceV5';
 import EffortlessParticles from './custom-visuals/EffortlessParticles';
+import SierpinskiBloom from './custom-visuals/SierpinskiBloom';
+import AuroraStrings from './custom-visuals/AuroraStrings';
+import VortexSandGarden from './custom-visuals/VortexSandGarden';
+import TidalLattice from './custom-visuals/TidalLattice';
+import GossamerPathways from './custom-visuals/GossamerPathways';
+import CrystalBlooming from './custom-visuals/CrystalBlooming';
+import GravityLanterns from './custom-visuals/GravityLanterns';
+import HelicalGrove from './custom-visuals/HelicalGrove';
+import PhantomConstellations from './custom-visuals/PhantomConstellations';
+import HarmonicResonator from './custom-visuals/HarmonicResonator';
 import MobiusFlowTunnel from './custom-visuals/MobiusFlowTunnel';
 import PenroseTriangleIllusion from './custom-visuals/PenroseTriangleIllusion';
 import EmergentTreeOfVoid from './custom-visuals/EmergentTreeOfVoid';
@@ -243,6 +253,16 @@ export const customVisuals = [
   CanyonUndulatingWalls,
   WaveInterferenceV5,
   EffortlessParticles,
+  SierpinskiBloom,
+  AuroraStrings,
+  VortexSandGarden,
+  TidalLattice,
+  GossamerPathways,
+  CrystalBlooming,
+  GravityLanterns,
+  HelicalGrove,
+  PhantomConstellations,
+  HarmonicResonator,
   MobiusFlowTunnel,
   PenroseTriangleIllusion,
   EmergentTreeOfVoid,
