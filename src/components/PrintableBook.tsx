@@ -27,29 +27,64 @@ const PrintableBook = () => {
     // Temporarily show all pages for rendering
     bookElement.classList.add('force-render-all');
 
-    const pdf = new jsPDF('portrait', 'mm', 'a6');
     const pages = bookElement.querySelectorAll('.page');
-
-    for (let i = 0; i < pages.length; i++) {
-      const page = pages[i] as HTMLElement;
-      const canvas = await html2canvas(page, {
-        scale: 2, // Higher scale for better quality
-        useCORS: true,
-        backgroundColor: '#ffffff',
-      });
-      const imgData = canvas.toDataURL('image/png');
-
-      if (i > 0) {
-        pdf.addPage();
+    const CHUNK_SIZE = 25; // Process pages in smaller chunks to avoid memory issues
+    
+    let pdf: jsPDF | null = null;
+    
+    try {
+      for (let chunkStart = 0; chunkStart < pages.length; chunkStart += CHUNK_SIZE) {
+        const chunkEnd = Math.min(chunkStart + CHUNK_SIZE, pages.length);
+        
+        // Process this chunk of pages
+        for (let i = chunkStart; i < chunkEnd; i++) {
+          const page = pages[i] as HTMLElement;
+          
+          // Create PDF on first page
+          if (i === 0) {
+            pdf = new jsPDF('portrait', 'mm', 'a6');
+          }
+          
+          const canvas = await html2canvas(page, {
+            scale: 2, // Keep high quality
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            logging: false, // Reduce console noise
+            allowTaint: false,
+            removeContainer: true,
+          });
+          
+          // Convert canvas to JPEG with compression to reduce memory usage
+          const imgData = canvas.toDataURL('image/jpeg', 0.95);
+          
+          if (i > 0 && pdf) {
+            pdf.addPage();
+          }
+          
+          if (pdf) {
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            pdf.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight);
+          }
+          
+          // Force garbage collection hints
+          canvas.width = 0;
+          canvas.height = 0;
+        }
+        
+        // Small delay between chunks to allow garbage collection
+        if (chunkEnd < pages.length) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
       }
-
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-
-      pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, pageHeight);
+      
+      if (pdf) {
+        pdf.save('math-meditations-book.pdf');
+      }
+    } catch (error) {
+      console.error('PDF generation failed:', error);
+      alert('PDF generation failed. The file may be too large. Try reducing the number of pages or contact support.');
     }
-
-    pdf.save('math-meditations-book.pdf');
 
     // Restore original view
     bookElement.classList.remove('force-render-all');
