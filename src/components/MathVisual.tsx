@@ -76,6 +76,7 @@ import RadialMeshFlower from './custom-visuals/RadialMeshFlower';
 import CanyonUndulatingWalls from './custom-visuals/CanyonUndulatingWalls';
 import WaveInterferenceV5 from './custom-visuals/WaveInterferenceV5';
 import EffortlessParticles from './custom-visuals/EffortlessParticles';
+import NonEuclideanRippleMaze from './custom-visuals/NonEuclideanRippleMaze';
 import CharacterVortex from './custom-visuals/CharacterVortex';
 import FractalBreathTree from './custom-visuals/FractalBreathTree';
 import QuantumSilkMandala from './custom-visuals/QuantumSilkMandala';
@@ -230,6 +231,7 @@ export const customVisuals = [
   CanyonUndulatingWalls,
   WaveInterferenceV5,
   EffortlessParticles,
+  NonEuclideanRippleMaze,
   CharacterVortex,
   FractalBreathTree,
   QuantumSilkMandala,
