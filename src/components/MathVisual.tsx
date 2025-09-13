@@ -77,6 +77,50 @@ import CanyonUndulatingWalls from './custom-visuals/CanyonUndulatingWalls';
 import WaveInterferenceV5 from './custom-visuals/WaveInterferenceV5';
 import EffortlessParticles from './custom-visuals/EffortlessParticles';
 
+// New mind-blowing visuals - Gemini
+import InteractiveFluidSimulation from './custom-visuals/InteractiveFluidSimulation';
+import QuantumFoam from './custom-visuals/QuantumFoam';
+import FractalZoom from './custom-visuals/FractalZoom';
+
+// New mind-blowing visuals - Claude
+import QuantumBridge from './custom-visuals/QuantumBridge';
+import MemoryPalace from './custom-visuals/MemoryPalace';
+import WaterClock from './custom-visuals/WaterClock';
+import SacredCode from './custom-visuals/SacredCode';
+import BreathingUniverse from './custom-visuals/BreathingUniverse';
+import InfiniteNesting from './custom-visuals/InfiniteNesting';
+import LightWeaving from './custom-visuals/LightWeaving';
+import VoidGarden from './custom-visuals/VoidGarden';
+import TimeSpiral from './custom-visuals/TimeSpiral';
+import CrystalSong from './custom-visuals/CrystalSong';
+import FlowingScript from './custom-visuals/FlowingScript';
+import EtherealLoom from './custom-visuals/EtherealLoom';
+// More visuals inspired by user favorites 
+// @FlowerOfLife.tsx @HankiesInTheWind.tsx @ParticleVessel.tsx @ParticleFlower.tsx @TimeSpiral.tsx @IronFillings.tsx @GentleWaves.tsx @OrganicGrowth.tsx 
+import CosmicRipples from './custom-visuals/CosmicRipples';
+import ParticleRose from './custom-visuals/ParticleRose';
+import FlowingMandala from './custom-visuals/FlowingMandala';
+import LivingGeometry from './custom-visuals/LivingGeometry';
+import ParticleOcean from './custom-visuals/ParticleOcean';
+import SpiralConsciousness from './custom-visuals/SpiralConsciousness';
+import WaveMeditation from './custom-visuals/WaveMeditation';
+import ParticleTree from './custom-visuals/ParticleTree';
+import EtherealField from './custom-visuals/EtherealField';
+import FlowingCaligraphy from './custom-visuals/FlowingCaligraphy';
+
+// New mind-blowing visuals - GPT-5
+import AcousticResonance from './custom-visuals/AcousticResonance';
+import TemporalMechanics from './custom-visuals/TemporalMechanics';
+import OrbitalResonance from './custom-visuals/OrbitalResonance';
+import QuantumWaveCollapse from './custom-visuals/QuantumWaveCollapse';
+import FibonacciGrowth from './custom-visuals/FibonacciGrowth';
+import FluidTurbulence from './custom-visuals/FluidTurbulence';
+import CrystallineLattice from './custom-visuals/CrystallineLattice';
+import SynapticNetwork from './custom-visuals/SynapticNetwork';
+import KleinBottleTransform from './custom-visuals/KleinBottleTransform';
+
+
+
 export const devMode = true;
 
 // Utility functions for rendering... (clamp, hslToRgb, nicePalette, worldToViewport - all remain the same)
@@ -223,6 +267,48 @@ export const customVisuals = [
   CanyonUndulatingWalls,
   WaveInterferenceV5,
   EffortlessParticles,
+  
+  // // New mind-blowing visuals - Gemini
+  InteractiveFluidSimulation,
+  QuantumFoam,
+  FractalZoom,
+  
+  // New mind-blowing visuals - Claude
+  QuantumBridge,
+  MemoryPalace,
+  WaterClock,
+  SacredCode,
+  BreathingUniverse,
+  InfiniteNesting,
+  LightWeaving,
+  VoidGarden,
+  TimeSpiral,
+  CrystalSong,
+  FlowingScript,
+  EtherealLoom,  
+
+  // New mind-blowing visuals - GPT-5
+  AcousticResonance,
+  TemporalMechanics,
+  OrbitalResonance,
+  QuantumWaveCollapse,
+  FibonacciGrowth,
+  FluidTurbulence,
+  CrystallineLattice,
+  SynapticNetwork,
+  KleinBottleTransform,
+  
+  // New visuals inspired by user favorites
+  CosmicRipples,
+  ParticleRose,
+  FlowingMandala,
+  LivingGeometry,
+  ParticleOcean,
+  SpiralConsciousness,
+  WaveMeditation,
+  ParticleTree,
+  EtherealField,
+  FlowingCaligraphy,
 ];
 
 
