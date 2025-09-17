@@ -149,6 +149,257 @@ import CrystallineLattice from './custom-visuals/CrystallineLattice';
 import SynapticNetwork from './custom-visuals/SynapticNetwork';
 import KleinBottleTransform from './custom-visuals/KleinBottleTransform';
 
+// New originals - Sept batch
+import SacredSpiralVeil from './custom-visuals/SacredSpiralVeil';
+import QuasicrystalWeave from './custom-visuals/QuasicrystalWeave';
+import VesicaField from './custom-visuals/VesicaField';
+import SilkenMembrane from './custom-visuals/SilkenMembrane';
+import TorusBreathLines from './custom-visuals/TorusBreathLines';
+import GoldenDust from './custom-visuals/GoldenDust';
+import EntangledLissajous from './custom-visuals/EntangledLissajous';
+import ZenSandRipples from './custom-visuals/ZenSandRipples';
+import PoincareWeb from './custom-visuals/PoincareWeb';
+import FireflyCohesion from './custom-visuals/FireflyCohesion';
+import CausticLattice from './custom-visuals/CausticLattice';
+import RadialCracks from './custom-visuals/RadialCracks';
+import AuroraVeil from './custom-visuals/AuroraVeil';
+import WhisperingSpirals from './custom-visuals/WhisperingSpirals';
+import QuantumPetals from './custom-visuals/QuantumPetals';
+import LatticeMorph from './custom-visuals/LatticeMorph';
+import CollidingVortices from './custom-visuals/CollidingVortices';
+import IcosahedralBloom from './custom-visuals/IcosahedralBloom';
+import FractalLeaf from './custom-visuals/FractalLeaf';
+import RippledMandala from './custom-visuals/RippledMandala';
+
+// New originals - Sept batch 2
+import StringArtCircle from './custom-visuals/StringArtCircle';
+import OrbitPrecession from './custom-visuals/OrbitPrecession';
+import PulseFountain from './custom-visuals/PulseFountain';
+import BraidWaveCurtains from './custom-visuals/BraidWaveCurtains';
+import TwistedGridVortex from './custom-visuals/TwistedGridVortex';
+import HalftoneBloom from './custom-visuals/HalftoneBloom';
+import PolygonMorphDance from './custom-visuals/PolygonMorphDance';
+import GyroidContours from './custom-visuals/GyroidContours';
+import CrescentOrbitGarden from './custom-visuals/CrescentOrbitGarden';
+import ChordRingMandala from './custom-visuals/ChordRingMandala';
+import BreathingCirclePacking from './custom-visuals/BreathingCirclePacking';
+import BezierShoalRibbons from './custom-visuals/BezierShoalRibbons';
+import MirrorRipplePool from './custom-visuals/MirrorRipplePool';
+import BinaryStarDance from './custom-visuals/BinaryStarDance';
+import SpiralQuiltField from './custom-visuals/SpiralQuiltField';
+import HarmonicWeaveMap from './custom-visuals/HarmonicWeaveMap';
+import PolarRoseTiling from './custom-visuals/PolarRoseTiling';
+import SeedStreamlines from './custom-visuals/SeedStreamlines';
+import LensedStars from './custom-visuals/LensedStars';
+import ConicOrbitGarden from './custom-visuals/ConicOrbitGarden';
+
+// New 3D originals - Sept batch 3
+import HelixForest3D from './custom-visuals/HelixForest3D';
+import TorusKnotBloom3D from './custom-visuals/TorusKnotBloom3D';
+import DandelionSpheres3D from './custom-visuals/DandelionSpheres3D';
+import LuminousFlocks3D from './custom-visuals/LuminousFlocks3D';
+import IcosaCageOrbits3D from './custom-visuals/IcosaCageOrbits3D';
+import RibbonSpirals3D from './custom-visuals/RibbonSpirals3D';
+import FlowShell3D from './custom-visuals/FlowShell3D';
+import CrystalFountain3D from './custom-visuals/CrystalFountain3D';
+import MagneticFieldLines3D from './custom-visuals/MagneticFieldLines3D';
+import WaveSheetStack3D from './custom-visuals/WaveSheetStack3D';
+import ToroidalVortexPoints3D from './custom-visuals/ToroidalVortexPoints3D';
+import GyroidRippleMesh3D from './custom-visuals/GyroidRippleMesh3D';
+import OrbitalChoreography3D from './custom-visuals/OrbitalChoreography3D';
+import LatticeBreath3D from './custom-visuals/LatticeBreath3D';
+import WhisperingTendrils3D from './custom-visuals/WhisperingTendrils3D';
+import KleinBottleWire3D from './custom-visuals/KleinBottleWire3D';
+import PoincareSphereGrid3D from './custom-visuals/PoincareSphereGrid3D';
+import AuroraColumns3D from './custom-visuals/AuroraColumns3D';
+import YinYangTori3D from './custom-visuals/YinYangTori3D';
+import HyparGarden3D from './custom-visuals/HyparGarden3D';
+
+// New visuals (Sept additions by Codex)
+import QuasicrystalInterferenceGarden from './custom-visuals/QuasicrystalInterferenceGarden';
+import MetaballInkContours from './custom-visuals/MetaballInkContours';
+import CliffordWeave from './custom-visuals/CliffordWeave';
+import PetriReactionDiffusion from './custom-visuals/PetriReactionDiffusion';
+import AbelianSandGarden from './custom-visuals/AbelianSandGarden';
+import BlueNoiseRelaxation from './custom-visuals/BlueNoiseRelaxation';
+import PrimeSpiralConstellation from './custom-visuals/PrimeSpiralConstellation';
+import HilbertCaravan from './custom-visuals/HilbertCaravan';
+import CirclePackingBloom from './custom-visuals/CirclePackingBloom';
+import DipoleFieldChoreography from './custom-visuals/DipoleFieldChoreography';
+import MemoryMeander from './custom-visuals/MemoryMeander';
+import PentagonalStepWalk from './custom-visuals/PentagonalStepWalk';
+import RingSpringLattice from './custom-visuals/RingSpringLattice';
+import DeltaBranchingLSystem from './custom-visuals/DeltaBranchingLSystem';
+import VortexCrystalFlow from './custom-visuals/VortexCrystalFlow';
+import HopfCirclesBundle from './custom-visuals/HopfCirclesBundle';
+import SphericalPhyllotaxisShell from './custom-visuals/SphericalPhyllotaxisShell';
+import QuasiTorusLissajous from './custom-visuals/QuasiTorusLissajous';
+import SpiralGalaxyDrizzle from './custom-visuals/SpiralGalaxyDrizzle';
+import StandingWaveLattice from './custom-visuals/StandingWaveLattice';
+
+// Math-structure originals – Sept additions
+import DeJongOrbitVeil from './custom-visuals/DeJongOrbitVeil';
+import IkedaMapNebula from './custom-visuals/IkedaMapNebula';
+import GumowskiMiraBloom from './custom-visuals/GumowskiMiraBloom';
+import TinkerbellFeather from './custom-visuals/TinkerbellFeather';
+import HenonFeatherfield from './custom-visuals/HenonFeatherfield';
+import HopalongMeadow from './custom-visuals/HopalongMeadow';
+import GingerbreadManScatter from './custom-visuals/GingerbreadManScatter';
+import BedheadAttractorLoom from './custom-visuals/BedheadAttractorLoom';
+import PopcornMapWeave from './custom-visuals/PopcornMapWeave';
+import StandardMapTwist from './custom-visuals/StandardMapTwist';
+import MandelbrotOrbitTrapInk from './custom-visuals/MandelbrotOrbitTrapInk';
+import JuliaSetDrift from './custom-visuals/JuliaSetDrift';
+import BurningShipContours from './custom-visuals/BurningShipContours';
+import NewtonBasinWeave from './custom-visuals/NewtonBasinWeave';
+import PhyllotaxisSunflowerDrift from './custom-visuals/PhyllotaxisSunflowerDrift';
+import SuperformulaRosette from './custom-visuals/SuperformulaRosette';
+import RosslerRibbonPortrait from './custom-visuals/RosslerRibbonPortrait';
+import AizawaInkCloud from './custom-visuals/AizawaInkCloud';
+import HalvorsenHalo from './custom-visuals/HalvorsenHalo';
+import ThomasCyclicMist from './custom-visuals/ThomasCyclicMist';
+
+// New 20 unique algorithm visuals - Original implementations
+import VoronoiDissolution from './custom-visuals/VoronoiDissolution';
+import GravityWells from './custom-visuals/GravityWells';
+import PenroseTiling from './custom-visuals/PenroseTiling';
+import FluidDynamics from './custom-visuals/FluidDynamics';
+import LorenzAttractor from './custom-visuals/LorenzAttractor';
+import PoissonDisk from './custom-visuals/PoissonDisk';
+import WavePackets from './custom-visuals/WavePackets';
+import DiffusionField from './custom-visuals/DiffusionField';
+import KnowledgeTree from './custom-visuals/KnowledgeTree';
+import FractalDust from './custom-visuals/FractalDust';
+import HopfFibration from './custom-visuals/HopfFibration';
+import PhaseTransition from './custom-visuals/PhaseTransition';
+import MinimalSurfaces from './custom-visuals/MinimalSurfaces';
+import SpinGlass from './custom-visuals/SpinGlass';
+import TopologicalSort from './custom-visuals/TopologicalSort';
+import BrownianTree from './custom-visuals/BrownianTree';
+import HamiltonianPath from './custom-visuals/HamiltonianPath';
+import SteinerTree from './custom-visuals/SteinerTree';
+
+// Meditation-themed originals – Dec batch (Codex)
+import DipoleLeyLines from './custom-visuals/DipoleLeyLines';
+import VoronoiBreathMap from './custom-visuals/VoronoiBreathMap';
+import HealingCrackMosaic from './custom-visuals/HealingCrackMosaic';
+import PendulumChainCurtain from './custom-visuals/PendulumChainCurtain';
+import EpicycleGlyphWeaver from './custom-visuals/EpicycleGlyphWeaver';
+import GrayScottBloom from './custom-visuals/GrayScottBloom';
+import IrrationalGridWander from './custom-visuals/IrrationalGridWander';
+import HilbertPulseLattice from './custom-visuals/HilbertPulseLattice';
+import IsochroneSpringWaves from './custom-visuals/IsochroneSpringWaves';
+import TopographicStreamMap from './custom-visuals/TopographicStreamMap';
+import CurlDriftSheets from './custom-visuals/CurlDriftSheets';
+import DiffractionArrayVeil from './custom-visuals/DiffractionArrayVeil';
+import TruchetRhythmTapestry from './custom-visuals/TruchetRhythmTapestry';
+import HexLifeBloom from './custom-visuals/HexLifeBloom';
+import RecursivePolygonBloom from './custom-visuals/RecursivePolygonBloom';
+import LogisticPetalLattice from './custom-visuals/LogisticPetalLattice';
+import PhasePortraitGarden from './custom-visuals/PhasePortraitGarden';
+import GyroidPointChant from './custom-visuals/GyroidPointChant';
+import ToroidalStreamFountain from './custom-visuals/ToroidalStreamFountain';
+import AperiodicOrbitalCloud from './custom-visuals/AperiodicOrbitalCloud';
+
+// Meditation-themed originals – Dec batch II
+import SpiralFluxAtrium from './custom-visuals/SpiralFluxAtrium';
+import ModularChordBloom from './custom-visuals/ModularChordBloom';
+import ShearPlumeCanopy from './custom-visuals/ShearPlumeCanopy';
+import RhombicPulseArray from './custom-visuals/RhombicPulseArray';
+import EllipticCausticLantern from './custom-visuals/EllipticCausticLantern';
+import DelaunayBreathVeil from './custom-visuals/DelaunayBreathVeil';
+import PolarHeatBloom from './custom-visuals/PolarHeatBloom';
+import AntTrailMurmuration from './custom-visuals/AntTrailMurmuration';
+import KelvinShearScrolls from './custom-visuals/KelvinShearScrolls';
+import OrnsteinVeilScribes from './custom-visuals/OrnsteinVeilScribes';
+
+// Meditation-themed originals – Dec batch III
+import FourierRoseCascade from './custom-visuals/FourierRoseCascade';
+import LegendreRibbonField from './custom-visuals/LegendreRibbonField';
+import AnisotropicDiffusionThreads from './custom-visuals/AnisotropicDiffusionThreads';
+import HyperbolicSpiralWeave from './custom-visuals/HyperbolicSpiralWeave';
+import BezierFlowMandala from './custom-visuals/BezierFlowMandala';
+import GradientCurlGarden from './custom-visuals/GradientCurlGarden';
+import HelmholtzWaveCanopy from './custom-visuals/HelmholtzWaveCanopy';
+import QuadraticBraidCurrents from './custom-visuals/QuadraticBraidCurrents';
+import ApollonianEchoOrbits from './custom-visuals/ApollonianEchoOrbits';
+import LagrangeWhisperSplines from './custom-visuals/LagrangeWhisperSplines';
+import PhaseShiftPlectrum from './custom-visuals/PhaseShiftPlectrum';
+import ScalarFieldStreamnet from './custom-visuals/ScalarFieldStreamnet';
+import HarmonicHexDither from './custom-visuals/HarmonicHexDither';
+import RadialIsoclineBloom from './custom-visuals/RadialIsoclineBloom';
+import SymplecticLoopDust from './custom-visuals/SymplecticLoopDust';
+import HexagonalWaveTide from './custom-visuals/HexagonalWaveTide';
+import DriftedContourGarden from './custom-visuals/DriftedContourGarden';
+import MorsePotentialPoints from './custom-visuals/MorsePotentialPoints';
+import TrefoilPointChorus from './custom-visuals/TrefoilPointChorus';
+import InvoluteRibbonDance from './custom-visuals/InvoluteRibbonDance';
+
+// Meditation-themed originals – Dec batch IV
+import WeierstrassRibbonField from './custom-visuals/WeierstrassRibbonField';
+import ChebyshevWaveLattice from './custom-visuals/ChebyshevWaveLattice';
+import FractionalBrownianScrolls from './custom-visuals/FractionalBrownianScrolls';
+import BesselRingResonance from './custom-visuals/BesselRingResonance';
+import PoincareGeodesicFlow from './custom-visuals/PoincareGeodesicFlow';
+import ArnoldCatTrace from './custom-visuals/ArnoldCatTrace';
+import CatalanBranchWeave from './custom-visuals/CatalanBranchWeave';
+import VolterraOrbitGarden from './custom-visuals/VolterraOrbitGarden';
+import WaveletStripeField from './custom-visuals/WaveletStripeField';
+import LambertSpiralFlow from './custom-visuals/LambertSpiralFlow';
+
+// Meditation-themed originals – Dec batch V
+import LissajousFabric from './custom-visuals/LissajousFabric';
+import MongeAmpereRipples from './custom-visuals/MongeAmpereRipples';
+import JacobiThetaRain from './custom-visuals/JacobiThetaRain';
+import CycloidPetalOrbits from './custom-visuals/CycloidPetalOrbits';
+import GeometricBrownianFans from './custom-visuals/GeometricBrownianFans';
+import SphericalHarmonicBloom from './custom-visuals/SphericalHarmonicBloom';
+import CauchyResidueFlow from './custom-visuals/CauchyResidueFlow';
+import EigenmodeWaveShell from './custom-visuals/EigenmodeWaveShell';
+import FokkerPlanckVeil from './custom-visuals/FokkerPlanckVeil';
+import EulerSpiralGarden from './custom-visuals/EulerSpiralGarden';
+
+// Meditation-themed originals – Dec batch VI
+import HyperbolicLatticeDrift from './custom-visuals/HyperbolicLatticeDrift';
+import FibonacciPhylloField from './custom-visuals/FibonacciPhylloField';
+import HeatKernelRipples from './custom-visuals/HeatKernelRipples';
+import LaplacianGrowthVeins from './custom-visuals/LaplacianGrowthVeins';
+import DoublePendulumWhisper from './custom-visuals/DoublePendulumWhisper';
+import RandomMatrixEigenFlow from './custom-visuals/RandomMatrixEigenFlow';
+import MarkovChainBraids from './custom-visuals/MarkovChainBraids';
+import DirichletHarmonicWeave from './custom-visuals/DirichletHarmonicWeave';
+import HelmholtzPointCloud from './custom-visuals/HelmholtzPointCloud';
+import BurgersFlowVeil from './custom-visuals/BurgersFlowVeil';
+import PeanoCascade from './custom-visuals/PeanoCascade';
+import LaguerreRadialFlare from './custom-visuals/LaguerreRadialFlare';
+import AiryCausticFans from './custom-visuals/AiryCausticFans';
+import RiccatiSpiralField from './custom-visuals/RiccatiSpiralField';
+import BernoulliFluxGrid from './custom-visuals/BernoulliFluxGrid';
+import BetaWaveStrips from './custom-visuals/BetaWaveStrips';
+import HermiteGradientGarden from './custom-visuals/HermiteGradientGarden';
+import QuaternionHaloPoints from './custom-visuals/QuaternionHaloPoints';
+import MilsteinDriftVeil from './custom-visuals/MilsteinDriftVeil';
+import SierpinskiCarpetGlow from './custom-visuals/SierpinskiCarpetGlow';
+import DuffingPhaseWeave from './custom-visuals/DuffingPhaseWeave';
+import LoziChaosMesh from './custom-visuals/LoziChaosMesh';
+import BakerMapThreads from './custom-visuals/BakerMapThreads';
+import HaltonPointCascade from './custom-visuals/HaltonPointCascade';
+import VonKarmanVortexStreet from './custom-visuals/VonKarmanVortexStreet';
+import CantorDustVeil from './custom-visuals/CantorDustVeil';
+import WalshHadamardStripes from './custom-visuals/WalshHadamardStripes';
+import MetropolisInkWalk from './custom-visuals/MetropolisInkWalk';
+import KdVSolitonField from './custom-visuals/KdVSolitonField';
+import JincDiffractionBloom from './custom-visuals/JincDiffractionBloom';
+import KolmogorovFlowCurtains from './custom-visuals/KolmogorovFlowCurtains';
+import StandardMapOrbits from './custom-visuals/StandardMapOrbits';
+import RiemannSphereCascade from './custom-visuals/RiemannSphereCascade';
+import KuramotoPhaseBloom from './custom-visuals/KuramotoPhaseBloom';
+import GaborWaveStrata from './custom-visuals/GaborWaveStrata';
+import LyapunovExponentVeil from './custom-visuals/LyapunovExponentVeil';
+import BiharmonicPlateModes from './custom-visuals/BiharmonicPlateModes';
+import ComplexLogSpiralGarden from './custom-visuals/ComplexLogSpiralGarden';
+import CosineTorusFlocks from './custom-visuals/CosineTorusFlocks';
+import HilbertDriftField from './custom-visuals/HilbertDriftField';
 
 
 export const devMode = true;
@@ -369,6 +620,249 @@ export const customVisuals = [
   ParticleTree,
   EtherealField,
   FlowingCaligraphy,
+  // 20 new originals
+  SacredSpiralVeil,
+  QuasicrystalWeave,
+  VesicaField,
+  SilkenMembrane,
+  TorusBreathLines,
+  GoldenDust,
+  EntangledLissajous,
+  ZenSandRipples,
+  PoincareWeb,
+  FireflyCohesion,
+  CausticLattice,
+  RadialCracks,
+  AuroraVeil,
+  WhisperingSpirals,
+  QuantumPetals,
+  LatticeMorph,
+  CollidingVortices,
+  IcosahedralBloom,
+  FractalLeaf,
+  RippledMandala,
+  // 20 new originals (second batch)
+  StringArtCircle,
+  OrbitPrecession,
+  PulseFountain,
+  BraidWaveCurtains,
+  TwistedGridVortex,
+  HalftoneBloom,
+  PolygonMorphDance,
+  GyroidContours,
+  CrescentOrbitGarden,
+  ChordRingMandala,
+  BreathingCirclePacking,
+  BezierShoalRibbons,
+  MirrorRipplePool,
+  BinaryStarDance,
+  SpiralQuiltField,
+  HarmonicWeaveMap,
+  PolarRoseTiling,
+  SeedStreamlines,
+  LensedStars,
+  ConicOrbitGarden,
+  // 20 new 3D originals
+  HelixForest3D,
+  TorusKnotBloom3D,
+  DandelionSpheres3D,
+  LuminousFlocks3D,
+  IcosaCageOrbits3D,
+  RibbonSpirals3D,
+  FlowShell3D,
+  CrystalFountain3D,
+  MagneticFieldLines3D,
+  WaveSheetStack3D,
+  ToroidalVortexPoints3D,
+  GyroidRippleMesh3D,
+  OrbitalChoreography3D,
+  LatticeBreath3D,
+  WhisperingTendrils3D,
+  KleinBottleWire3D,
+  PoincareSphereGrid3D,
+  AuroraColumns3D,
+  YinYangTori3D,
+  HyparGarden3D,
+  // Sept additions by Codex GPT-5 (20 new unique visuals)
+  // Advanced prompt
+  QuasicrystalInterferenceGarden,
+  MetaballInkContours,
+  CliffordWeave,
+  PetriReactionDiffusion,
+  AbelianSandGarden,
+  BlueNoiseRelaxation,
+  PrimeSpiralConstellation,
+  HilbertCaravan,
+  CirclePackingBloom,
+  DipoleFieldChoreography,
+  MemoryMeander,
+  PentagonalStepWalk,
+  RingSpringLattice,
+  DeltaBranchingLSystem,
+  VortexCrystalFlow,
+  HopfCirclesBundle,
+  SphericalPhyllotaxisShell,
+  QuasiTorusLissajous,
+  SpiralGalaxyDrizzle,
+  StandingWaveLattice,
+  // Math-structure originals – Sept additions
+  DeJongOrbitVeil,
+  IkedaMapNebula,
+  GumowskiMiraBloom,
+  TinkerbellFeather,
+  HenonFeatherfield,
+  HopalongMeadow,
+  GingerbreadManScatter,
+  BedheadAttractorLoom,
+  PopcornMapWeave,
+  StandardMapTwist,
+  MandelbrotOrbitTrapInk,
+  JuliaSetDrift,
+  BurningShipContours,
+  NewtonBasinWeave,
+  PhyllotaxisSunflowerDrift,
+  SuperformulaRosette,
+  RosslerRibbonPortrait,
+  AizawaInkCloud,
+  HalvorsenHalo,
+  ThomasCyclicMist,
+  // New 20 unique algorithm visuals - Original implementations
+  // Claude Advanced prompt
+  VoronoiDissolution,
+  GravityWells,
+  PenroseTiling,
+  FluidDynamics,
+  LorenzAttractor,
+  PoissonDisk,
+  WavePackets,
+  DiffusionField,
+  KnowledgeTree,
+  FractalDust,
+  HopfFibration,
+  PhaseTransition,
+  MinimalSurfaces,
+  SpinGlass,
+  TopologicalSort,
+  BrownianTree,
+  HamiltonianPath,
+  SteinerTree,
+  // Meditation-themed originals – Dec batch (gpt-5-codex-high)
+  DipoleLeyLines,
+  VoronoiBreathMap,
+  HealingCrackMosaic,
+  PendulumChainCurtain,
+  EpicycleGlyphWeaver,
+  GrayScottBloom,
+  IrrationalGridWander,
+  HilbertPulseLattice,
+  IsochroneSpringWaves,
+  TopographicStreamMap,
+  CurlDriftSheets,
+  DiffractionArrayVeil,
+  TruchetRhythmTapestry,
+  HexLifeBloom,
+  RecursivePolygonBloom,
+  LogisticPetalLattice,
+  PhasePortraitGarden,
+  GyroidPointChant,
+  ToroidalStreamFountain,
+  AperiodicOrbitalCloud,
+  // Meditation-themed originals – Dec batch II
+  SpiralFluxAtrium,
+  ModularChordBloom,
+  ShearPlumeCanopy,
+  RhombicPulseArray,
+  EllipticCausticLantern,
+  DelaunayBreathVeil,
+  PolarHeatBloom,
+  AntTrailMurmuration,
+  KelvinShearScrolls,
+  OrnsteinVeilScribes,
+  // Meditation-themed originals – Dec batch III
+  FourierRoseCascade,
+  LegendreRibbonField,
+  AnisotropicDiffusionThreads,
+  HyperbolicSpiralWeave,
+  BezierFlowMandala,
+  GradientCurlGarden,
+  HelmholtzWaveCanopy,
+  QuadraticBraidCurrents,
+  ApollonianEchoOrbits,
+  LagrangeWhisperSplines,
+  PhaseShiftPlectrum,
+  ScalarFieldStreamnet,
+  HarmonicHexDither,
+  RadialIsoclineBloom,
+  SymplecticLoopDust,
+  HexagonalWaveTide,
+  DriftedContourGarden,
+  MorsePotentialPoints,
+  TrefoilPointChorus,
+  InvoluteRibbonDance,
+  // Meditation-themed originals – Dec batch IV
+  WeierstrassRibbonField,
+  ChebyshevWaveLattice,
+  FractionalBrownianScrolls,
+  BesselRingResonance,
+  PoincareGeodesicFlow,
+  ArnoldCatTrace,
+  CatalanBranchWeave,
+  VolterraOrbitGarden,
+  WaveletStripeField,
+  LambertSpiralFlow,
+  // Meditation-themed originals – Dec batch V
+  LissajousFabric,
+  MongeAmpereRipples,
+  JacobiThetaRain,
+  CycloidPetalOrbits,
+  GeometricBrownianFans,
+  SphericalHarmonicBloom,
+  CauchyResidueFlow,
+  EigenmodeWaveShell,
+  FokkerPlanckVeil,
+  EulerSpiralGarden,
+  CosineTorusFlocks,
+  HilbertDriftField,
+  HyperbolicLatticeDrift,
+  FibonacciPhylloField,
+  HeatKernelRipples,
+  LaplacianGrowthVeins,
+  DoublePendulumWhisper,
+  RandomMatrixEigenFlow,
+  MarkovChainBraids,
+  DirichletHarmonicWeave,
+  HelmholtzPointCloud,
+  BurgersFlowVeil,
+  PeanoCascade,
+  LaguerreRadialFlare,
+  AiryCausticFans,
+  RiccatiSpiralField,
+  BernoulliFluxGrid,
+  BetaWaveStrips,
+  HermiteGradientGarden,
+  QuaternionHaloPoints,
+  MilsteinDriftVeil,
+  SierpinskiCarpetGlow,
+  // Meditation-themed originals – Dec batch VII
+  DuffingPhaseWeave,
+  LoziChaosMesh,
+  BakerMapThreads,
+  HaltonPointCascade,
+  VonKarmanVortexStreet,
+  CantorDustVeil,
+  WalshHadamardStripes,
+  MetropolisInkWalk,
+  KdVSolitonField,
+  JincDiffractionBloom,
+  // Meditation-themed originals – Dec batch VIII
+  KolmogorovFlowCurtains,
+  StandardMapOrbits,
+  RiemannSphereCascade,
+  KuramotoPhaseBloom,
+  GaborWaveStrata,
+  LyapunovExponentVeil,
+  BiharmonicPlateModes,
+  ComplexLogSpiralGarden,
 ];
 
 

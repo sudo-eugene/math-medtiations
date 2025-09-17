@@ -15,12 +15,15 @@ const CharacterVortex: React.FC<CharacterVortexProps> = ({ width, height, text =
     const ctx = canvas?.getContext('2d');
     if (!canvas || !ctx) return;
 
-    canvas.width = width;
-    canvas.height = height;
+    const dpr = (window.devicePixelRatio || 1);
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    ctx.scale(dpr, dpr);
 
     const centerX = width / 2;
     const centerY = height / 2;
-    const chars = text.split('').filter(c => c.trim().length);
+    const baseText = (text && text.trim().length) ? text : '·•○●·•○●|';
+    const chars = baseText.split('').filter(c => c.trim().length);
     let charIndex = 0;
 
     interface Particle {
@@ -81,10 +84,10 @@ const CharacterVortex: React.FC<CharacterVortexProps> = ({ width, height, text =
 
         p.x += p.vx;
         p.y += p.vy;
-        p.alpha *= 0.97;
+        p.alpha *= 0.985;
 
-        ctx.fillStyle = `rgba(50,50,50,${p.alpha})`;
-        ctx.font = '16px monospace';
+        ctx.fillStyle = `rgba(50,50,50,${Math.max(0.25, p.alpha)})`;
+        ctx.font = '18px monospace';
         ctx.fillText(p.char, p.x, p.y);
 
         const dist = Math.hypot(centerX - p.x, centerY - p.y);
