@@ -119,6 +119,7 @@ const MobiusFlowTunnel: React.FC<VisualProps> = ({ width: containerWidth, height
         fontSize: `${fontSize}px`,
         lineHeight: '0.9',
         overflow: 'hidden',
+        color: '#333',
       }}
     >
       <div ref={divRef} style={{ width: '100%', height: '100%' }} />
