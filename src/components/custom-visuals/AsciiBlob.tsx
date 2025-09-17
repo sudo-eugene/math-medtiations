@@ -59,7 +59,8 @@ const AsciiBlob: React.FC<VisualProps> = ({ width: containerWidth, height: conta
       overflow: 'hidden',
       display: 'flex',
       justifyContent: 'center',
-      alignItems: 'center'
+      alignItems: 'center',
+      color: '#333'
     }}>
       <div>
         {grid.map((row, i) => (

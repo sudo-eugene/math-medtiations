@@ -216,12 +216,12 @@ const AnimatedAsciiMandala: React.FC<VisualProps> = ({ width: containerWidth, he
               // Calculate color based on character
               let opacity = 1.0;
               switch (char) {
-                case '●': opacity = 0.9; break;
-                case '○': opacity = 0.7; break;
-                case '•': opacity = 0.6; break;
-                case '·': opacity = 0.5; break;
-                case '.': opacity = 0.4; break;
-                case '|': opacity = 0.3; break;
+                case '●': opacity = 0.95; break;
+                case '○': opacity = 0.8; break;
+                case '•': opacity = 0.7; break;
+                case '·': opacity = 0.6; break;
+                case '.': opacity = 0.5; break;
+                case '|': opacity = 0.45; break;
                 case ' ': opacity = 0; break;
               }
               
