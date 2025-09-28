@@ -40,9 +40,12 @@ const EXTRA_NAVIGATION_TIMEOUT_MS = {
 
 const visualsArrayContent = customVisualsMatch[1];
 const NUM_VISUALS = visualsArrayContent
-  .split(',')
+  .split('\n')
   .map(line => line.trim())
-  .filter(line => line && !line.startsWith('//')).length;
+  .map(line => line.replace(/\/\/.*$/, ''))
+  .map(line => line.replace(/\/\*.*?\*\//g, ''))
+  .map(line => line.replace(/,$/, '').trim())
+  .filter(line => line.length > 0).length;
 
 console.log(`Found ${NUM_VISUALS} custom visuals to snapshot.`);
 

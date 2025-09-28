@@ -4,6 +4,13 @@ import html2canvas from 'html2canvas';
 import quotes from '../../quotes-easy.json';
 import MathVisual, { customVisuals, devMode, getPresetForQuote } from './MathVisual';
 
+const formatVisualName = (rawName: string) => {
+  const withoutExtension = rawName.replace(/\.tsx?$/i, '');
+  const withSpacesAroundNumbers = withoutExtension.replace(/([a-zA-Z])(\d)/g, '$1 $2').replace(/(\d)([a-zA-Z])/g, '$1 $2');
+  const withCamelCaseSpaces = withSpacesAroundNumbers.replace(/([a-z])([A-Z])/g, '$1 $2');
+  return withCamelCaseSpaces.trim();
+};
+
 interface Page {
   id: string | number;
   type?: 'cover';
@@ -145,7 +152,7 @@ const PrintableBook = () => {
                 <div className="flex-grow flex flex-col items-center justify-center gap-4">
                   <p className="quote-text text-center">{p.quote}</p>
                                     <div className="relative w-[300px] h-[300px] rounded-2xl overflow-hidden border border-gray-300">
-                    {customVisuals.hasOwnProperty(p.id) ? (
+                    {typeof p.id === 'number' && customVisuals[p.id - 1] ? (
                       <img 
                         src={`/assets/visuals/${p.id}.png`} 
                         alt={`Visual for quote ${p.id}`} 
@@ -161,8 +168,10 @@ const PrintableBook = () => {
                   </div>
                   {devMode && (
                     <div className="text-center text-xs text-gray-500 -mt-2">
-                      {customVisuals.hasOwnProperty(p.id)
-                        ? `${customVisuals[p.id].name}.tsx`
+                      {typeof p.id === 'number'
+                        ? customVisuals[p.id - 1]
+                          ? `${formatVisualName(customVisuals[p.id - 1].name)} (${p.id})`
+                          : `${getPresetForQuote(p.id).id} - ${JSON.stringify(getPresetForQuote(p.id).params)} (${p.id})`
                         : `${getPresetForQuote(p.id).id} - ${JSON.stringify(getPresetForQuote(p.id).params)}`}
                     </div>
                   )}
