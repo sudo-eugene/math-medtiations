@@ -6,8 +6,55 @@ const VITE_PORT = 5173;
 const BASE_URL = `http://localhost:${VITE_PORT}`;
 const SNAPSHOT_DIR = './public/assets/visuals';
 
-// The number of custom visuals to snapshot
-const NUM_VISUALS = 76;
+// Dynamically determine the number of visuals
+const mathVisualsContent = fs.readFileSync('./src/components/MathVisual.tsx', 'utf8');
+const customVisualsMatch = mathVisualsContent.match(/export const customVisuals = \[([\s\S]*?)\];/);
+
+if (!customVisualsMatch || !customVisualsMatch[1]) {
+  throw new Error('Could not find or parse customVisuals array in MathVisual.tsx');
+}
+
+const args = process.argv.slice(2);
+const visualArg = args.find(arg => arg.startsWith('--visual='));
+let targetVisual = null;
+
+if (visualArg) {
+  const value = Number.parseInt(visualArg.split('=')[1], 10);
+  if (Number.isNaN(value)) {
+    throw new Error(`Invalid value provided for --visual: ${visualArg}`);
+  }
+  targetVisual = value;
+}
+
+// Time to wait for canvas to render before capturing (ms)
+const CANVAS_SETTLE_MS = 2000;
+const EXTRA_WAIT_MS = {
+  28: 10000,
+};
+
+const NAVIGATION_WAIT_UNTIL = 'domcontentloaded';
+const BASE_NAVIGATION_TIMEOUT_MS = 30000;
+const EXTRA_NAVIGATION_TIMEOUT_MS = {
+  12: 30000,
+};
+
+const visualsArrayContent = customVisualsMatch[1];
+const NUM_VISUALS = visualsArrayContent
+  .split('\n')
+  .map(line => line.trim())
+  .map(line => line.replace(/\/\/.*$/, ''))
+  .map(line => line.replace(/\/\*.*?\*\//g, ''))
+  .map(line => line.replace(/,$/, '').trim())
+  .filter(line => line.length > 0).length;
+
+console.log(`Found ${NUM_VISUALS} custom visuals to snapshot.`);
+
+if (targetVisual !== null) {
+  if (targetVisual < 1 || targetVisual > NUM_VISUALS) {
+    throw new Error(`Requested visual ${targetVisual} is outside the valid range 1-${NUM_VISUALS}.`);
+  }
+  console.log(`Limiting snapshot generation to visual ${targetVisual}.`);
+}
 
 async function generateSnapshots() {
   // Create snapshot directory if it doesn't exist
@@ -25,11 +72,26 @@ async function generateSnapshots() {
   const page = await browser.newPage();
   await page.setViewport({ width: 512, height: 512 });
 
-  for (let i = 1; i <= NUM_VISUALS; i++) {
+  const visualsToCapture =
+    targetVisual !== null
+      ? [targetVisual]
+      : Array.from({ length: NUM_VISUALS }, (_, index) => index + 1);
+
+  for (const i of visualsToCapture) {
     const url = `${BASE_URL}/snapshot/${i}`;
     console.log(`Navigating to ${url}`);
     try {
-      await page.goto(url, { waitUntil: 'networkidle0', timeout: 10000 });
+      const navigationTimeout = BASE_NAVIGATION_TIMEOUT_MS + (EXTRA_NAVIGATION_TIMEOUT_MS[i] ?? 0);
+      await page.goto(url, { waitUntil: NAVIGATION_WAIT_UNTIL, timeout: navigationTimeout });
+
+      // Ensure the snapshot container is visible and give canvas time to render
+      await page.waitForSelector('#snapshot-container', { visible: true, timeout: 30000 });
+
+      const extraDelay = EXTRA_WAIT_MS[i] ?? 0;
+      const totalDelay = CANVAS_SETTLE_MS + extraDelay;
+      if (totalDelay > 0) {
+        await new Promise(resolve => setTimeout(resolve, totalDelay));
+      }
 
       // Set page background to transparent
       await page.evaluate(() => {
@@ -55,6 +117,7 @@ async function generateSnapshots() {
   await browser.close();
   viteServer.kill();
   console.log('Finished generating snapshots.');
+  process.exit(0);
 }
 
 generateSnapshots();
