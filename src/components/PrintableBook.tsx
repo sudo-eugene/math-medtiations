@@ -105,22 +105,36 @@ const PrintableBook = () => {
     author: ''
   }));
 
-  // Ensure even page count for binding
-  const quotesWithBacking = [...quotesWithIds];
-  if (quotesWithBacking.length % 2 !== 0) {
-    quotesWithBacking.push({ id: 'blank', quote: '', author: '' });
-  }
+  // Calculate pages between covers (excluding front and back cover)
+  // Structure: dedication + quotes + padding blanks + blank page before back
+  const dedicationPage = {
+    id: 'dedication',
+    type: 'cover' as const,
+    dedication: 'To ..,',
+    quote: ``,
+    author: '',
+  };
+
+  // Count interior pages: 1 dedication + quotes + 1 blank before back = 2 + quotes.length
+  let interiorPageCount = 2 + quotesWithIds.length;
+  
+  // Calculate how many blank pages needed to make total divisible by 4
+  const remainder = interiorPageCount % 4;
+  const paddingPagesNeeded = remainder === 0 ? 0 : 4 - remainder;
+  
+  // Create padding blank pages
+  const paddingPages = Array.from({ length: paddingPagesNeeded }, (_, i) => ({
+    id: `padding-blank-${i + 1}`,
+    quote: '',
+    author: ''
+  }));
 
   const finalPages: Page[] = [
     { id: 'cover-1', type: 'cover', quote: '', author: '', imageUrl: '/assets/covers/Cover.png' },
-    {
-      id: 'cover-2',
-      type: 'cover',
-      dedication: 'To ..,',
-      quote: ``,
-      author: '',
-    },
-    ...quotesWithBacking,
+    dedicationPage,
+    ...quotesWithIds,
+    ...paddingPages, // Add padding pages to the back
+    { id: 'blank-before-back', quote: '', author: '' }, // Blank page before back cover
     { id: 'back-cover', type: 'cover', quote: '', author: '', imageUrl: '/assets/covers/Back.png' },
   ];
 
@@ -148,7 +162,7 @@ const PrintableBook = () => {
                     <p className="text-lg mt-4">from</p>
                   </div>
                 )
-              ) : p.id !== 'blank' ? (
+              ) : p.quote ? (
                 <div className="flex-grow flex flex-col items-center justify-center gap-4">
                   <p className="quote-text text-center">{p.quote}</p>
                                     <div className="relative w-[300px] h-[300px] rounded-2xl overflow-hidden border border-gray-300">
