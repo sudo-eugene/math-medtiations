@@ -165,7 +165,7 @@ const PrintableBook = () => {
               ) : p.quote ? (
                 <div className="flex-grow flex flex-col items-center justify-center gap-4">
                   <p className="quote-text text-center">{p.quote}</p>
-                                    <div className="relative w-[300px] h-[300px] rounded-2xl overflow-hidden border border-gray-300">
+                                    <div className="relative w-[300px] h-[300px] rounded-2xl overflow-hidden border border-gray-200">
                     {typeof p.id === 'number' && customVisuals[p.id - 1] ? (
                       <img 
                         src={`/assets/visuals/${p.id}.png`} 
