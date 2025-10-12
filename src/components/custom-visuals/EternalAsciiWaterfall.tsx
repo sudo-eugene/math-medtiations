@@ -12,9 +12,11 @@ interface Shape {
 }
 
 const shapePatterns: string[][] = [
-  ['***', '* *', '***'], // square
-  [' /\\ ', '/  \\', '\\  /', ' \\/ '], // diamond
-  ['  *  ', ' *** ', '*****', ' *** ', '  *  '] // star
+  ['###', '# #', '###'],
+  [' /\\ ', '/  \\', '\\  /', ' \\/ '],
+  ['  *  ', ' *** ', '*****', ' *** ', '  *  '],
+  ['====', ' ===', '  = '],
+  ['@@@@', '@@@@', '@@@@']
 ];
 
 const EternalAsciiWaterfall: React.FC<VisualProps> = ({ width, height }) => {
@@ -25,10 +27,12 @@ const EternalAsciiWaterfall: React.FC<VisualProps> = ({ width, height }) => {
   const rows = Math.floor(height / 10);
 
   const randomRow = useCallback(() => {
-    const chars = [' ', '.', ':'];
+    const palette = [' ', '.', ':', '-', '=', '*', '#', '@', '▓', '█'];
     let row = '';
     for (let i = 0; i < cols; i++) {
-      row += chars[Math.floor(Math.random() * chars.length)];
+      const bias = Math.random();
+      const index = Math.floor(Math.pow(bias, 0.45) * (palette.length - 1));
+      row += palette[index];
     }
     return row;
   }, [cols]);
@@ -48,7 +52,7 @@ const EternalAsciiWaterfall: React.FC<VisualProps> = ({ width, height }) => {
 
   const step = useCallback(() => {
     // Occasionally birth a new shape
-    if (Math.random() < 0.03) {
+    if (Math.random() < 0.08) {
       spawnShape();
     }
 
@@ -110,6 +114,7 @@ const EternalAsciiWaterfall: React.FC<VisualProps> = ({ width, height }) => {
     fontSize: '10px',
     lineHeight: '1',
     margin: 0,
+    color: '#1f1f1f',
     userSelect: 'none' as const
   }), []);
 
@@ -125,4 +130,3 @@ const EternalAsciiWaterfall: React.FC<VisualProps> = ({ width, height }) => {
 };
 
 export default EternalAsciiWaterfall;
-

@@ -29,11 +29,13 @@ const JuliaSetDrift: React.FC<VisualProps> = ({ width, height }) => {
     const xmin=-1.6, xmax=1.6, ymin=-1.2, ymax=1.2;
 
     const render = (tms:number)=>{
-      ctx.fillStyle='rgba(240,238,230,0.05)'; ctx.fillRect(0,0,width,height);
+      // Reduced fade rate to minimize white screens during transitions
+      ctx.fillStyle='rgba(240,238,230,0.015)'; ctx.fillRect(0,0,width,height);
       ctx.strokeStyle='rgba(20,20,20,0.08)'; ctx.lineWidth=1;
       const t = tms*0.001;
-      const cr = -0.8 + 0.2*Math.cos(t*0.2);
-      const ci =  0.156 + 0.1*Math.sin(t*0.17);
+      // Faster parameter transitions to reduce blank periods
+      const cr = -0.8 + 0.2*Math.cos(t*0.35);
+      const ci =  0.156 + 0.1*Math.sin(t*0.3);
 
       for(let i=0;i<N;i++){
         const zr = parts[i*4], zi = parts[i*4+1];

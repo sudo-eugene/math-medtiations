@@ -6,6 +6,13 @@ import { VisualProps } from '../../types';
 
 const FluidTurbulence: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
+  const isWhiteSnapshot = (() => {
+    if (typeof window === 'undefined') {
+      return false;
+    }
+    const params = new URLSearchParams(window.location.search);
+    return window.location.pathname.includes('/snapshot') && params.get('bg') === 'white';
+  })();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -152,8 +159,7 @@ const FluidTurbulence: React.FC<VisualProps> = ({ width, height }) => {
     };
 
     const animate = () => {
-      // Background
-      ctx.fillStyle = '#F0EEE6';
+      ctx.fillStyle = isWhiteSnapshot ? '#ffffff' : '#F0EEE6';
       ctx.fillRect(0, 0, width, height);
 
       time += 1;
@@ -255,13 +261,13 @@ const FluidTurbulence: React.FC<VisualProps> = ({ width, height }) => {
         cancelAnimationFrame(animationId);
       }
     };
-  }, [width, height]);
+  }, [width, height, isWhiteSnapshot]);
 
   return (
     <div style={{ 
       width: `${width}px`, 
       height: `${height}px`, 
-      backgroundColor: '#F0EEE6' 
+      backgroundColor: isWhiteSnapshot ? '#ffffff' : '#F0EEE6' 
     }}>
       <canvas ref={canvasRef} width={width} height={height} />
     </div>

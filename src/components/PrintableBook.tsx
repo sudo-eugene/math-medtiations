@@ -3,6 +3,7 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import quotes from '../../quotes-easy.json';
 import MathVisual, { customVisuals, devMode, getPresetForQuote } from './MathVisual';
+import { useVisualBackgroundOverride } from '../utils/visualBackgroundOverride';
 
 const formatVisualName = (rawName: string) => {
   const withoutExtension = rawName.replace(/\.tsx?$/i, '');
@@ -18,10 +19,12 @@ interface Page {
   author: string;
   dedication?: string;
   imageUrl?: string;
+  footnote?: boolean;
 }
 
 const PrintableBook = () => {
   const [loading, setLoading] = useState(false);
+  useVisualBackgroundOverride('#ffffff');
 
   const downloadPdf = async () => {
     setLoading(true);
@@ -98,8 +101,11 @@ const PrintableBook = () => {
     setLoading(false);
   };
 
+  const MAX_QUOTES = 365;
+  const limitedQuotes = quotes.slice(0, MAX_QUOTES);
+
   // Convert string array to objects with index-based IDs (starting from 1)
-  const quotesWithIds = quotes.map((quote, index) => ({
+  const quotesWithIds = limitedQuotes.map((quote, index) => ({
     id: index + 1,
     quote: quote,
     author: ''
@@ -115,11 +121,15 @@ const PrintableBook = () => {
     author: '',
   };
 
-  // Count interior pages: 1 dedication + quotes + 1 blank before back = 2 + quotes.length
-  let interiorPageCount = 2 + quotesWithIds.length;
-  
-  // Calculate how many blank pages needed to make total divisible by 4
-  const remainder = interiorPageCount % 4;
+  const dedicationFootnotePage = {
+    id: 'dedication-footnote',
+    quote: '',
+    author: '',
+    footnote: true,
+  } as const;
+
+  const totalBasePages = 5 + quotesWithIds.length; // front cover, dedication, footnote, blank before back, back cover
+  const remainder = totalBasePages % 4;
   const paddingPagesNeeded = remainder === 0 ? 0 : 4 - remainder;
   
   // Create padding blank pages
@@ -132,6 +142,7 @@ const PrintableBook = () => {
   const finalPages: Page[] = [
     { id: 'cover-1', type: 'cover', quote: '', author: '', imageUrl: '/assets/covers/Cover.png' },
     dedicationPage,
+    dedicationFootnotePage,
     ...quotesWithIds,
     ...paddingPages, // Add padding pages to the back
     { id: 'blank-before-back', quote: '', author: '' }, // Blank page before back cover
@@ -139,7 +150,7 @@ const PrintableBook = () => {
   ];
 
   return (
-    <div className="printable-book-container bg-gray-200 font-serif">
+    <div className="printable-book-container bg-white font-serif">
       <div className="controls p-4 bg-white shadow-md sticky top-0 z-10 flex items-center justify-center">
         <button onClick={downloadPdf} disabled={loading} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400">
           {loading ? 'Generating PDF...' : 'Download as A6 PDF'}
@@ -154,18 +165,25 @@ const PrintableBook = () => {
                   <img src={p.imageUrl} alt="Cover Page" className="w-full h-full object-cover" />
                 ) : (
                   <div className="flex-grow flex flex-col text-left">
-                    <p className="text-lg mb-4">Inspired by Mathematics, Art, Code and Grace</p>
+                    <p className="text-lg mb-4 text-center">An Artwork Inspired by<br /> Mathematics, Code and Grace</p>
                     {p.dedication && <p className="text-lg mb-4">{p.dedication}</p>}
                     <p className="text-sm">A quiet blessing for your beginning: may your days find their centre in gratitude, your steps trace patterns of wonder, and your love hold steady like a star.</p>
                     <p className="text-sm">May your life together be beautifully designed—precise yet playful, simple yet profound.</p>
                     <p className="text-sm">With love and warmest wishes.</p>
                     <p className="text-lg mt-4">from</p>
+                    <p className="text-xs mt-6 text-gray-500 text-center">*This book is a printed companion to the animated experience at <a href="https://gratitude.evenwel.me" className="underline" target="_blank" rel="noreferrer">https://gratitude.evenwel.me</a>.*</p>
                   </div>
                 )
+              ) : p.footnote ? (
+                <div className="flex-grow flex items-center justify-center">
+                  <p className="text-xs text-gray-500 text-center max-w-xs">
+                    This page intentionally left blank to honor the transition from dedication to daily meditations.
+                  </p>
+                </div>
               ) : p.quote ? (
                 <div className="flex-grow flex flex-col items-center justify-center gap-4">
                   <p className="quote-text text-center">{p.quote}</p>
-                                    <div className="relative w-[300px] h-[300px] rounded-2xl overflow-hidden border border-gray-300">
+                                    <div className="relative w-[300px] h-[300px] rounded-2xl overflow-hidden border border-gray-200">
                     {typeof p.id === 'number' && customVisuals[p.id - 1] ? (
                       <img 
                         src={`/assets/visuals/${p.id}.png`} 

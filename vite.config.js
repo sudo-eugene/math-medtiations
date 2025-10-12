@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => {
     server: {
       host: '0.0.0.0',
       port: 5173,
-      open: true,
+      open: false,
       allowedHosts: [env.VITE_ALLOWED_HOST || 'gratitude.evenwel.me'],
     },
   };

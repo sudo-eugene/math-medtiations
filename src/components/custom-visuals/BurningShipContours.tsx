@@ -17,8 +17,10 @@ const BurningShipContours: React.FC<VisualProps> = ({ width, height }) => {
     const maxIter=180;
 
     const render = ()=>{
-      ctx.fillStyle='rgba(240,238,230,0.05)'; ctx.fillRect(0,0,width,height);
-      ctx.fillStyle='rgba(20,20,20,0.05)';
+      // Soft pencil trail fade
+      ctx.fillStyle='rgba(240,238,230,0.01)'; ctx.fillRect(0,0,width,height);
+      // Soft pencil-like dark grey with higher opacity
+      ctx.fillStyle='rgba(25,25,28,0.45)';
       const samples=160;
       for(let n=0;n<samples;n++){
         const cr = xmin + rnd()*(xmax-xmin);

@@ -37,7 +37,9 @@ const FractalWaterfall: React.FC<VisualProps> = ({ width, height }) => {
         ctx.beginPath();
         ctx.moveTo(lineX, y);
         ctx.lineTo(lineX, y + h);
-        ctx.strokeStyle = `rgba(120, 160, 255, ${opacity})`;
+        const tone = 90 + level * 4;
+        const alpha = Math.min(0.35, opacity * 1.6);
+        ctx.strokeStyle = `rgba(${tone}, ${tone}, ${tone}, ${alpha})`;
         ctx.lineWidth = 1 + level * 0.2;
         ctx.stroke();
       }
@@ -57,7 +59,7 @@ const FractalWaterfall: React.FC<VisualProps> = ({ width, height }) => {
 
       time.current += 0.02;
 
-      ctx.fillStyle = '#0a0a0a';
+      ctx.fillStyle = 'rgba(240,238,230,0.12)';
       ctx.fillRect(0, 0, width, height);
 
       drawWaterfall(0, 0, width, height, 5);
@@ -73,7 +75,7 @@ const FractalWaterfall: React.FC<VisualProps> = ({ width, height }) => {
   }, [width, height]);
 
   return (
-    <div style={{ width: `${width}px`, height: `${height}px` }} className="bg-black">
+    <div style={{ width: `${width}px`, height: `${height}px`, background: '#F0EEE6', overflow: 'hidden' }}>
       <canvas ref={canvasRef} width={width} height={height} className="w-full h-full" />
     </div>
   );

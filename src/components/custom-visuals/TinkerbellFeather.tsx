@@ -20,7 +20,7 @@ const TinkerbellFeather: React.FC<VisualProps> = ({ width, height }) => {
     // Standard Tinkerbell parameters
     const a = 0.9, b = -0.6013, c = 2.0, d = 0.5;
     let x = (rnd()*2-1)*0.1, y = (rnd()*2-1)*0.1;
-    const cx = width*0.5, cy = height*0.5;
+    const cx = width*0.7, cy = height*0.72;
     const scale = Math.min(width,height)*0.45;
 
     const render = ()=>{

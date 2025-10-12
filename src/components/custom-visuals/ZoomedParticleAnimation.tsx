@@ -24,9 +24,9 @@ const ZoomedParticleAnimation: React.FC<VisualProps> = ({ width, height }) => {
     const isSmallContainer = canvas.width < 440;
     
     // Zoomed parameters - focusing on a specific region
-    const zoomLevel = isSmallContainer ? 2.5 : 2.5; // Increased zoom by 25% (from original 2.0)
-    const zoomOffsetX = canvas.width / 18; // Adjust these to change the focus point
-    const zoomOffsetY = canvas.height / 18 - 60;
+    const zoomLevel = isSmallContainer ? 2.5 : 1.5; // Increased zoom by 25% (from original 2.0)
+    const zoomOffsetX = canvas.width / 1000; // Adjust these to change the focus point
+    const zoomOffsetY = canvas.height / 1000;
     
     const particles: Array<{
       x: number;

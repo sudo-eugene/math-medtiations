@@ -17,7 +17,7 @@ const QuantumLatticeBloom: React.FC<VisualProps> = ({ width: containerWidth, hei
     const cols = Math.floor(containerWidth / charWidth);
     const rows = Math.floor(containerHeight / charHeight);
 
-    const density = '.·•○●';
+    const density = '  ..--==**##@@▓█';
     let grid: number[][] = Array.from({ length: rows }, () => Array(cols).fill(0));
     let frame = 0;
     let animationId: number;
@@ -29,16 +29,17 @@ const QuantumLatticeBloom: React.FC<VisualProps> = ({ width: containerWidth, hei
     };
 
     const render = () => {
-      let html = '';
+      const fragments = new Array(rows);
       for (let y = 0; y < rows; y++) {
+        let line = '';
         for (let x = 0; x < cols; x++) {
-          const val = Math.min(1, grid[y][x]);
-          const idx = Math.min(density.length - 1, Math.floor(val * density.length));
-          html += density[idx];
+          const val = Math.min(1, Math.pow(grid[y][x], 0.6));
+          const idx = Math.min(density.length - 1, Math.floor(val * (density.length - 1)));
+          line += density[idx];
         }
-        html += '<br>';
+        fragments[y] = line;
       }
-      container.innerHTML = html;
+      container.textContent = fragments.join('\n');
     };
 
     const update = () => {
@@ -46,10 +47,10 @@ const QuantumLatticeBloom: React.FC<VisualProps> = ({ width: containerWidth, hei
 
       for (let y = 0; y < rows; y++) {
         for (let x = 0; x < cols; x++) {
-          next[y][x] = grid[y][x] * 0.85;
+          next[y][x] = grid[y][x] * 0.9;
 
           if (seededRandom(x, y, frame) > 0.995) {
-            next[y][x] = 1;
+            next[y][x] = 1.25;
           }
 
           if (grid[y][x] > 0.1) {
@@ -59,7 +60,7 @@ const QuantumLatticeBloom: React.FC<VisualProps> = ({ width: containerWidth, hei
                 const nx = x + dx;
                 const ny = y + dy;
                 if (nx >= 0 && nx < cols && ny >= 0 && ny < rows) {
-                  next[ny][nx] = Math.max(next[ny][nx], grid[y][x] * 0.6);
+                  next[ny][nx] = Math.max(next[ny][nx], grid[y][x] * 0.82);
                 }
               }
             }
@@ -80,7 +81,9 @@ const QuantumLatticeBloom: React.FC<VisualProps> = ({ width: containerWidth, hei
     animate();
 
     return () => {
-      cancelAnimationFrame(animationId);
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
     };
   }, [containerWidth, containerHeight]);
 
@@ -94,6 +97,7 @@ const QuantumLatticeBloom: React.FC<VisualProps> = ({ width: containerWidth, hei
         fontFamily: 'monospace',
         fontSize: '12px',
         lineHeight: '1.2em',
+        color: '#1f1f1f',
         whiteSpace: 'pre',
         display: 'flex',
         alignItems: 'center',
@@ -105,4 +109,3 @@ const QuantumLatticeBloom: React.FC<VisualProps> = ({ width: containerWidth, hei
 };
 
 export default QuantumLatticeBloom;
-

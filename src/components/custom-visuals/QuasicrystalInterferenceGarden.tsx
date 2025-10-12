@@ -28,7 +28,7 @@ const QuasicrystalInterferenceGarden: React.FC<VisualProps> = ({ width, height }
       return { kx: Math.cos(ang) * k, ky: Math.sin(ang) * k, phase, speed: (rnd()*0.4+0.2)*0.3 };
     });
 
-    const res = Math.max(6, Math.floor(Math.min(width, height) / 180)); // coarse lattice for speed
+    const res = Math.max(5, Math.floor(Math.min(width, height) / 150)); // coarse lattice for speed
     const nx = Math.floor(width / res);
     const ny = Math.floor(height / res);
 
@@ -56,11 +56,22 @@ const QuasicrystalInterferenceGarden: React.FC<VisualProps> = ({ width, height }
           }
           // Normalize to [0,1]
           const val = (sum + waves.length) / (2 * waves.length);
-          // Stipple threshold near high-intensity interference
-          const a = smoothstep(0.82, 0.96, val);
-          if (a > 0) {
-            ctx.fillStyle = `rgba(20,20,20,${0.18 * a})`;
-            ctx.fillRect(x|0, y|0, 1, 1);
+          // Stipple clusters near high-intensity interference using jittered offsets
+          const a = smoothstep(0.78, 0.95, val);
+          if (a > 0.02) {
+            const jitter = (idx: number) => ((idx * 0x1f123bb + 0x9e3779b9) & 0xffff) / 0xffff;
+            const seed = (yi * nx + xi);
+            const points = 3;
+            for (let k = 0; k < points; k++) {
+              const j = jitter(seed + k * 7919);
+              const offX = (j - 0.5) * res * 0.65;
+              const offY = (j * 1.732 - Math.floor(j * 1.732)) * res * 0.65 - res * 0.325;
+              const px = x + offX;
+              const py = y + offY;
+              const opacity = 0.08 + 0.22 * a * ((k + j) % 1);
+              ctx.fillStyle = `rgba(28,28,28,${opacity})`;
+              ctx.fillRect(px, py, 1.1, 1.1);
+            }
           }
         }
       }
@@ -88,4 +99,3 @@ const metadata = {
 export default QuasicrystalInterferenceGarden;
 
 // Differs from others by: five-plane wave quasicrystal interference as the core mechanism
-

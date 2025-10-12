@@ -1,6 +1,6 @@
-// Themes: frustrated magnetism, glassy dynamics, competing interactions
-// Visualisation: Magnetic spins create frustrated, glassy dynamics with competing forces
-// Unique mechanism: Edwards-Anderson spin glass model with frustrated magnetic interactions
+// Themes: interconnection, flowing tensions, graceful balance, inner dynamics
+// Visualisation: Particles find balance through gentle connections and flowing relationships
+// Unique mechanism: Edwards-Anderson spin glass model transformed into meditation on balance
 
 import React, { useRef, useEffect } from 'react';
 import { VisualProps } from '../../types';
@@ -94,7 +94,7 @@ const SpinGlass: React.FC<VisualProps> = ({ width, height }) => {
 
     // Spin glass dynamics (simplified Glauber dynamics)
     const updateSpins = () => {
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 8; i++) {
         const spinIndex = Math.floor(random() * spins.length);
         const spin = spins[spinIndex];
         
@@ -113,8 +113,8 @@ const SpinGlass: React.FC<VisualProps> = ({ width, height }) => {
     };
 
     const render = (t: number) => {
-      // Trails with translucent clear
-      ctx.fillStyle = 'rgba(240,238,230,0.08)';
+      // Gentle fade for flowing movement
+      ctx.fillStyle = 'rgba(240,238,230,0.05)';
       ctx.fillRect(0, 0, width, height);
 
       const time = t * 0.001;
@@ -122,111 +122,83 @@ const SpinGlass: React.FC<VisualProps> = ({ width, height }) => {
       updateSpins();
       updateSpinProperties();
 
-      // Draw connections with frustration indication
+      // Draw ethereal connections
       spins.forEach((spin, i) => {
         spin.connections.forEach(conn => {
           const otherSpin = spins[conn.target];
           const interaction = -conn.coupling * spin.value * otherSpin.value;
-          const isFrustrated = interaction > 0;
+          const inHarmony = interaction < 0;
           
-          // Color based on coupling strength and frustration
-          const alpha = Math.abs(conn.coupling) * 0.5;
-          const color = isFrustrated ? 'rgba(120,60,60,' : 'rgba(60,120,60,';
+          // Subtle neutral colors for connections
+          const strength = Math.abs(conn.coupling);
+          const pulse = Math.sin(time * 1.5 + i * 0.1) * 0.05 + 0.95;
+          const alpha = strength * 0.15 * pulse;
           
-          ctx.strokeStyle = color + alpha + ')';
-          ctx.lineWidth = Math.abs(conn.coupling) * 2 + 0.5;
+          // Neutral grays with subtle variation
+          const grayTone = inHarmony ? 100 : 80;
+          ctx.strokeStyle = `rgba(${grayTone}, ${grayTone}, ${grayTone}, ${alpha})`;
+          ctx.lineWidth = strength * 1.2 + 0.3;
           
-          // Draw wavy line for frustrated bonds
+          // Draw gently flowing lines
           ctx.beginPath();
-          if (isFrustrated) {
-            const segments = 8;
-            for (let seg = 0; seg <= segments; seg++) {
-              const t = seg / segments;
-              const x = spin.x + (otherSpin.x - spin.x) * t;
-              const y = spin.y + (otherSpin.y - spin.y) * t + Math.sin(t * Math.PI * 4) * 3;
-              
-              if (seg === 0) ctx.moveTo(x, y);
-              else ctx.lineTo(x, y);
-            }
-          } else {
-            ctx.moveTo(spin.x, spin.y);
-            ctx.lineTo(otherSpin.x, otherSpin.y);
+          const segments = 12;
+          for (let seg = 0; seg <= segments; seg++) {
+            const t = seg / segments;
+            const flowOffset = Math.sin(time * 0.5 + t * Math.PI * 2) * 2;
+            const x = spin.x + (otherSpin.x - spin.x) * t;
+            const y = spin.y + (otherSpin.y - spin.y) * t + flowOffset;
+            
+            if (seg === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
           }
           ctx.stroke();
         });
       });
 
-      // Draw spins
-      spins.forEach(spin => {
-        const frustrationLevel = spin.frustration;
+      // Draw particles with ethereal glow
+      spins.forEach((spin, idx) => {
         const energyLevel = Math.abs(spin.energy) / 5;
+        const connectionCount = spin.connections.length;
         
-        // Spin visualization
-        const size = 8 + energyLevel * 4;
-        const pulse = Math.sin(time * 2 + spin.x * 0.01) * 0.2 + 0.8;
+        // Gentle breathing pulse
+        const breathe = Math.sin(time * 1.2 + idx * 0.2) * 0.15 + 1;
+        const size = 7 + energyLevel * 3;
         
-        // Frustration halo
-        if (frustrationLevel > 0.3) {
-          const gradient = ctx.createRadialGradient(
-            spin.x, spin.y, 0,
-            spin.x, spin.y, size * 2
-          );
-          gradient.addColorStop(0, `rgba(150,80,80,${frustrationLevel * 0.3})`);
-          gradient.addColorStop(1, 'rgba(150,80,80,0)');
-          
-          ctx.fillStyle = gradient;
-          ctx.beginPath();
-          ctx.arc(spin.x, spin.y, size * 2, 0, Math.PI * 2);
-          ctx.fill();
-        }
+        // Subtle ethereal halo based on connections
+        const haloSize = size * (1.5 + connectionCount * 0.15);
+        const gradient = ctx.createRadialGradient(
+          spin.x, spin.y, 0,
+          spin.x, spin.y, haloSize * breathe
+        );
         
-        // Spin direction indicator
-        const spinColor = spin.value > 0 ? 'rgba(80,80,80,0.8)' : 'rgba(50,50,50,0.8)';
-        ctx.fillStyle = spinColor;
-        ctx.strokeStyle = 'rgba(40,40,40,0.6)';
-        ctx.lineWidth = 1.5;
+        // Neutral tones - lighter for one state, darker for another
+        const baseTone = spin.value > 0 ? 110 : 85;
+        const glowIntensity = 0.12 + (connectionCount / 10) * 0.08;
         
+        gradient.addColorStop(0, `rgba(${baseTone}, ${baseTone}, ${baseTone}, ${glowIntensity})`);
+        gradient.addColorStop(0.5, `rgba(${baseTone}, ${baseTone}, ${baseTone}, ${glowIntensity * 0.4})`);
+        gradient.addColorStop(1, `rgba(${baseTone}, ${baseTone}, ${baseTone}, 0)`);
+        
+        ctx.fillStyle = gradient;
         ctx.beginPath();
-        ctx.arc(spin.x, spin.y, size * pulse, 0, Math.PI * 2);
+        ctx.arc(spin.x, spin.y, haloSize * breathe, 0, Math.PI * 2);
         ctx.fill();
-        ctx.stroke();
         
-        // Arrow indicating spin direction
-        const arrowSize = size * 0.6;
-        ctx.strokeStyle = 'rgba(30,30,30,0.8)';
-        ctx.lineWidth = 2;
+        // Core particle with soft edge
+        const coreGradient = ctx.createRadialGradient(
+          spin.x, spin.y, 0,
+          spin.x, spin.y, size * breathe
+        );
+        
+        const coreTone = spin.value > 0 ? 95 : 70;
+        coreGradient.addColorStop(0, `rgba(${coreTone}, ${coreTone}, ${coreTone}, 0.7)`);
+        coreGradient.addColorStop(1, `rgba(${coreTone}, ${coreTone}, ${coreTone}, 0.2)`);
+        
+        ctx.fillStyle = coreGradient;
         ctx.beginPath();
-        
-        if (spin.value > 0) {
-          // Up arrow
-          ctx.moveTo(spin.x, spin.y - arrowSize);
-          ctx.lineTo(spin.x, spin.y + arrowSize);
-          ctx.moveTo(spin.x - arrowSize/2, spin.y - arrowSize/2);
-          ctx.lineTo(spin.x, spin.y - arrowSize);
-          ctx.lineTo(spin.x + arrowSize/2, spin.y - arrowSize/2);
-        } else {
-          // Down arrow
-          ctx.moveTo(spin.x, spin.y - arrowSize);
-          ctx.lineTo(spin.x, spin.y + arrowSize);
-          ctx.moveTo(spin.x - arrowSize/2, spin.y + arrowSize/2);
-          ctx.lineTo(spin.x, spin.y + arrowSize);
-          ctx.lineTo(spin.x + arrowSize/2, spin.y + arrowSize/2);
-        }
-        ctx.stroke();
+        ctx.arc(spin.x, spin.y, size * breathe, 0, Math.PI * 2);
+        ctx.fill();
       });
-
-      // Display frustration statistics
-      const totalFrustration = spins.reduce((sum, spin) => sum + spin.frustration, 0);
-      const avgFrustration = totalFrustration / spins.length;
-      
-      ctx.font = '11px serif';
-      ctx.fillStyle = 'rgba(60,60,60,0.8)';
-      ctx.fillText(`Avg Frustration: ${avgFrustration.toFixed(3)}`, 10, 25);
-      ctx.fillText(`Temperature: ${temperature}`, 10, 40);
-      
-      const glassyState = avgFrustration > 0.2 ? 'Glassy' : 'Ordered';
-      ctx.fillStyle = avgFrustration > 0.2 ? 'rgba(120,60,60,0.8)' : 'rgba(60,120,60,0.8)';
-      ctx.fillText(`State: ${glassyState}`, 10, 55);
 
       rafRef.current = requestAnimationFrame(render);
     };
@@ -249,9 +221,9 @@ const SpinGlass: React.FC<VisualProps> = ({ width, height }) => {
 // Differs from others by: Implements Edwards-Anderson spin glass model with frustrated magnetic interactions and glassy dynamics - no other visual models competing magnetic forces
 
 const metadata = {
-  themes: "frustrated magnetism, glassy dynamics, competing interactions",
-  visualisation: "Magnetic spins create frustrated, glassy dynamics with competing forces",
-  promptSuggestion: "1. Adjust temperature and coupling distributions\n2. Vary frustration visualization\n3. Control spin flip dynamics"
+  themes: "interconnection, flowing tensions, graceful balance, inner dynamics",
+  visualisation: "Particles find balance through gentle connections and flowing relationships",
+  promptSuggestion: "1. Adjust connection patterns\n2. Vary particle dynamics\n3. Control flow and harmony"
 };
 (SpinGlass as any).metadata = metadata;
 

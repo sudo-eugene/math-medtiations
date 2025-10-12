@@ -91,10 +91,6 @@ const QuadraticBraidCurrents: React.FC<VisualProps> = ({ width, height }) => {
         ctx.stroke();
       }
 
-      ctx.strokeStyle = 'rgba(20,20,20,0.08)';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(width * 0.07, height * 0.07, width * 0.86, height * 0.86);
-
       rafRef.current = requestAnimationFrame(render);
     };
 

@@ -79,8 +79,8 @@ const LorenzAttractor: React.FC<VisualProps> = ({ width, height }) => {
     // 3D to 2D projection
     const project3D = (x: number, y: number, z: number) => {
       const scale = 8;
-      const offsetX = width / 2;
-      const offsetY = height / 2;
+      const offsetX = width / 2 - 90;
+      const offsetY = height / 2 + 80;
       
       // Rotate for better viewing angle
       const rotX = Math.PI / 6;
@@ -205,26 +205,6 @@ const LorenzAttractor: React.FC<VisualProps> = ({ width, height }) => {
           ctx.fill();
         }
       });
-
-      // Draw phase space axes (subtle)
-      ctx.strokeStyle = 'rgba(60,60,60,0.2)';
-      ctx.lineWidth = 1;
-      
-      // X-axis
-      const xAxis1 = project3D(-30, 0, 0);
-      const xAxis2 = project3D(30, 0, 0);
-      ctx.beginPath();
-      ctx.moveTo(xAxis1.x, xAxis1.y);
-      ctx.lineTo(xAxis2.x, xAxis2.y);
-      ctx.stroke();
-      
-      // Y-axis  
-      const yAxis1 = project3D(0, -30, 0);
-      const yAxis2 = project3D(0, 30, 0);
-      ctx.beginPath();
-      ctx.moveTo(yAxis1.x, yAxis1.y);
-      ctx.lineTo(yAxis2.x, yAxis2.y);
-      ctx.stroke();
 
       rafRef.current = requestAnimationFrame(render);
     };

@@ -1,6 +1,6 @@
-// Themes: order-disorder transitions, critical phenomena, statistical physics meditation
-// Visualisation: Order-disorder transitions in particle arrangements showing critical behavior
-// Unique mechanism: Ising model Monte Carlo simulation with phase transition dynamics
+// Themes: transformation, harmony, graceful change, unity and diversity
+// Visualisation: Gentle flowing patterns of unity and diversity in harmonious transformation
+// Unique mechanism: Ising model Monte Carlo simulation transformed into ethereal meditation
 
 import React, { useRef, useEffect } from 'react';
 import { VisualProps } from '../../types';
@@ -92,8 +92,8 @@ const PhaseTransition: React.FC<VisualProps> = ({ width, height }) => {
     };
 
     const render = (t: number) => {
-      // Trails with translucent clear
-      ctx.fillStyle = 'rgba(240,238,230,0.1)';
+      // Gentle fade for flowing transitions
+      ctx.fillStyle = 'rgba(240,238,230,0.05)';
       ctx.fillRect(0, 0, width, height);
 
       const time = t * 0.001;
@@ -101,15 +101,15 @@ const PhaseTransition: React.FC<VisualProps> = ({ width, height }) => {
       // Vary temperature to show phase transition
       temperature = 2.269 + Math.sin(time * 0.1) * 1.5; // Critical temp ± 1.5
 
-      // Run Monte Carlo steps
-      for (let i = 0; i < 5; i++) {
+      // Run Monte Carlo steps for smooth transformation
+      for (let i = 0; i < 8; i++) {
         metropolisStep();
       }
 
       const magnetization = calculateMagnetization();
       const energy = calculateEnergy();
 
-      // Visualize spins
+      // Visualize spins with ethereal softness
       const cellWidth = width / gridSize;
       const cellHeight = height / gridSize;
 
@@ -119,93 +119,76 @@ const PhaseTransition: React.FC<VisualProps> = ({ width, height }) => {
           const x = i * cellWidth;
           const y = j * cellHeight;
 
-          // Color based on spin and local order
-          let neighborAlignment = 0;
+          // Calculate harmony with neighbors
           const neighbors = [
             spins[(i + 1) % gridSize][j],
             spins[(i - 1 + gridSize) % gridSize][j],
             spins[i][(j + 1) % gridSize],
             spins[i][(j - 1 + gridSize) % gridSize]
           ];
-          neighborAlignment = neighbors.filter(n => n === spin).length / 4;
+          const neighborAlignment = neighbors.filter(n => n === spin).length / 4;
 
-          const alpha = 0.3 + neighborAlignment * 0.5;
-          const intensity = (spin + 1) / 2; // Convert -1,1 to 0,1
-
-          ctx.fillStyle = `rgba(${60 + intensity * 40}, ${60 + intensity * 40}, ${60 + intensity * 40}, ${alpha})`;
-          ctx.fillRect(x, y, cellWidth, cellHeight);
-
-          // Draw spin direction indicator
+          // Soft, ethereal colors based on state and harmony
           const centerX = x + cellWidth / 2;
           const centerY = y + cellHeight / 2;
-          const arrowSize = Math.min(cellWidth, cellHeight) * 0.3;
-
-          ctx.strokeStyle = `rgba(50,50,50,${0.6 * neighborAlignment})`;
-          ctx.lineWidth = 1;
-          ctx.beginPath();
-          ctx.moveTo(centerX, centerY);
+          
+          // Add gentle breathing pulse to size
+          const breathe = Math.sin(time * 1.5 + i * 0.3 + j * 0.3) * 0.1 + 1;
+          const radius = Math.min(cellWidth, cellHeight) * 0.4 * breathe;
+          
+          // Create gentle gradient for each particle
+          const gradient = ctx.createRadialGradient(
+            centerX, centerY, 0,
+            centerX, centerY, radius * 1.5
+          );
           
           if (spin > 0) {
-            // Up arrow
-            ctx.lineTo(centerX, centerY - arrowSize);
-            ctx.moveTo(centerX - arrowSize/3, centerY - arrowSize*0.7);
-            ctx.lineTo(centerX, centerY - arrowSize);
-            ctx.lineTo(centerX + arrowSize/3, centerY - arrowSize*0.7);
+            // Warm, luminous tones for one state
+            const warmth = 140 + neighborAlignment * 40;
+            const glow = 0.25 + neighborAlignment * 0.35 + Math.sin(time * 2) * 0.1;
+            gradient.addColorStop(0, `rgba(${warmth}, ${warmth - 20}, ${warmth - 40}, ${glow})`);
+            gradient.addColorStop(1, `rgba(${warmth}, ${warmth - 20}, ${warmth - 40}, 0)`);
           } else {
-            // Down arrow
-            ctx.lineTo(centerX, centerY + arrowSize);
-            ctx.moveTo(centerX - arrowSize/3, centerY + arrowSize*0.7);
-            ctx.lineTo(centerX, centerY + arrowSize);
-            ctx.lineTo(centerX + arrowSize/3, centerY + arrowSize*0.7);
-          }
-          ctx.stroke();
-        }
-      }
-
-      // Draw domain boundaries
-      ctx.strokeStyle = 'rgba(40,40,40,0.4)';
-      ctx.lineWidth = 2;
-
-      for (let i = 0; i < gridSize - 1; i++) {
-        for (let j = 0; j < gridSize - 1; j++) {
-          const spin = spins[i][j];
-          
-          // Check for domain boundary
-          if (spins[i + 1][j] !== spin) {
-            // Vertical boundary
-            ctx.beginPath();
-            ctx.moveTo((i + 1) * cellWidth, j * cellHeight);
-            ctx.lineTo((i + 1) * cellWidth, (j + 1) * cellHeight);
-            ctx.stroke();
+            // Cool, serene tones for the other state
+            const coolness = 120 + neighborAlignment * 40;
+            const glow = 0.25 + neighborAlignment * 0.35 + Math.sin(time * 2 + Math.PI) * 0.1;
+            gradient.addColorStop(0, `rgba(${coolness - 30}, ${coolness - 10}, ${coolness + 20}, ${glow})`);
+            gradient.addColorStop(1, `rgba(${coolness - 30}, ${coolness - 10}, ${coolness + 20}, 0)`);
           }
           
-          if (spins[i][j + 1] !== spin) {
-            // Horizontal boundary
-            ctx.beginPath();
-            ctx.moveTo(i * cellWidth, (j + 1) * cellHeight);
-            ctx.lineTo((i + 1) * cellWidth, (j + 1) * cellHeight);
-            ctx.stroke();
+          ctx.fillStyle = gradient;
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+          ctx.fill();
+          
+          // Add subtle connecting lines between harmonious neighbors
+          if (neighborAlignment > 0.5) {
+            const connectionGlow = 0.12 * neighborAlignment + Math.sin(time * 2.5) * 0.04;
+            ctx.strokeStyle = spin > 0 
+              ? `rgba(160, 140, 100, ${connectionGlow})`
+              : `rgba(90, 110, 140, ${connectionGlow})`;
+            ctx.lineWidth = 0.8;
+            
+            // Draw gentle connections
+            neighbors.forEach((neighbor, idx) => {
+              if (neighbor === spin) {
+                const [ni, nj] = [
+                  [(i + 1) % gridSize, j],
+                  [(i - 1 + gridSize) % gridSize, j],
+                  [i, (j + 1) % gridSize],
+                  [i, (j - 1 + gridSize) % gridSize]
+                ][idx];
+                const nx = ni * cellWidth + cellWidth / 2;
+                const ny = nj * cellHeight + cellHeight / 2;
+                
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(nx, ny);
+                ctx.stroke();
+              }
+            });
           }
         }
-      }
-
-      // Display system properties
-      ctx.font = '12px serif';
-      ctx.fillStyle = 'rgba(60,60,60,0.8)';
-      ctx.fillText(`Temperature: ${temperature.toFixed(2)}`, 10, 25);
-      ctx.fillText(`Magnetization: ${magnetization.toFixed(3)}`, 10, 45);
-      ctx.fillText(`Energy: ${(energy / (gridSize * gridSize)).toFixed(2)}`, 10, 65);
-
-      // Phase indicator
-      const phase = temperature < 2.269 ? 'Ordered' : 'Disordered';
-      const phaseColor = temperature < 2.269 ? 'rgba(80,120,80,0.8)' : 'rgba(120,80,80,0.8)';
-      ctx.fillStyle = phaseColor;
-      ctx.fillText(`Phase: ${phase}`, 10, 85);
-
-      // Critical temperature line
-      if (Math.abs(temperature - 2.269) < 0.1) {
-        ctx.fillStyle = 'rgba(120,60,60,0.8)';
-        ctx.fillText('~ CRITICAL POINT ~', 10, 105);
       }
 
       rafRef.current = requestAnimationFrame(render);
@@ -229,9 +212,9 @@ const PhaseTransition: React.FC<VisualProps> = ({ width, height }) => {
 // Differs from others by: Implements Ising model Monte Carlo simulation showing order-disorder phase transitions - no other visual models statistical physics critical phenomena
 
 const metadata = {
-  themes: "order-disorder transitions, critical phenomena, statistical physics meditation",
-  visualisation: "Order-disorder transitions in particle arrangements showing critical behavior",
-  promptSuggestion: "1. Adjust temperature cycling range\n2. Vary coupling strength and magnetic field\n3. Control domain boundary visualization"
+  themes: "transformation, harmony, graceful change, unity and diversity",
+  visualisation: "Gentle flowing patterns of unity and diversity in harmonious transformation",
+  promptSuggestion: "1. Adjust transformation rhythm\n2. Vary harmony patterns\n3. Control visual softness and glow"
 };
 (PhaseTransition as any).metadata = metadata;
 

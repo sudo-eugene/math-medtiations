@@ -123,11 +123,17 @@ const GravityWells: React.FC<VisualProps> = ({ width, height }) => {
         particle.x += particle.vx;
         particle.y += particle.vy;
         
-        // Boundary handling - wrap around
-        if (particle.x < 0) particle.x = width;
-        if (particle.x > width) particle.x = 0;
-        if (particle.y < 0) particle.y = height;
-        if (particle.y > height) particle.y = 0;
+        // Boundary handling - wrap around and clear trail to avoid drawing lines across screen
+        let wrapped = false;
+        if (particle.x < 0) { particle.x = width; wrapped = true; }
+        if (particle.x > width) { particle.x = 0; wrapped = true; }
+        if (particle.y < 0) { particle.y = height; wrapped = true; }
+        if (particle.y > height) { particle.y = 0; wrapped = true; }
+        
+        // Clear trail if particle wrapped to avoid drawing lines across screen
+        if (wrapped) {
+          particle.trail = [];
+        }
         
         // Update trail
         particle.trail.push({

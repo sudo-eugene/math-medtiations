@@ -78,10 +78,6 @@ const KelvinShearScrolls: React.FC<VisualProps> = ({ width, height }) => {
         ctx.stroke();
       }
 
-      ctx.strokeStyle = 'rgba(20,20,20,0.08)';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(width * 0.06, height * 0.08, width * 0.88, height * 0.84);
-
       rafRef.current = requestAnimationFrame(render);
     };
 

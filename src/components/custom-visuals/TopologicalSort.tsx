@@ -1,6 +1,6 @@
-// Themes: dependency resolution, hierarchical order, directed flow
-// Visualisation: Directed graph nodes arrange in dependency layers showing topological ordering
-// Unique mechanism: Kahn's topological sorting algorithm with force layout and live dependency resolution
+// Themes: flowing order, natural unfolding, graceful progression, interconnected becoming
+// Visualisation: Particles arrange themselves in flowing layers revealing natural progression
+// Unique mechanism: Kahn's topological sorting algorithm transformed into meditation on natural order
 
 import React, { useRef, useEffect } from 'react';
 import { VisualProps } from '../../types';
@@ -192,8 +192,8 @@ const TopologicalSort: React.FC<VisualProps> = ({ width, height }) => {
     generateDAG();
 
     const render = (t: number) => {
-      // Trails with translucent clear
-      ctx.fillStyle = 'rgba(240,238,230,0.06)';
+      // Gentle fade for flowing movement
+      ctx.fillStyle = 'rgba(240,238,230,0.04)';
       ctx.fillRect(0, 0, width, height);
 
       const time = t * 0.001;
@@ -215,113 +215,92 @@ const TopologicalSort: React.FC<VisualProps> = ({ width, height }) => {
 
       applyForces();
 
-      // Draw dependency levels
+      // Draw subtle flowing layers
       for (let level = 0; level <= sortingStep; level++) {
         const levelX = 50 + level * (width / 5);
-        ctx.strokeStyle = 'rgba(80,80,80,0.2)';
-        ctx.lineWidth = 1;
-        ctx.setLineDash([5, 5]);
+        const wave = Math.sin(time * 0.5 + level) * 0.05 + 0.95;
+        ctx.strokeStyle = `rgba(90,90,90,${0.08 * wave})`;
+        ctx.lineWidth = 0.5;
+        ctx.setLineDash([8, 8]);
         ctx.beginPath();
         ctx.moveTo(levelX, 0);
         ctx.lineTo(levelX, height);
         ctx.stroke();
         ctx.setLineDash([]);
-
-        // Level label
-        ctx.font = '10px serif';
-        ctx.fillStyle = 'rgba(60,60,60,0.5)';
-        ctx.fillText(`L${level}`, levelX + 5, 15);
       }
 
-      // Draw edges
+      // Draw flowing connections
       edges.forEach(edge => {
         const fromNode = nodes.find(n => n.id === edge.from);
         const toNode = nodes.find(n => n.id === edge.to);
 
         if (fromNode && toNode) {
-          const alpha = edge.active ? 0.6 : 0.2;
-          const width = edge.active ? 2 : 1;
+          const pulse = Math.sin(time * 1.5 + edge.from * 0.3) * 0.05 + 0.95;
+          const alpha = edge.active ? 0.2 * pulse : 0.08;
+          const lineWidth = edge.active ? 1.5 : 0.8;
           
-          ctx.strokeStyle = `rgba(70,70,70,${alpha})`;
-          ctx.lineWidth = width;
+          ctx.strokeStyle = `rgba(90,90,90,${alpha})`;
+          ctx.lineWidth = lineWidth;
           
-          // Draw arrow
+          // Draw gently curved line
           ctx.beginPath();
+          const midX = (fromNode.x + toNode.x) / 2;
+          const midY = (fromNode.y + toNode.y) / 2;
+          const offsetY = Math.sin(time + edge.from) * 5;
+          
           ctx.moveTo(fromNode.x, fromNode.y);
-          ctx.lineTo(toNode.x, toNode.y);
-          ctx.stroke();
-
-          // Arrowhead
-          const angle = Math.atan2(toNode.y - fromNode.y, toNode.x - fromNode.x);
-          const headLength = 8;
-          
-          ctx.beginPath();
-          ctx.moveTo(toNode.x, toNode.y);
-          ctx.lineTo(
-            toNode.x - headLength * Math.cos(angle - Math.PI / 6),
-            toNode.y - headLength * Math.sin(angle - Math.PI / 6)
-          );
-          ctx.moveTo(toNode.x, toNode.y);
-          ctx.lineTo(
-            toNode.x - headLength * Math.cos(angle + Math.PI / 6),
-            toNode.y - headLength * Math.sin(angle + Math.PI / 6)
-          );
+          ctx.quadraticCurveTo(midX, midY + offsetY, toNode.x, toNode.y);
           ctx.stroke();
         }
       });
 
-      // Draw nodes
+      // Draw ethereal particles
       nodes.forEach(node => {
-        const pulse = Math.sin(node.age) * 0.1 + 0.9;
-        let nodeColor, strokeColor;
-
+        const breathe = Math.sin(node.age + time * 1.5) * 0.12 + 1;
+        const size = node.size * breathe;
+        
+        // Determine glow based on state
+        let baseTone, glowIntensity;
         if (node.processed) {
-          // Processed nodes - colored by level
-          const hue = node.level * 60;
-          nodeColor = `rgba(${80 + hue % 40},${80 + hue % 40},${80 + hue % 40},0.8)`;
-          strokeColor = `rgba(${50 + hue % 40},${50 + hue % 40},${50 + hue % 40},0.8)`;
+          // Processed - lighter, calmer
+          baseTone = 100 + node.level * 5;
+          glowIntensity = 0.25;
         } else if (node.indegree === 0) {
-          // Ready to process - highlighted
-          nodeColor = 'rgba(100,120,100,0.8)';
-          strokeColor = 'rgba(60,80,60,0.8)';
+          // Ready - gentle highlight
+          baseTone = 105;
+          glowIntensity = 0.3 + Math.sin(time * 2) * 0.1;
         } else {
-          // Waiting for dependencies
-          nodeColor = 'rgba(100,80,80,0.8)';
-          strokeColor = 'rgba(70,50,50,0.8)';
+          // Waiting - softer
+          baseTone = 85;
+          glowIntensity = 0.15;
         }
 
-        // Node circle
-        ctx.fillStyle = nodeColor;
-        ctx.strokeStyle = strokeColor;
-        ctx.lineWidth = 2;
+        // Outer glow
+        const gradient = ctx.createRadialGradient(
+          node.x, node.y, 0,
+          node.x, node.y, size * 1.8
+        );
+        gradient.addColorStop(0, `rgba(${baseTone}, ${baseTone}, ${baseTone}, ${glowIntensity})`);
+        gradient.addColorStop(1, `rgba(${baseTone}, ${baseTone}, ${baseTone}, 0)`);
+        
+        ctx.fillStyle = gradient;
         ctx.beginPath();
-        ctx.arc(node.x, node.y, node.size * pulse, 0, Math.PI * 2);
+        ctx.arc(node.x, node.y, size * 1.8, 0, Math.PI * 2);
         ctx.fill();
-        ctx.stroke();
-
-        // Indegree indicator
-        if (!node.processed && node.indegree > 0) {
-          ctx.font = '8px serif';
-          ctx.fillStyle = 'rgba(40,40,40,0.8)';
-          ctx.textAlign = 'center';
-          ctx.fillText(node.indegree.toString(), node.x, node.y + 3);
-        }
-
-        // Level indicator for processed nodes
-        if (node.processed) {
-          ctx.font = '10px serif';
-          ctx.fillStyle = 'rgba(30,30,30,0.8)';
-          ctx.textAlign = 'center';
-          ctx.fillText(node.level.toString(), node.x, node.y + 4);
-        }
+        
+        // Core particle
+        const coreGradient = ctx.createRadialGradient(
+          node.x, node.y, 0,
+          node.x, node.y, size
+        );
+        coreGradient.addColorStop(0, `rgba(${baseTone - 10}, ${baseTone - 10}, ${baseTone - 10}, 0.6)`);
+        coreGradient.addColorStop(1, `rgba(${baseTone - 10}, ${baseTone - 10}, ${baseTone - 10}, 0.2)`);
+        
+        ctx.fillStyle = coreGradient;
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, size, 0, Math.PI * 2);
+        ctx.fill();
       });
-
-      // Display sorting progress
-      ctx.font = '12px serif';
-      ctx.fillStyle = 'rgba(60,60,60,0.8)';
-      ctx.textAlign = 'left';
-      ctx.fillText(`Sorted: ${sortedOrder.length}/${nodes.length}`, 10, height - 40);
-      ctx.fillText(`Current Level: ${sortingStep}`, 10, height - 20);
 
       rafRef.current = requestAnimationFrame(render);
     };
@@ -344,9 +323,9 @@ const TopologicalSort: React.FC<VisualProps> = ({ width, height }) => {
 // Differs from others by: Implements Kahn's topological sorting algorithm with live dependency resolution visualization - no other visual performs graph algorithm computation
 
 const metadata = {
-  themes: "dependency resolution, hierarchical order, directed flow",
-  visualisation: "Directed graph nodes arrange in dependency layers showing topological ordering",
-  promptSuggestion: "1. Adjust graph complexity and edge density\n2. Vary sorting speed and animation\n3. Control dependency visualization"
+  themes: "flowing order, natural unfolding, graceful progression, interconnected becoming",
+  visualisation: "Particles arrange themselves in flowing layers revealing natural progression",
+  promptSuggestion: "1. Adjust particle count and connections\n2. Vary flow speed and rhythm\n3. Control layer visualization"
 };
 (TopologicalSort as any).metadata = metadata;
 

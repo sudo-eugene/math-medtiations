@@ -40,7 +40,7 @@ const InvoluteRibbonDance: React.FC<VisualProps> = ({ width, height }) => {
           const radius = baseRadius * (1 + 0.1 * Math.sin(t * 1.2 + r + i * 0.05));
           const x = cx + (radius * (Math.cos(theta) + theta * Math.sin(theta)));
           const y = cy + (radius * (Math.sin(theta) - theta * Math.cos(theta)));
-          const scale = 0.008;
+          const scale = 0.15;
           const px = cx + (x - cx) * scale;
           const py = cy + (y - cy) * scale;
           if (i === 0) ctx.moveTo(px, py);

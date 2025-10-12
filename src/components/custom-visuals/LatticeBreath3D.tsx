@@ -21,14 +21,16 @@ const LatticeBreath3D: React.FC<VisualProps> = ({ width, height }) => {
     const inst = new THREE.InstancedMesh(geo, mat, total); scene.add(inst);
     const dummy = new THREE.Object3D();
 
-    let idx=0; const phases: number[] = [];
+    let idx=0; const phases: number[] = []; const positions: THREE.Vector3[] = [];
     for (let x=0;x<count;x++) for (let y=0;y<count;y++) for (let z=0;z<count;z++) {
       const px = (x - count/2) * spacing;
       const py = (y - count/2) * spacing;
       const pz = (z - count/2) * spacing;
       dummy.position.set(px, py, pz);
       dummy.updateMatrix(); inst.setMatrixAt(idx, dummy.matrix);
-      phases[idx] = Math.hypot(px,py,pz) * 0.02; idx++;
+      phases[idx] = Math.hypot(px,py,pz) * 0.02;
+      positions[idx] = new THREE.Vector3(px, py, pz);
+      idx++;
     }
 
     let raf: number | null = null; let t=0;
@@ -36,17 +38,25 @@ const LatticeBreath3D: React.FC<VisualProps> = ({ width, height }) => {
       raf = requestAnimationFrame(animate); t+=0.02;
       for (let i=0;i<total;i++){
         const s = 0.6 + 0.4 * (0.5 + 0.5*Math.sin(t + phases[i]));
-        dummy.scale.setScalar(s); inst.setMatrixAt(i, dummy.matrix);
+        dummy.position.copy(positions[i]);
+        dummy.scale.setScalar(s);
+        dummy.updateMatrix();
+        inst.setMatrixAt(i, dummy.matrix);
       }
       inst.instanceMatrix.needsUpdate = true;
       scene.rotation.y = 0.2*Math.sin(t*0.6);
       renderer.render(scene,camera);
     }; animate();
 
-    return ()=>{ if (raf) cancelAnimationFrame(raf); renderer.dispose(); if (ref.current) ref.current.removeChild(renderer.domElement); geo.dispose(); (mat as any).dispose?.(); };
+    return ()=>{
+      if (raf) cancelAnimationFrame(raf);
+      renderer.dispose();
+      if (ref.current) ref.current.removeChild(renderer.domElement);
+      geo.dispose();
+      mat.dispose();
+    };
   }, [width,height]);
   return <div ref={ref} style={{width,height,background:'#F0EEE6'}}/>;
 };
 
 export default LatticeBreath3D;
-

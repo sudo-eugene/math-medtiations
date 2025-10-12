@@ -6,6 +6,13 @@ import { VisualProps } from '../../types';
 
 const OrbitalResonance: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
+  const isWhiteSnapshot = (() => {
+    if (typeof window === 'undefined') {
+      return false;
+    }
+    const params = new URLSearchParams(window.location.search);
+    return window.location.pathname.includes('/snapshot') && params.get('bg') === 'white';
+  })();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -121,12 +128,16 @@ const OrbitalResonance: React.FC<VisualProps> = ({ width, height }) => {
     };
 
     const animate = () => {
-      // Background with subtle gradient
-      const bgGradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, Math.max(width, height));
-      bgGradient.addColorStop(0, '#F2F0E8');
-      bgGradient.addColorStop(1, '#E8E6DE');
-      ctx.fillStyle = bgGradient;
-      ctx.fillRect(0, 0, width, height);
+      if (isWhiteSnapshot) {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+      } else {
+        const bgGradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, Math.max(width, height));
+        bgGradient.addColorStop(0, '#F2F0E8');
+        bgGradient.addColorStop(1, '#E8E6DE');
+        ctx.fillStyle = bgGradient;
+        ctx.fillRect(0, 0, width, height);
+      }
 
       time += 0.02;
 
@@ -226,13 +237,13 @@ const OrbitalResonance: React.FC<VisualProps> = ({ width, height }) => {
         cancelAnimationFrame(animationId);
       }
     };
-  }, [width, height]);
+  }, [width, height, isWhiteSnapshot]);
 
   return (
     <div style={{ 
       width: `${width}px`, 
       height: `${height}px`, 
-      backgroundColor: '#F0EEE6' 
+      backgroundColor: isWhiteSnapshot ? '#ffffff' : '#F0EEE6' 
     }}>
       <canvas ref={canvasRef} width={width} height={height} />
     </div>

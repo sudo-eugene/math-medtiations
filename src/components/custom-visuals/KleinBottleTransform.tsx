@@ -5,7 +5,7 @@ import { VisualProps } from '../../types';
 // visualization: Klein bottle surface transforming through 4D space projections
 
 const KleinBottleTransform: React.FC<VisualProps> = ({ width, height }) => {
-  const canvasRef = useRef(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -20,8 +20,18 @@ const KleinBottleTransform: React.FC<VisualProps> = ({ width, height }) => {
     const centerY = height / 2;
     let time = 0;
 
+    type SurfacePoint = {
+      u: number;
+      v: number;
+      originalU: number;
+      originalV: number;
+      alpha: number;
+    };
+
+    type Vec3 = { x: number; y: number; z: number };
+
     // Klein bottle parameterization points
-    const surfacePoints = [];
+    const surfacePoints: SurfacePoint[] = [];
     const numU = 40;
     const numV = 20;
 
@@ -41,10 +51,26 @@ const KleinBottleTransform: React.FC<VisualProps> = ({ width, height }) => {
       }
     }
 
-    let animationId = null;
+    const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
+
+    const normalizeVec = (vec: Vec3): Vec3 => {
+      const length = Math.hypot(vec.x, vec.y, vec.z);
+      if (length === 0) return { x: 0, y: 0, z: 0 };
+      return { x: vec.x / length, y: vec.y / length, z: vec.z / length };
+    };
+
+    const cross = (a: Vec3, b: Vec3): Vec3 => ({
+      x: a.y * b.z - a.z * b.y,
+      y: a.z * b.x - a.x * b.z,
+      z: a.x * b.y - a.y * b.x,
+    });
+
+    const lightDirection = normalizeVec({ x: 0.35, y: -0.45, z: 0.82 });
+
+    let animationId: number | null = null;
 
     // Klein bottle surface equation with 4D rotation
-    const kleinBottle = (u, v, t) => {
+    const kleinBottle = (u: number, v: number, t: number) => {
       const cos_u = Math.cos(u);
       const sin_u = Math.sin(u);
       const cos_v = Math.cos(v);
@@ -88,7 +114,7 @@ const KleinBottleTransform: React.FC<VisualProps> = ({ width, height }) => {
     };
 
     // Project 4D to 3D using stereographic projection
-    const project4Dto3D = (x4d, y4d, z4d, w4d) => {
+    const project4Dto3D = (x4d: number, y4d: number, z4d: number, w4d: number) => {
       const w_offset = 4; // Avoid division by zero
       return {
         x: x4d / (w_offset - w4d),
@@ -98,7 +124,7 @@ const KleinBottleTransform: React.FC<VisualProps> = ({ width, height }) => {
     };
 
     // Project 3D to 2D screen coordinates
-    const project3Dto2D = (x3d, y3d, z3d) => {
+    const project3Dto2D = (x3d: number, y3d: number, z3d: number) => {
       const distance = 15;
       const scale = 8;
       
@@ -110,11 +136,105 @@ const KleinBottleTransform: React.FC<VisualProps> = ({ width, height }) => {
       };
     };
 
+    const computeShading = (u: number, v: number, base3d: Vec3) => {
+      const delta = 0.04;
+      const offsetU = kleinBottle(u + delta, v, time);
+      const offsetV = kleinBottle(u, v + delta, time);
+
+      const offsetU3d = project4Dto3D(offsetU.x, offsetU.y, offsetU.z, offsetU.w);
+      const offsetV3d = project4Dto3D(offsetV.x, offsetV.y, offsetV.z, offsetV.w);
+
+      const tangentU: Vec3 = {
+        x: offsetU3d.x - base3d.x,
+        y: offsetU3d.y - base3d.y,
+        z: offsetU3d.z - base3d.z,
+      };
+
+      const tangentV: Vec3 = {
+        x: offsetV3d.x - base3d.x,
+        y: offsetV3d.y - base3d.y,
+        z: offsetV3d.z - base3d.z,
+      };
+
+      const normal = cross(tangentU, tangentV);
+      const normalLength = Math.hypot(normal.x, normal.y, normal.z);
+      if (normalLength === 0) {
+        return { shading: 0.35, rim: 0.1 };
+      }
+
+      const normalizedNormal = {
+        x: normal.x / normalLength,
+        y: normal.y / normalLength,
+        z: normal.z / normalLength,
+      };
+
+      const diffuse = clamp(
+        normalizedNormal.x * lightDirection.x +
+          normalizedNormal.y * lightDirection.y +
+          normalizedNormal.z * lightDirection.z,
+        -1,
+        1
+      );
+
+      const intensity = Math.max(0, diffuse);
+      const shading = 0.25 + intensity * 0.65;
+      const rim = Math.pow(clamp(1 - intensity, 0, 1), 2);
+
+      return { shading, rim };
+    };
+
+    const drawBackground = () => {
+      const radialGradient = ctx.createRadialGradient(
+        centerX,
+        centerY,
+        Math.max(width, height) * 0.08,
+        centerX,
+        centerY,
+        Math.max(width, height) * 0.8
+      );
+
+      radialGradient.addColorStop(0, '#F5F2EA');
+      radialGradient.addColorStop(0.55, '#E4E8EC');
+      radialGradient.addColorStop(1, '#D4DEE6');
+
+      ctx.fillStyle = radialGradient;
+      ctx.fillRect(0, 0, width, height);
+
+      const linearGradient = ctx.createLinearGradient(0, 0, width, height);
+      linearGradient.addColorStop(0, 'rgba(180, 196, 214, 0.18)');
+      linearGradient.addColorStop(0.6, 'rgba(220, 228, 234, 0.08)');
+      linearGradient.addColorStop(1, 'rgba(170, 192, 210, 0.16)');
+
+      ctx.fillStyle = linearGradient;
+      ctx.fillRect(0, 0, width, height);
+    };
+
+    const drawNebulaVeil = () => {
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+
+      for (let i = 0; i < 3; i++) {
+        const angle = time * 0.0025 + i;
+        const offsetX = centerX + Math.cos(angle) * width * 0.12;
+        const offsetY = centerY + Math.sin(angle * 1.3) * height * 0.1;
+        const gradient = ctx.createRadialGradient(offsetX, offsetY, 0, offsetX, offsetY, Math.max(width, height) * 0.7);
+
+        gradient.addColorStop(0, `rgba(210, 224, 238, ${0.12 - i * 0.03})`);
+        gradient.addColorStop(0.6, 'rgba(196, 216, 229, 0.05)');
+        gradient.addColorStop(1, 'rgba(180, 206, 220, 0)');
+
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+      }
+
+      ctx.restore();
+    };
+
     const drawWireframe = () => {
-      // Draw wireframe connections
-      ctx.strokeStyle = 'rgba(70, 70, 70, 0.3)';
-      ctx.lineWidth = 1;
-      
+      ctx.save();
+      ctx.lineWidth = 0.8;
+      ctx.lineJoin = 'round';
+
       for (let i = 0; i < numU - 1; i++) {
         for (let j = 0; j < numV - 1; j++) {
           const idx1 = i * numV + j;
@@ -145,6 +265,10 @@ const KleinBottleTransform: React.FC<VisualProps> = ({ width, height }) => {
             const screen3 = project3Dto2D(pos3_3d.x, pos3_3d.y, pos3_3d.z);
             const screen4 = project3Dto2D(pos4_3d.x, pos4_3d.y, pos4_3d.z);
             
+            const avgDepth = (screen1.depth + screen2.depth + screen3.depth + screen4.depth) / 4;
+            const opacity = clamp(0.22 - avgDepth * 0.02, 0.05, 0.22);
+            ctx.strokeStyle = `rgba(118, 142, 176, ${opacity})`;
+
             // Draw quad edges
             ctx.beginPath();
             ctx.moveTo(screen1.x, screen1.y);
@@ -156,22 +280,34 @@ const KleinBottleTransform: React.FC<VisualProps> = ({ width, height }) => {
           }
         }
       }
+
+      ctx.restore();
     };
 
     const drawSurfacePoints = () => {
       // Sort points by depth for proper rendering
-      const projectedPoints = [];
+      const projectedPoints: Array<{
+        x: number;
+        y: number;
+        depth: number;
+        alpha: number;
+        w4d: number;
+        shading: number;
+        rim: number;
+      }> = [];
       
       surfacePoints.forEach((point, i) => {
         const pos4d = kleinBottle(point.u, point.v, time);
         const pos3d = project4Dto3D(pos4d.x, pos4d.y, pos4d.z, pos4d.w);
+        const { shading, rim } = computeShading(point.u, point.v, pos3d);
         const screen = project3Dto2D(pos3d.x, pos3d.y, pos3d.z);
         
         projectedPoints.push({
           ...screen,
           alpha: point.alpha,
           w4d: pos4d.w,
-          index: i
+          shading,
+          rim,
         });
       });
       
@@ -185,32 +321,36 @@ const KleinBottleTransform: React.FC<VisualProps> = ({ width, height }) => {
           
           // Color based on 4D w-coordinate
           const wColor = (Math.sin(point.w4d * 0.5 + time * 0.1) + 1) / 2;
-          const hue = wColor * 60; // Blue to cyan range
+          const baseHue = 200 + wColor * 45;
+          const saturation = clamp(52 + wColor * 20 + point.rim * 25, 0, 100);
+          const lightness = clamp(32 + point.shading * 35 + point.rim * 10, 0, 88);
           
-          const size = Math.max(0, 2 + (1 - Math.abs(point.depth) / 10) * 2);
-          const alpha = point.alpha * (1 - Math.abs(point.depth) / 15);
+          const size = Math.max(1.2, 1.8 + point.shading * 1.6 - point.depth * 0.08);
+          const alpha = clamp(point.alpha * (0.65 + point.shading * 0.3), 0.08, 0.85);
           
-          ctx.fillStyle = `hsla(${180 + hue}, 40%, 40%, ${alpha})`;
+          ctx.fillStyle = `hsla(${baseHue}, ${saturation}%, ${lightness}%, ${alpha})`;
           ctx.beginPath();
           ctx.arc(point.x, point.y, size, 0, Math.PI * 2);
           ctx.fill();
           
           // Dimensional shimmer effect
-          if (Math.abs(point.w4d) > 2) {
-            ctx.fillStyle = `hsla(${180 + hue}, 60%, 60%, ${alpha * 0.5})`;
-            ctx.beginPath();
-            ctx.arc(point.x, point.y, size * 1.5, 0, Math.PI * 2);
-            ctx.fill();
-          }
+          ctx.save();
+          ctx.globalCompositeOperation = 'lighter';
+          ctx.fillStyle = `hsla(${baseHue + 10}, ${clamp(saturation + 12, 0, 100)}%, ${clamp(lightness + 12, 0, 96)}%, ${alpha * 0.35 * (0.6 + point.rim)})`;
+          ctx.beginPath();
+          ctx.arc(point.x, point.y, size * (1.3 + point.rim * 0.45), 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
         }
       });
     };
 
     const drawDimensionalRifts = () => {
       // Show dimensional transitions where Klein bottle intersects itself
-      ctx.strokeStyle = 'rgba(100, 60, 120, 0.4)';
-      ctx.lineWidth = 2;
-      
+      ctx.save();
+      ctx.lineWidth = 1.4;
+      ctx.globalCompositeOperation = 'screen';
+
       for (let i = 0; i < 8; i++) {
         const u = Math.PI + Math.sin(time * 0.03 + i) * 0.5;
         const v = (i / 8) * Math.PI * 2;
@@ -220,22 +360,32 @@ const KleinBottleTransform: React.FC<VisualProps> = ({ width, height }) => {
         const screen = project3Dto2D(pos3d.x, pos3d.y, pos3d.z);
         
         const riftSize = 10 + Math.sin(time * 0.1 + i) * 5;
-        
+        const riftOpacity = clamp(0.18 + Math.sin(time * 0.05 + i) * 0.08, 0.06, 0.32);
+        ctx.strokeStyle = `rgba(170, 120, 210, ${riftOpacity})`;
+        ctx.shadowColor = `rgba(180, 150, 230, ${riftOpacity * 0.6})`;
+        ctx.shadowBlur = 8;
+
         ctx.beginPath();
         ctx.arc(screen.x, screen.y, riftSize, 0, Math.PI * 2);
         ctx.stroke();
       }
+
+      ctx.restore();
     };
 
     const drawTopologicalAnnotations = () => {
       // Draw mathematical curves showing topology
-      ctx.strokeStyle = 'rgba(80, 80, 80, 0.2)';
-      ctx.lineWidth = 1;
-      
-      // Draw parameter space grid overlay
-      for (let u = 0; u < Math.PI * 2; u += Math.PI / 6) {
+      ctx.save();
+      ctx.strokeStyle = 'rgba(120, 150, 176, 0.1)';
+      ctx.lineWidth = 0.6;
+
+      // Draw parameter space grid overlay with lighter density
+      const uStep = Math.PI / 4;
+      const vStep = 0.16;
+
+      for (let u = 0; u < Math.PI * 2; u += uStep) {
         ctx.beginPath();
-        for (let v = 0; v < Math.PI * 2; v += 0.1) {
+        for (let v = 0; v <= Math.PI * 2 + vStep; v += vStep) {
           const pos4d = kleinBottle(u, v, time);
           const pos3d = project4Dto3D(pos4d.x, pos4d.y, pos4d.z, pos4d.w);
           const screen = project3Dto2D(pos3d.x, pos3d.y, pos3d.z);
@@ -245,16 +395,35 @@ const KleinBottleTransform: React.FC<VisualProps> = ({ width, height }) => {
         }
         ctx.stroke();
       }
+
+      ctx.restore();
+    };
+
+    const drawAtmosphericBloom = () => {
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+
+      const bloom = ctx.createRadialGradient(
+        centerX,
+        centerY,
+        Math.max(width, height) * 0.12,
+        centerX,
+        centerY,
+        Math.max(width, height) * 0.65
+      );
+      bloom.addColorStop(0, 'rgba(232, 244, 252, 0.22)');
+      bloom.addColorStop(0.55, 'rgba(192, 212, 234, 0.12)');
+      bloom.addColorStop(1, 'rgba(168, 194, 220, 0)');
+
+      ctx.fillStyle = bloom;
+      ctx.fillRect(0, 0, width, height);
+
+      ctx.restore();
     };
 
     const animate = () => {
-      // Background with dimensional gradient
-      const bgGradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, Math.max(width, height) / 2);
-      bgGradient.addColorStop(0, '#F2F0E8');
-      bgGradient.addColorStop(0.7, '#E8E6DE');
-      bgGradient.addColorStop(1, '#DDD8CE');
-      ctx.fillStyle = bgGradient;
-      ctx.fillRect(0, 0, width, height);
+      drawBackground();
+      drawNebulaVeil();
 
       time += 0.25;
       
@@ -269,12 +438,8 @@ const KleinBottleTransform: React.FC<VisualProps> = ({ width, height }) => {
       
       // Draw dimensional intersections
       drawDimensionalRifts();
-      
-      // Title annotation
-      ctx.fillStyle = 'rgba(60, 60, 60, 0.3)';
-      ctx.font = '12px serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('Klein Bottle ⊂ ℝ⁴ → ℝ³', centerX, height - 20);
+
+      drawAtmosphericBloom();
 
       animationId = requestAnimationFrame(animate);
     };

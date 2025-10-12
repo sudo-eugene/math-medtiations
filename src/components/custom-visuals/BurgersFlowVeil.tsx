@@ -34,15 +34,20 @@ const BurgersFlowVeil: React.FC<VisualProps> = ({ width, height }) => {
     const dt = 0.002;
 
     const render = (time: number) => {
+      const seconds = time * 0.001;
+      const phase = seconds * 0.55;
+
       ctx.fillStyle = 'rgba(240,238,230,0.045)';
       ctx.fillRect(0, 0, width, height);
 
       for (let i = 1; i < cells - 1; i++) {
         const du = -u[i] * (u[i] - u[i - 1]) / dx + viscosity * (u[i + 1] - 2 * u[i] + u[i - 1]) / (dx * dx);
-        uNext[i] = u[i] + du * dt;
+        const base = 0.5 + 0.3 * Math.sin((i / cells) * Math.PI * 2 + phase);
+        uNext[i] = (u[i] + du * dt) * 0.9 + base * 0.1;
       }
-      uNext[0] = uNext[1];
-      uNext[cells - 1] = uNext[cells - 2];
+      const edgePhase = 0.5 + 0.3 * Math.sin(phase);
+      uNext[0] = edgePhase;
+      uNext[cells - 1] = edgePhase;
       u.set(uNext);
 
       ctx.lineWidth = 1;
@@ -51,7 +56,8 @@ const BurgersFlowVeil: React.FC<VisualProps> = ({ width, height }) => {
         const x2 = ((i + 1) / (cells - 1)) * width;
         const y1 = height * (0.15 + u[i] * 0.7);
         const y2 = height * (0.15 + u[i + 1] * 0.7);
-        ctx.strokeStyle = `rgba(25,25,25,${0.04 + 0.16 * Math.abs(u[i] - 0.5)})`;
+        const energy = Math.abs(u[i] - 0.5);
+        ctx.strokeStyle = `rgba(25,25,25,${0.05 + 0.2 * energy})`;
         ctx.beginPath();
         ctx.moveTo(x1, y1);
         ctx.lineTo(x2, y2);

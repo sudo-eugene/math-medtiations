@@ -70,10 +70,6 @@ const VolterraOrbitGarden: React.FC<VisualProps> = ({ width, height }) => {
         ctx.stroke();
       });
 
-      ctx.strokeStyle = 'rgba(20,20,20,0.1)';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(width * 0.15, height * 0.15, width * 0.7, height * 0.7);
-
       rafRef.current = requestAnimationFrame(render);
     };
 
