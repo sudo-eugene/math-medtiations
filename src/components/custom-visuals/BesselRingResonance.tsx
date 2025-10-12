@@ -42,8 +42,8 @@ const BesselRingResonance: React.FC<VisualProps> = ({ width, height }) => {
     ctx.fillStyle = '#F0EEE6';
     ctx.fillRect(0, 0, width, height);
 
-    const rings = 24;
-    const baseRadius = Math.min(width, height) * 0.4;
+    const rings = 5;
+    const baseRadius = Math.min(width, height) * 0.6;
     const cx = width / 2;
     const cy = height / 2;
 

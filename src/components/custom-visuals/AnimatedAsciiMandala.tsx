@@ -6,9 +6,9 @@ import { VisualProps } from '../../types';
 
 const AnimatedAsciiMandala: React.FC<VisualProps> = ({ width: containerWidth, height: containerHeight }) => {
   const [frame, setFrame] = useState(0);
-  const [asciiGrid, setAsciiGrid] = useState([]);
-  const requestRef = useRef();
-  const mountedRef = useRef(true);
+  const [asciiGrid, setAsciiGrid] = useState<string[][]>([]);
+  const requestRef = useRef<number | null>(null);
+  const mountedRef = useRef(false);
   
   // The path into light begins with simple forms
   const fontSize = 12;
@@ -20,30 +20,36 @@ const AnimatedAsciiMandala: React.FC<VisualProps> = ({ width: containerWidth, he
   
   // Initialize grid on component mount
   useEffect(() => {
+    if (width <= 0 || height <= 0) {
+      mountedRef.current = false;
+      setAsciiGrid([]);
+      return;
+    }
+
+    mountedRef.current = true;
+
     // Create empty grid
-    const grid = Array(height).fill().map(() => Array(width).fill(' '));
+    const grid = Array(height).fill(null).map(() => Array(width).fill(' '));
     setAsciiGrid(grid);
+    setFrame(0);
     
     // Animation loop
     const animate = () => {
-      if (mountedRef.current) {
-        setFrame(prevFrame => prevFrame + 1);
-        requestRef.current = requestAnimationFrame(animate);
-      }
+      if (!mountedRef.current) return;
+      setFrame(prevFrame => prevFrame + 1);
+      requestRef.current = requestAnimationFrame(animate);
     };
+
     requestRef.current = requestAnimationFrame(animate);
-    
+
     return () => {
       mountedRef.current = false;
       if (requestRef.current) {
         cancelAnimationFrame(requestRef.current);
       }
       requestRef.current = null;
-      
-      // Clear state to prevent memory leaks
-      setAsciiGrid([]);
     };
-  }, []);
+  }, [width, height]);
   
   // Update ASCII grid based on animation frame
   useEffect(() => {
@@ -62,7 +68,7 @@ const AnimatedAsciiMandala: React.FC<VisualProps> = ({ width: containerWidth, he
   }, [frame]);
   
   // What seems unsophisticated holds the greatest wisdom
-  const drawMandala = (grid, frame) => {
+  const drawMandala = (grid: string[][], frame: number) => {
     const centerX = Math.floor(width / 2);  // Finding the still point
     const centerY = Math.floor(height / 2);  // Where opposites meet
     
@@ -150,7 +156,7 @@ const AnimatedAsciiMandala: React.FC<VisualProps> = ({ width: containerWidth, he
   };
   
   // Draw central circular pattern
-  const drawCirclePattern = (grid, centerX, centerY, frame) => {
+  const drawCirclePattern = (grid: string[][], centerX: number, centerY: number, frame: number) => {
     // Center point
     const centerIntensity = (Math.sin(frame * 0.025) + 1) / 2;
     grid[centerY][centerX] = getCharForIntensity(centerIntensity, true);
@@ -175,7 +181,7 @@ const AnimatedAsciiMandala: React.FC<VisualProps> = ({ width: containerWidth, he
   };
   
   // The perfect form has no shape, yet shapes arise from emptiness
-  const getCharForIntensity = (intensity, isCenter = false) => {
+  const getCharForIntensity = (intensity: number, isCenter = false) => {
     if (intensity < 0.1) return ' ';  // The void that contains all possibilities
     
     // For center elements, use more prominent characters

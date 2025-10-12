@@ -76,10 +76,6 @@ const HelmholtzWaveCanopy: React.FC<VisualProps> = ({ width, height }) => {
         }
       }
 
-      ctx.strokeStyle = 'rgba(20,20,20,0.08)';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(width * 0.06, height * 0.1, width * 0.88, height * 0.8);
-
       rafRef.current = requestAnimationFrame(render);
     };
 

@@ -19,8 +19,8 @@ const PetriReactionDiffusion: React.FC<VisualProps> = ({ width, height }) => {
     let s = 42424242 >>> 0;
     const rnd = () => (s=(1664525*s+1013904223)>>>0, s/4294967296);
 
-    const gx = Math.max(140, Math.floor(width/6));
-    const gy = Math.max(90, Math.floor(height/6));
+    const gx = Math.max(200, Math.floor(width/4));
+    const gy = Math.max(140, Math.floor(height/4));
     const A = new Float32Array(gx*gy);
     const B = new Float32Array(gx*gy);
     const An = new Float32Array(gx*gy);
@@ -56,7 +56,7 @@ const PetriReactionDiffusion: React.FC<VisualProps> = ({ width, height }) => {
 
     const lap = (arr: Float32Array, x: number, y: number) => {
       const xm = (x-1+gx)%gx, xp=(x+1)%gx, ym=(y-1+gy)%gy, yp=(y+1)%gy;
-      return arr[I(xm,y)] + arr[I(xp,y)] + arr[I(x,ym)] + arr[I(x,yp)] - 4*arr[I(x,y)];
+      return (arr[I(xm,y)] + arr[I(xp,y)] + arr[I(x,ym)] + arr[I(x,yp)] - 4*arr[I(x,y)]) * 0.25;
     };
 
     const step = ()=>{
@@ -66,8 +66,8 @@ const PetriReactionDiffusion: React.FC<VisualProps> = ({ width, height }) => {
           const a = A[i], b = B[i];
           const ra = Da*lap(A,x,y) - a*b*b + feed*(1-a);
           const rb = Db*lap(B,x,y) + a*b*b - (kill+feed)*b;
-          An[i] = a + ra*dt;
-          Bn[i] = b + rb*dt;
+          An[i] = Math.max(0, Math.min(1, a + ra*dt));
+          Bn[i] = Math.max(0, Math.min(1, b + rb*dt));
         }
       }
       A.set(An); B.set(Bn);
@@ -116,4 +116,3 @@ const metadata = {
 export default PetriReactionDiffusion;
 
 // Differs from others by: Gray–Scott PDE integration (only RD simulation)
-

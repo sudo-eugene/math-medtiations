@@ -20,8 +20,10 @@ const RosslerRibbonPortrait: React.FC<VisualProps> = ({ width, height }) => {
     const dt=0.01;
     const cx = width*0.5, cy = height*0.5; const scale = Math.min(width,height)*0.18;
     const render = (tms:number)=>{
-      ctx.fillStyle='rgba(240,238,230,0.05)'; ctx.fillRect(0,0,width,height);
-      ctx.strokeStyle='rgba(20,20,20,0.2)'; ctx.lineWidth=1;
+      // Soft pencil trail fade
+      ctx.fillStyle='rgba(240,238,230,0.01)'; ctx.fillRect(0,0,width,height);
+      // Soft pencil-like dark grey with higher opacity
+      ctx.strokeStyle='rgba(25,25,28,0.6)'; ctx.lineWidth=1;
       const th = tms*0.001*0.2; const cth=Math.cos(th), sth=Math.sin(th);
       for(let i=0;i<1500;i++){
         // Integrate Rössler

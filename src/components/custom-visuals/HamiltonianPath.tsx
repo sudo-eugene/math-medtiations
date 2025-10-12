@@ -1,6 +1,6 @@
-// Themes: complete traversal, graph walking meditation, optimal journeys
-// Visualisation: Graph traversal creates meditative walking patterns visiting every node exactly once
-// Unique mechanism: Hamiltonian path finding on random graphs with backtracking visualization
+// Themes: graceful journey, complete presence, flowing connection, sacred visiting
+// Visualisation: Gentle path flows through all points in perfect harmony and connection
+// Unique mechanism: Hamiltonian path finding transformed into meditation on completeness
 
 import React, { useRef, useEffect } from 'react';
 import { VisualProps } from '../../types';
@@ -203,8 +203,8 @@ const HamiltonianPath: React.FC<VisualProps> = ({ width, height }) => {
     findHamiltonianPath(0);
 
     const render = (t: number) => {
-      // Trails with translucent clear
-      ctx.fillStyle = 'rgba(240,238,230,0.06)';
+      // Gentle fade for flowing trails
+      ctx.fillStyle = 'rgba(240,238,230,0.04)';
       ctx.fillRect(0, 0, width, height);
 
       const time = t * 0.001;
@@ -222,105 +222,92 @@ const HamiltonianPath: React.FC<VisualProps> = ({ width, height }) => {
         findHamiltonianPath(Math.floor(random() * nodes.length));
       }
 
-      // Draw edges
+      // Draw subtle potential connections
       edges.forEach(edge => {
         const fromNode = nodes[edge.from];
         const toNode = nodes[edge.to];
         
-        let strokeStyle, lineWidth;
+        const pulse = Math.sin(time * 1.5 + edge.from * 0.2) * 0.05 + 0.95;
+        
         if (edge.inHamiltonianPath) {
-          strokeStyle = 'rgba(80,120,80,0.8)';
-          lineWidth = 3;
+          // Path connections - slightly more visible
+          ctx.strokeStyle = `rgba(100, 100, 100, ${0.2 * pulse})`;
+          ctx.lineWidth = 1.8;
         } else {
-          strokeStyle = 'rgba(70,70,70,0.3)';
-          lineWidth = 1;
+          // Potential connections - very subtle
+          ctx.strokeStyle = `rgba(90, 90, 90, ${0.06})`;
+          ctx.lineWidth = 0.5;
         }
         
-        ctx.strokeStyle = strokeStyle;
-        ctx.lineWidth = lineWidth;
         ctx.beginPath();
         ctx.moveTo(fromNode.x, fromNode.y);
         ctx.lineTo(toNode.x, toNode.y);
         ctx.stroke();
       });
 
-      // Draw Hamiltonian path sequence
+      // Draw flowing path with ethereal animation
       if (pathFound) {
-        ctx.strokeStyle = 'rgba(60,100,60,0.6)';
-        ctx.lineWidth = 4;
-        ctx.setLineDash([8, 4]);
+        const pathGlow = Math.sin(time * 2) * 0.1 + 0.9;
         
         for (let i = 1; i < hamiltonianPath.length; i++) {
           const fromNode = nodes[hamiltonianPath[i - 1]];
           const toNode = nodes[hamiltonianPath[i]];
+          
+          const progress = i / hamiltonianPath.length;
+          const tone = 95 + progress * 20;
+          const flowPulse = Math.sin(time * 2 - i * 0.3) * 0.08 + 0.92;
+          
+          ctx.strokeStyle = `rgba(${tone}, ${tone}, ${tone}, ${0.25 * flowPulse})`;
+          ctx.lineWidth = 2.5;
           
           ctx.beginPath();
           ctx.moveTo(fromNode.x, fromNode.y);
           ctx.lineTo(toNode.x, toNode.y);
           ctx.stroke();
         }
-        ctx.setLineDash([]);
       }
 
-      // Draw nodes
+      // Draw ethereal particles
       nodes.forEach(node => {
-        const pulse = Math.sin(time * 2 + node.id * 0.5) * 0.1 + 0.9;
-        let fillStyle, strokeStyle;
+        const breathe = Math.sin(time * 1.3 + node.id * 0.5) * 0.15 + 1;
+        const size = node.size * breathe;
         
+        let baseTone, glowIntensity;
         if (node.inPath) {
           const pathProgress = node.pathIndex / Math.max(1, hamiltonianPath.length - 1);
-          const intensity = 80 + pathProgress * 40;
-          fillStyle = `rgba(${intensity},${intensity + 20},${intensity},0.8)`;
-          strokeStyle = `rgba(${intensity - 20},${intensity},${intensity - 20},0.8)`;
+          baseTone = 90 + pathProgress * 25;
+          glowIntensity = 0.3 + Math.sin(time * 2 + pathProgress * Math.PI * 2) * 0.1;
         } else {
-          fillStyle = 'rgba(80,80,80,0.7)';
-          strokeStyle = 'rgba(50,50,50,0.8)';
+          baseTone = 80;
+          glowIntensity = 0.12;
         }
         
-        // Node circle
-        ctx.fillStyle = fillStyle;
-        ctx.strokeStyle = strokeStyle;
-        ctx.lineWidth = 2;
+        // Outer ethereal glow
+        const gradient = ctx.createRadialGradient(
+          node.x, node.y, 0,
+          node.x, node.y, size * 2
+        );
+        gradient.addColorStop(0, `rgba(${baseTone}, ${baseTone}, ${baseTone}, ${glowIntensity})`);
+        gradient.addColorStop(1, `rgba(${baseTone}, ${baseTone}, ${baseTone}, 0)`);
+        
+        ctx.fillStyle = gradient;
         ctx.beginPath();
-        ctx.arc(node.x, node.y, node.size * pulse, 0, Math.PI * 2);
+        ctx.arc(node.x, node.y, size * 2, 0, Math.PI * 2);
         ctx.fill();
-        ctx.stroke();
         
-        // Path index for nodes in Hamiltonian path
-        if (node.inPath) {
-          ctx.font = '10px serif';
-          ctx.fillStyle = 'rgba(30,30,30,0.9)';
-          ctx.textAlign = 'center';
-          ctx.fillText(node.pathIndex.toString(), node.x, node.y + 4);
-        }
+        // Soft core
+        const coreGradient = ctx.createRadialGradient(
+          node.x, node.y, 0,
+          node.x, node.y, size
+        );
+        coreGradient.addColorStop(0, `rgba(${baseTone - 10}, ${baseTone - 10}, ${baseTone - 10}, 0.7)`);
+        coreGradient.addColorStop(1, `rgba(${baseTone - 10}, ${baseTone - 10}, ${baseTone - 10}, 0.2)`);
         
-        // Node ID
-        ctx.font = '8px serif';
-        ctx.fillStyle = 'rgba(40,40,40,0.7)';
-        ctx.textAlign = 'center';
-        ctx.fillText(node.id.toString(), node.x, node.y - node.size - 5);
+        ctx.fillStyle = coreGradient;
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, size, 0, Math.PI * 2);
+        ctx.fill();
       });
-
-      // Draw search progress
-      if (searching) {
-        ctx.font = '10px serif';
-        ctx.fillStyle = 'rgba(80,60,60,0.8)';
-        ctx.fillText('Searching for Hamiltonian path...', 10, 25);
-        ctx.fillText(`Search stack: ${searchStack.length}`, 10, 40);
-      }
-
-      // Display results
-      ctx.font = '12px serif';
-      ctx.fillStyle = 'rgba(60,60,60,0.8)';
-      
-      if (pathFound) {
-        ctx.fillStyle = 'rgba(60,100,60,0.8)';
-        ctx.fillText(`Hamiltonian path found!`, 10, height - 40);
-        ctx.fillText(`Path: ${hamiltonianPath.join(' → ')}`, 10, height - 20);
-      } else if (!searching) {
-        ctx.fillStyle = 'rgba(100,60,60,0.8)';
-        ctx.fillText('No Hamiltonian path exists', 10, height - 20);
-      }
 
       rafRef.current = requestAnimationFrame(render);
     };
@@ -343,9 +330,9 @@ const HamiltonianPath: React.FC<VisualProps> = ({ width, height }) => {
 // Differs from others by: Implements Hamiltonian path search using backtracking algorithm with complete graph traversal visualization - no other visual solves NP-complete path problems
 
 const metadata = {
-  themes: "complete traversal, graph walking meditation, optimal journeys",
-  visualisation: "Graph traversal creates meditative walking patterns visiting every node exactly once",
-  promptSuggestion: "1. Adjust graph connectivity and complexity\n2. Vary search algorithm visualization speed\n3. Control path highlighting and animation"
+  themes: "graceful journey, complete presence, flowing connection, sacred visiting",
+  visualisation: "Gentle path flows through all points in perfect harmony and connection",
+  promptSuggestion: "1. Adjust particle arrangement\n2. Vary path flow rhythm\n3. Control connection visualization"
 };
 (HamiltonianPath as any).metadata = metadata;
 

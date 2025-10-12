@@ -6,8 +6,9 @@ import { VisualProps } from '../../types';
 
 const FlowingRibbons: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef(null);
-  const ctxRef = useRef(null);
-  const pointsCacheRef = useRef(null);
+  const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
+  const pointsCacheRef = useRef<{ u: number; v: number }[] | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -18,6 +19,7 @@ const FlowingRibbons: React.FC<VisualProps> = ({ width, height }) => {
 
     canvas.width = width;
     canvas.height = height;
+    ctxRef.current = ctx;
 
     let time = 0;
     const gridSize = 20;
@@ -63,11 +65,16 @@ const FlowingRibbons: React.FC<VisualProps> = ({ width, height }) => {
       }
 
       time += 0.01;
-      requestAnimationFrame(draw);
+      animationFrameRef.current = requestAnimationFrame(draw);
     };
 
     draw();
-
+    return () => {
+      if (animationFrameRef.current !== null) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+    };
   }, [width, height]);
 
   return (

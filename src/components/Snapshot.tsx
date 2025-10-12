@@ -1,9 +1,15 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { customVisuals } from './MathVisual';
+import { useVisualBackgroundOverride } from '../utils/visualBackgroundOverride';
 
 const Snapshot = () => {
   const { quoteId } = useParams();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const backgroundParam = searchParams.get('bg');
+  const backgroundOverride = backgroundParam === 'white' ? '#ffffff' : null;
+  useVisualBackgroundOverride(backgroundOverride);
   const numericQuoteId = parseInt(quoteId, 10);
 
   // Check if quoteId is a valid number

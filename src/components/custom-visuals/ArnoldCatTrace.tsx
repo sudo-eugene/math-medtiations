@@ -37,22 +37,35 @@ const ArnoldCatTrace: React.FC<VisualProps> = ({ width, height }) => {
       return { x: nx, y: ny };
     };
 
-    const render = () => {
+    let lastUpdate = 0;
+    const updateInterval = 150; // Update every 150ms for visible animation
+
+    const render = (time: number) => {
       ctx.fillStyle = 'rgba(240,238,230,0.06)';
       ctx.fillRect(0, 0, width, height);
 
+      // Only update positions at intervals
+      if (time - lastUpdate > updateInterval) {
+        lastUpdate = time;
+        
+        for (let i = 0; i < points.length; i++) {
+          const p = points[i];
+          const mapped = applyCatMap(p.x, p.y);
+          p.x = mapped.x;
+          p.y = mapped.y;
+          const px = p.x * width;
+          const py = p.y * height;
+          p.trail.push(px, py);
+          if (p.trail.length > 40) {
+            p.trail.splice(0, 2);
+          }
+        }
+      }
+
+      // Draw trails every frame
       ctx.lineWidth = 0.7;
       for (let i = 0; i < points.length; i++) {
         const p = points[i];
-        const mapped = applyCatMap(p.x, p.y);
-        p.x = mapped.x;
-        p.y = mapped.y;
-        const px = p.x * width;
-        const py = p.y * height;
-        p.trail.push(px, py);
-        if (p.trail.length > 40) {
-          p.trail.splice(0, 2);
-        }
         if (p.trail.length >= 4) {
           ctx.strokeStyle = 'rgba(25,25,25,0.05)';
           ctx.beginPath();

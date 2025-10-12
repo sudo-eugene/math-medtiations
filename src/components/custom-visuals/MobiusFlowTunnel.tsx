@@ -12,6 +12,10 @@ const MobiusFlowTunnel: React.FC<VisualProps> = ({ width: containerWidth, height
     const el = divRef.current;
     if (!el) return;
 
+    el.style.whiteSpace = 'pre';
+    el.style.display = 'inline-block';
+    el.style.textAlign = 'center';
+
     const charWidth = fontSize * 0.6;
     const charHeight = fontSize * 1.2;
     const cols = Math.floor(containerWidth / charWidth);
@@ -89,11 +93,11 @@ const MobiusFlowTunnel: React.FC<VisualProps> = ({ width: containerWidth, height
         }
       }
 
-      let html = '';
+      const lines = new Array(rows);
       for (let r = 0; r < rows; r++) {
-        html += grid[r].join('') + '<br>';
+        lines[r] = grid[r].join('');
       }
-      el.innerHTML = html;
+      el.textContent = lines.join('\n');
 
       animationFrameId = requestAnimationFrame(render);
     }
@@ -122,10 +126,9 @@ const MobiusFlowTunnel: React.FC<VisualProps> = ({ width: containerWidth, height
         color: '#333',
       }}
     >
-      <div ref={divRef} style={{ width: '100%', height: '100%' }} />
+      <div ref={divRef} style={{ maxWidth: '100%', maxHeight: '100%' }} />
     </div>
   );
 };
 
 export default MobiusFlowTunnel;
-

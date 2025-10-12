@@ -27,8 +27,8 @@ const DeJongOrbitVeil: React.FC<VisualProps> = ({ width, height }) => {
     const d = -0.33 + (rnd()*0.06 - 0.03);
 
     let x = 0.1*(rnd()*2-1), y = 0.1*(rnd()*2-1);
-    const scale = Math.min(width, height) * 0.35;
-    const cx = width*0.5, cy = height*0.5;
+    const scale = Math.min(width, height) * 0.25;
+    const cx = width*0.5, cy = height*0.7;
 
     const render = () => {
       // Trails

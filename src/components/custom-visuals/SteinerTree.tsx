@@ -1,6 +1,6 @@
-// Themes: optimal connections, minimal networks, geometric optimization
-// Visualisation: Optimal connection points minimize total distances creating efficient network trees
-// Unique mechanism: Steiner tree approximation algorithm with geometric network optimization
+// Themes: natural efficiency, graceful connections, effortless unity, flowing networks
+// Visualisation: Points find their natural connections forming harmonious efficient networks
+// Unique mechanism: Steiner tree approximation transformed into meditation on efficiency
 
 import React, { useRef, useEffect } from 'react';
 import { VisualProps } from '../../types';
@@ -237,8 +237,8 @@ const SteinerTree: React.FC<VisualProps> = ({ width, height }) => {
     approximateSteinerTree();
 
     const render = (t: number) => {
-      // Trails with translucent clear
-      ctx.fillStyle = 'rgba(240,238,230,0.05)';
+      // Gentle fade for flowing networks
+      ctx.fillStyle = 'rgba(240,238,230,0.04)';
       ctx.fillRect(0, 0, width, height);
 
       const time = t * 0.001;
@@ -252,115 +252,100 @@ const SteinerTree: React.FC<VisualProps> = ({ width, height }) => {
         approximateSteinerTree();
       }
 
-      // Draw edges
+      // Draw flowing connections
       edges.forEach(edge => {
         const fromPoint = points.find(p => p.id === edge.from);
         const toPoint = points.find(p => p.id === edge.to);
         
         if (fromPoint && toPoint) {
-          const alpha = edge.inSteinerTree ? 0.7 : 0.2;
-          const lineWidth = edge.inSteinerTree ? 2.5 : 1;
+          const pulse = Math.sin(time * 1.5 + edge.from * 0.2) * 0.05 + 0.95;
           
-          // Color based on edge optimality
-          const efficiency = 1 - (edge.length / (width + height));
-          const intensity = 60 + efficiency * 40;
-          
-          ctx.strokeStyle = `rgba(${intensity},${intensity + 10},${intensity},${alpha})`;
-          ctx.lineWidth = lineWidth;
+          if (edge.inSteinerTree) {
+            // Active connections - gentle and visible
+            const efficiency = 1 - (edge.length / (width + height));
+            const baseTone = 90 + efficiency * 20;
+            const alpha = 0.25 * pulse;
+            
+            ctx.strokeStyle = `rgba(${baseTone}, ${baseTone}, ${baseTone}, ${alpha})`;
+            ctx.lineWidth = 2;
+          } else {
+            // Potential connections - very subtle
+            ctx.strokeStyle = `rgba(85, 85, 85, 0.05)`;
+            ctx.lineWidth = 0.5;
+          }
           
           ctx.beginPath();
           ctx.moveTo(fromPoint.x, fromPoint.y);
           ctx.lineTo(toPoint.x, toPoint.y);
           ctx.stroke();
-          
-          // Draw length annotation for Steiner edges
-          if (edge.inSteinerTree && (fromPoint.isSteiner || toPoint.isSteiner)) {
-            const midX = (fromPoint.x + toPoint.x) / 2;
-            const midY = (fromPoint.y + toPoint.y) / 2;
-            
-            ctx.font = '8px serif';
-            ctx.fillStyle = 'rgba(60,60,60,0.5)';
-            ctx.textAlign = 'center';
-            ctx.fillText(Math.round(edge.length).toString(), midX, midY - 5);
-          }
         }
       });
 
-      // Draw connection optimization visualization
+      // Draw ethereal optimization fields around harmony points
       points.filter(p => p.isSteiner).forEach(steinerPoint => {
-        // Draw optimization field around Steiner points
+        const breathe = Math.sin(steinerPoint.age + time * 1.2) * 0.15 + 1;
+        const fieldSize = 40 * breathe;
+        
         const gradient = ctx.createRadialGradient(
           steinerPoint.x, steinerPoint.y, 0,
-          steinerPoint.x, steinerPoint.y, 40
+          steinerPoint.x, steinerPoint.y, fieldSize
         );
-        gradient.addColorStop(0, 'rgba(100,120,100,0.2)');
-        gradient.addColorStop(1, 'rgba(100,120,100,0)');
+        gradient.addColorStop(0, 'rgba(105, 105, 105, 0.12)');
+        gradient.addColorStop(1, 'rgba(105, 105, 105, 0)');
         
         ctx.fillStyle = gradient;
         ctx.beginPath();
-        ctx.arc(steinerPoint.x, steinerPoint.y, 40, 0, Math.PI * 2);
+        ctx.arc(steinerPoint.x, steinerPoint.y, fieldSize, 0, Math.PI * 2);
         ctx.fill();
       });
 
-      // Draw points
+      // Draw ethereal particles
       points.forEach(point => {
-        const pulse = Math.sin(point.age + time * 2) * 0.1 + 0.9;
-        let size, fillStyle, strokeStyle;
+        const breathe = Math.sin(point.age + time * 1.5) * 0.15 + 1;
+        let size, baseTone, glowIntensity;
         
         if (point.isTerminal) {
-          size = 8;
-          fillStyle = 'rgba(80,80,80,0.8)';
-          strokeStyle = 'rgba(50,50,50,0.8)';
+          // Terminal points - primary nodes
+          size = 8 * breathe;
+          baseTone = 90;
+          glowIntensity = 0.25;
         } else if (point.isSteiner) {
-          size = 6;
-          fillStyle = 'rgba(100,120,100,0.8)';
-          strokeStyle = 'rgba(60,80,60,0.8)';
+          // Harmony points - efficient connectors
+          size = 6 * breathe;
+          baseTone = 100;
+          glowIntensity = 0.3 + Math.sin(time * 2) * 0.1;
         } else {
-          size = 5;
-          fillStyle = 'rgba(70,70,70,0.6)';
-          strokeStyle = 'rgba(40,40,40,0.6)';
+          size = 5 * breathe;
+          baseTone = 85;
+          glowIntensity = 0.15;
         }
         
-        // Point circle
-        ctx.fillStyle = fillStyle;
-        ctx.strokeStyle = strokeStyle;
-        ctx.lineWidth = 2;
+        // Outer glow
+        const gradient = ctx.createRadialGradient(
+          point.x, point.y, 0,
+          point.x, point.y, size * 2
+        );
+        gradient.addColorStop(0, `rgba(${baseTone}, ${baseTone}, ${baseTone}, ${glowIntensity})`);
+        gradient.addColorStop(1, `rgba(${baseTone}, ${baseTone}, ${baseTone}, 0)`);
+        
+        ctx.fillStyle = gradient;
         ctx.beginPath();
-        ctx.arc(point.x, point.y, size * pulse, 0, Math.PI * 2);
+        ctx.arc(point.x, point.y, size * 2, 0, Math.PI * 2);
         ctx.fill();
-        ctx.stroke();
         
-        // Point type indicator
-        if (point.isSteiner) {
-          // Steiner point - draw small triangle
-          ctx.fillStyle = 'rgba(40,60,40,0.8)';
-          ctx.beginPath();
-          ctx.moveTo(point.x, point.y - 3);
-          ctx.lineTo(point.x - 2.5, point.y + 2);
-          ctx.lineTo(point.x + 2.5, point.y + 2);
-          ctx.closePath();
-          ctx.fill();
-        } else {
-          // Terminal point - draw small square
-          ctx.fillStyle = 'rgba(40,40,40,0.8)';
-          ctx.fillRect(point.x - 2, point.y - 2, 4, 4);
-        }
+        // Soft core
+        const coreGradient = ctx.createRadialGradient(
+          point.x, point.y, 0,
+          point.x, point.y, size
+        );
+        coreGradient.addColorStop(0, `rgba(${baseTone - 10}, ${baseTone - 10}, ${baseTone - 10}, 0.7)`);
+        coreGradient.addColorStop(1, `rgba(${baseTone - 10}, ${baseTone - 10}, ${baseTone - 10}, 0.2)`);
+        
+        ctx.fillStyle = coreGradient;
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, size, 0, Math.PI * 2);
+        ctx.fill();
       });
-
-      // Draw network statistics
-      const terminalCount = points.filter(p => p.isTerminal).length;
-      const steinerCount = points.filter(p => p.isSteiner).length;
-      
-      ctx.font = '11px serif';
-      ctx.fillStyle = 'rgba(60,60,60,0.8)';
-      ctx.fillText(`Terminals: ${terminalCount}`, 10, 25);
-      ctx.fillText(`Steiner Points: ${steinerCount}`, 10, 40);
-      ctx.fillText(`Total Length: ${totalLength.toFixed(1)}`, 10, 55);
-      
-      // Efficiency indicator
-      const maxPossibleLength = terminalCount * Math.sqrt(width * width + height * height);
-      const efficiency = 1 - (totalLength / maxPossibleLength);
-      ctx.fillText(`Efficiency: ${(efficiency * 100).toFixed(1)}%`, 10, 70);
 
       rafRef.current = requestAnimationFrame(render);
     };
@@ -383,9 +368,9 @@ const SteinerTree: React.FC<VisualProps> = ({ width, height }) => {
 // Differs from others by: Implements Steiner tree approximation algorithm with geometric network optimization and Fermat point computation - no other visual solves network optimization problems
 
 const metadata = {
-  themes: "optimal connections, minimal networks, geometric optimization",
-  visualisation: "Optimal connection points minimize total distances creating efficient network trees",
-  promptSuggestion: "1. Adjust terminal point distribution\n2. Vary Steiner point optimization\n3. Control network efficiency visualization"
+  themes: "natural efficiency, graceful connections, effortless unity, flowing networks",
+  visualisation: "Points find their natural connections forming harmonious efficient networks",
+  promptSuggestion: "1. Adjust point distribution\n2. Vary harmony patterns\n3. Control network flow visualization"
 };
 (SteinerTree as any).metadata = metadata;
 

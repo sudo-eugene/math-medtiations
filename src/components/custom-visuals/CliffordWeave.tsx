@@ -25,17 +25,19 @@ const CliffordWeave: React.FC<VisualProps> = ({ width, height }) => {
     const d = 0.7 + (rnd()*0.1 - 0.05);
 
     let x = (rnd()*2 - 1)*0.1, y = (rnd()*2 - 1)*0.1;
-    const scale = Math.min(width, height) * 0.35;
-    const cx = width*0.5, cy = height*0.5;
+    const scale = Math.min(width, height) * 0.25;
+    const cx = width*0.4, cy = height*0.5;
 
+    let frameCount = 0;
     const render = ()=>{
       // Trails
-      ctx.fillStyle = 'rgba(240,238,230,0.05)';
+      ctx.fillStyle = 'rgba(240,238,230,0.04)';
       ctx.fillRect(0,0,width,height);
 
-      ctx.fillStyle = 'rgba(20,20,20,0.06)';
+      ctx.fillStyle = frameCount < 240 ? 'rgba(18,18,18,0.05)' : 'rgba(20,20,20,0.08)';
       // Plot many points per frame
-      for(let i=0;i<18000;i++){
+      const iterations = frameCount < 60 ? 24000 : 20000;
+      for(let i=0;i<iterations;i++){
         const nx = Math.sin(a*y) + c*Math.cos(a*x);
         const ny = Math.sin(b*x) + d*Math.cos(b*y);
         x = nx; y = ny;
@@ -44,6 +46,7 @@ const CliffordWeave: React.FC<VisualProps> = ({ width, height }) => {
           ctx.fillRect(px|0, py|0, 1, 1);
         }
       }
+      frameCount++;
 
       rafRef.current = requestAnimationFrame(render);
     };
@@ -66,4 +69,3 @@ const metadata = {
 export default CliffordWeave;
 
 // Differs from others by: Clifford strange attractor orbit plotting as the primary mechanism
-

@@ -1,337 +1,325 @@
 import React, { useEffect, useRef } from 'react';
 import { VisualProps } from '../../types';
 
-// themes: flowers bloom from emptiness, forms defined by what they're not
-// visualization: Flowers bloom from emptiness, their forms defined by what they're not
+type VoidShapeType = 'circle' | 'polygon';
+
+type FlowerPetal = {
+  angleOffset: number;
+  length: number;
+  width: number;
+  curl: number;
+};
+
+type FlowerNode = {
+  x: number;
+  y: number;
+  voidRadius: number;
+  petals: FlowerPetal[];
+  bloomPhase: number;
+  bloomSpeed: number;
+  swayPhase: number;
+  swaySpeed: number;
+  stemHeight: number;
+  stemPhase: number;
+};
+
+type VoidBubble = {
+  x: number;
+  y: number;
+  radius: number;
+  pulsePhase: number;
+  pulseSpeed: number;
+  rotation: number;
+  rotationSpeed: number;
+  shape: VoidShapeType;
+  sides: number;
+};
+
+type SeededRng = () => number;
+
+const smoothStep = (t: number) => t * t * (3 - 2 * t);
+
+const createSeededRng = (seed: number): SeededRng => {
+  return function rng() {
+    seed |= 0;
+    seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+};
 
 const VoidGarden: React.FC<VisualProps> = ({ width, height }) => {
-  const canvasRef = useRef(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const animationRef = useRef<number | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    
-    canvas.width = width;
-    canvas.height = height;
-    
-    let time = 0;
-    let animationId;
-    let voidFlowers = [];
-    let voidSpaces = [];
-    
-    class VoidFlower {
-      constructor(x, y, voidRadius) {
-        this.x = x;
-        this.y = y;
-        this.voidRadius = voidRadius; // The empty space that defines the flower
-        this.targetVoidRadius = voidRadius;
-        this.petalCount = 5 + Math.floor(Math.random() * 8);
-        this.stemHeight = 20 + Math.random() * 40;
-        this.bloomPhase = 0;
-        this.targetBloomPhase = 0;
-        this.bloomSpeed = 0.008 + Math.random() * 0.005;
-        this.rotation = Math.random() * Math.PI * 2;
-        this.rotationSpeed = (Math.random() - 0.5) * 0.003;
-        this.petalOpacity = 0.3 + Math.random() * 0.4;
-        this.phase = Math.random() * Math.PI * 2;
-        this.isReversing = false;
-        this.reverseDelay = 2000 + Math.random() * 3000;
-        this.age = 0;
+
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    ctx.scale(dpr, dpr);
+
+    const rng = createSeededRng(Math.floor(width * 73 + height * 41));
+    const fieldRadius = Math.min(width, height) * 0.45;
+
+    const flowers: FlowerNode[] = [];
+    const voids: VoidBubble[] = [];
+
+    const init = () => {
+      flowers.length = 0;
+      voids.length = 0;
+
+      const voidCount = 8 + Math.floor(rng() * 5);
+      for (let i = 0; i < voidCount; i++) {
+        const radius = 14 + rng() * 24;
+        const angle = rng() * Math.PI * 2;
+        const distance = (0.25 + rng() * 0.6) * fieldRadius;
+        const shape = rng() > 0.4 ? 'circle' : 'polygon';
+        voids.push({
+          x: width / 2 + Math.cos(angle) * distance,
+          y: height / 2 + Math.sin(angle) * distance,
+          radius,
+          pulsePhase: rng() * Math.PI * 2,
+          pulseSpeed: 0.35 + rng() * 0.35,
+          rotation: rng() * Math.PI * 2,
+          rotationSpeed: (rng() - 0.5) * 0.25,
+          shape,
+          sides: 4 + Math.floor(rng() * 4),
+        });
       }
-      
-      update(time) {
-        this.age += 1;
-        this.rotation += this.rotationSpeed;
-        this.phase += 0.02;
-        
-        // Blooming cycle
-        if (!this.isReversing && this.age > 100) {
-          this.targetBloomPhase = 1;
-          if (this.bloomPhase > 0.95) {
-            setTimeout(() => {
-              this.isReversing = true;
-              this.targetBloomPhase = 0;
-            }, this.reverseDelay);
-          }
+
+      const flowerCount = 6 + Math.floor(rng() * 4);
+      for (let i = 0; i < flowerCount; i++) {
+        const radius = 12 + rng() * 18;
+        const angle = rng() * Math.PI * 2;
+        const distance = (0.15 + rng() * 0.7) * fieldRadius;
+        const x = width / 2 + Math.cos(angle) * distance;
+        const y = height / 2 + Math.sin(angle) * distance;
+
+        const petals: FlowerPetal[] = [];
+        const petalCount = 6 + Math.floor(rng() * 5);
+        for (let p = 0; p < petalCount; p++) {
+          petals.push({
+            angleOffset: (p / petalCount) * Math.PI * 2,
+            length: radius * (1.2 + rng() * 0.8),
+            width: radius * (0.4 + rng() * 0.3),
+            curl: (rng() - 0.5) * 0.8,
+          });
         }
-        
-        this.bloomPhase += (this.targetBloomPhase - this.bloomPhase) * this.bloomSpeed;
-        
-        // Void radius pulsing
-        this.targetVoidRadius = this.voidRadius * (0.8 + Math.sin(this.phase) * 0.2);
-      }
-      
-      draw(ctx) {
-        if (this.bloomPhase < 0.05) return;
-        
-        ctx.save();
-        ctx.translate(this.x, this.y);
-        ctx.rotate(this.rotation);
-        
-        const currentVoidRadius = this.targetVoidRadius * this.bloomPhase;
-        const petalLength = currentVoidRadius * 1.5;
-        
-        // Draw stem (defined by the space around it)
-        const stemWidth = 3;
-        ctx.strokeStyle = `rgba(60, 60, 60, ${this.petalOpacity * 0.6})`;
-        ctx.lineWidth = 1;
-        
-        // Stem as negative space outline
-        ctx.beginPath();
-        ctx.moveTo(-stemWidth, 0);
-        ctx.lineTo(-stemWidth, this.stemHeight);
-        ctx.moveTo(stemWidth, 0);
-        ctx.lineTo(stemWidth, this.stemHeight);
-        ctx.stroke();
-        
-        // Draw petals as the space around the void
-        for (let i = 0; i < this.petalCount; i++) {
-          const angle = (i / this.petalCount) * Math.PI * 2;
-          const petalPhase = this.bloomPhase * this.petalCount - i;
-          
-          if (petalPhase > 0) {
-            const actualPhase = Math.min(petalPhase, 1);
-            this.drawVoidPetal(ctx, angle, currentVoidRadius, petalLength, actualPhase);
-          }
-        }
-        
-        // Draw the central void
-        ctx.strokeStyle = `rgba(80, 80, 80, ${this.petalOpacity * this.bloomPhase})`;
-        ctx.lineWidth = 1.5;
-        ctx.setLineDash([2, 4]);
-        ctx.beginPath();
-        ctx.arc(0, 0, currentVoidRadius, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.setLineDash([]);
-        
-        // Add void indicator points
-        const voidPoints = 6;
-        for (let i = 0; i < voidPoints; i++) {
-          const angle = (i / voidPoints) * Math.PI * 2;
-          const x = Math.cos(angle) * currentVoidRadius * 0.7;
-          const y = Math.sin(angle) * currentVoidRadius * 0.7;
-          
-          ctx.fillStyle = `rgba(70, 70, 70, ${this.petalOpacity * 0.3})`;
-          ctx.beginPath();
-          ctx.arc(x, y, 1, 0, Math.PI * 2);
-          ctx.fill();
-        }
-        
-        ctx.restore();
-      }
-      
-      drawVoidPetal(ctx, angle, voidRadius, petalLength, phase) {
-        const alpha = this.petalOpacity * phase;
-        
-        // Draw petal outline - the flower is defined by what it's not
-        ctx.strokeStyle = `rgba(60, 60, 60, ${alpha})`;
-        ctx.lineWidth = 0.8;
-        
-        // Petal shape defined by curves around the void
-        const petalTipX = Math.cos(angle) * petalLength;
-        const petalTipY = Math.sin(angle) * petalLength;
-        const voidEdgeX = Math.cos(angle) * voidRadius;
-        const voidEdgeY = Math.sin(angle) * voidRadius;
-        
-        // Left side of petal
-        const leftAngle = angle - 0.3;
-        const leftCurveX = Math.cos(leftAngle) * voidRadius * 1.2;
-        const leftCurveY = Math.sin(leftAngle) * voidRadius * 1.2;
-        
-        // Right side of petal
-        const rightAngle = angle + 0.3;
-        const rightCurveX = Math.cos(rightAngle) * voidRadius * 1.2;
-        const rightCurveY = Math.sin(rightAngle) * voidRadius * 1.2;
-        
-        ctx.beginPath();
-        ctx.moveTo(voidEdgeX, voidEdgeY);
-        ctx.quadraticCurveTo(leftCurveX, leftCurveY, petalTipX, petalTipY);
-        ctx.quadraticCurveTo(rightCurveX, rightCurveY, voidEdgeX, voidEdgeY);
-        ctx.stroke();
-        
-        // Add texture lines that respect the void
-        const textureLines = 3;
-        for (let t = 0; t < textureLines; t++) {
-          const textureRatio = (t + 1) / (textureLines + 1);
-          const textureX = voidEdgeX + (petalTipX - voidEdgeX) * textureRatio;
-          const textureY = voidEdgeY + (petalTipY - voidEdgeY) * textureRatio;
-          
-          ctx.strokeStyle = `rgba(70, 70, 70, ${alpha * 0.5})`;
-          ctx.lineWidth = 0.3;
-          ctx.beginPath();
-          ctx.moveTo(voidEdgeX, voidEdgeY);
-          ctx.lineTo(textureX, textureY);
-          ctx.stroke();
-        }
-      }
-    }
-    
-    class VoidSpace {
-      constructor(x, y, radius) {
-        this.x = x;
-        this.y = y;
-        this.radius = radius;
-        this.targetRadius = radius;
-        this.opacity = 0.1 + Math.random() * 0.2;
-        this.phase = Math.random() * Math.PI * 2;
-        this.pulseSpeed = 0.01 + Math.random() * 0.02;
-        this.type = Math.random() > 0.5 ? 'circle' : 'square';
-      }
-      
-      update() {
-        this.phase += this.pulseSpeed;
-        this.targetRadius = this.radius * (0.9 + Math.sin(this.phase) * 0.1);
-      }
-      
-      draw(ctx) {
-        const alpha = this.opacity * (0.7 + Math.sin(this.phase) * 0.3);
-        
-        ctx.strokeStyle = `rgba(80, 80, 80, ${alpha})`;
-        ctx.lineWidth = 0.5;
-        ctx.setLineDash([1, 3]);
-        
-        if (this.type === 'circle') {
-          ctx.beginPath();
-          ctx.arc(this.x, this.y, this.targetRadius, 0, Math.PI * 2);
-          ctx.stroke();
-        } else {
-          const half = this.targetRadius;
-          ctx.beginPath();
-          ctx.rect(this.x - half, this.y - half, half * 2, half * 2);
-          ctx.stroke();
-        }
-        
-        ctx.setLineDash([]);
-        
-        // Void center indicator
-        ctx.fillStyle = `rgba(70, 70, 70, ${alpha * 0.5})`;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, 1, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-    
-    const initializeGarden = () => {
-      voidFlowers = [];
-      voidSpaces = [];
-      
-      // Create void spaces first
-      const numVoidSpaces = 8 + Math.floor(Math.random() * 6);
-      for (let i = 0; i < numVoidSpaces; i++) {
-        const x = width * (0.1 + Math.random() * 0.8);
-        const y = height * (0.1 + Math.random() * 0.8);
-        const radius = 10 + Math.random() * 20;
-        
-        voidSpaces.push(new VoidSpace(x, y, radius));
-      }
-      
-      // Create flowers that grow around some void spaces
-      const numFlowers = 4 + Math.floor(Math.random() * 4);
-      for (let i = 0; i < numFlowers; i++) {
-        let x, y, voidRadius;
-        
-        if (i < voidSpaces.length && Math.random() < 0.7) {
-          // Grow around existing void space
-          const voidSpace = voidSpaces[i];
-          x = voidSpace.x;
-          y = voidSpace.y;
-          voidRadius = voidSpace.radius * 0.8;
-        } else {
-          // Create independent flower
-          x = width * (0.2 + Math.random() * 0.6);
-          y = height * (0.2 + Math.random() * 0.6);
-          voidRadius = 8 + Math.random() * 15;
-        }
-        
-        voidFlowers.push(new VoidFlower(x, y, voidRadius));
+
+        flowers.push({
+          x,
+          y,
+          voidRadius: radius,
+          petals,
+          bloomPhase: rng() * 0.4,
+          bloomSpeed: 0.25 + rng() * 0.2,
+          swayPhase: rng() * Math.PI * 2,
+          swaySpeed: 0.5 + rng() * 0.4,
+          stemHeight: 20 + rng() * 40,
+          stemPhase: rng() * Math.PI * 2,
+        });
       }
     };
-    
-    const animate = () => {
+
+    const drawBackground = () => {
+      const gradient = ctx.createRadialGradient(
+        width / 2,
+        height / 2,
+        0,
+        width / 2,
+        height / 2,
+        fieldRadius * 1.15
+      );
+      gradient.addColorStop(0, 'rgba(25, 25, 25, 0.18)');
+      gradient.addColorStop(1, 'rgba(25, 25, 25, 0)');
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(width / 2, height / 2, fieldRadius * 1.15, 0, Math.PI * 2);
+      ctx.fill();
+    };
+
+    const updateVoid = (voidBubble: VoidBubble, delta: number) => {
+      voidBubble.pulsePhase += voidBubble.pulseSpeed * delta;
+      voidBubble.rotation += voidBubble.rotationSpeed * delta;
+    };
+
+    const drawVoid = (voidBubble: VoidBubble) => {
+      const { x, y, radius, pulsePhase, shape, sides } = voidBubble;
+      const pulse = 0.85 + 0.15 * Math.sin(pulsePhase);
+      const effectiveRadius = radius * pulse;
+
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(voidBubble.rotation);
+
+      ctx.strokeStyle = 'rgba(35, 35, 35, 0.35)';
+      ctx.lineWidth = 0.6;
+      ctx.setLineDash([3, 7]);
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(0, effectiveRadius * 1.15);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.strokeStyle = 'rgba(30, 30, 30, 0.45)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      if (shape === 'circle') {
+        ctx.arc(0, 0, effectiveRadius, 0, Math.PI * 2);
+      } else {
+        for (let i = 0; i <= sides; i++) {
+          const angle = (i / sides) * Math.PI * 2;
+          const vx = Math.cos(angle) * effectiveRadius;
+          const vy = Math.sin(angle) * effectiveRadius;
+          if (i === 0) ctx.moveTo(vx, vy);
+          else ctx.lineTo(vx, vy);
+        }
+      }
+      ctx.stroke();
+
+      ctx.fillStyle = 'rgba(25, 25, 25, 0.12)';
+      ctx.beginPath();
+      ctx.arc(0, 0, Math.max(1.5, effectiveRadius * 0.16), 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    };
+
+    const updateFlower = (flower: FlowerNode, delta: number) => {
+      flower.bloomPhase += flower.bloomSpeed * delta;
+      if (flower.bloomPhase > 1) {
+        flower.bloomPhase = 1;
+        flower.bloomSpeed *= -1;
+      }
+      if (flower.bloomPhase < 0.2) {
+        flower.bloomPhase = 0.2;
+        flower.bloomSpeed *= -1;
+      }
+      flower.swayPhase += flower.swaySpeed * delta;
+      flower.stemPhase += 0.75 * delta;
+    };
+
+    const drawFlower = (flower: FlowerNode) => {
+      const { x, y, voidRadius, petals, bloomPhase, swayPhase, stemHeight, stemPhase } = flower;
+      const smoothBloom = smoothStep(bloomPhase);
+      const sway = Math.sin(swayPhase) * 5;
+
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(Math.sin(stemPhase) * 0.08);
+
+      ctx.strokeStyle = 'rgba(35, 35, 35, 0.45)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(sway * 0.2, 0);
+      ctx.quadraticCurveTo(sway * 0.6, stemHeight * 0.5, sway, stemHeight);
+      ctx.stroke();
+
+      ctx.translate(sway, 0);
+
+      ctx.strokeStyle = 'rgba(20, 20, 20, 0.48)';
+      ctx.lineWidth = 1.4;
+      ctx.setLineDash([3, 6]);
+      ctx.beginPath();
+      ctx.arc(0, 0, voidRadius * (0.75 + smoothBloom * 0.25), 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      petals.forEach(petal => {
+        const angle = petal.angleOffset + sway * 0.01;
+        const length = petal.length * (0.6 + smoothBloom * 0.5);
+        const width = petal.width * (0.6 + smoothBloom * 0.35);
+        const curl = petal.curl;
+
+        const tipX = Math.cos(angle) * length;
+        const tipY = Math.sin(angle) * length;
+        const baseX = Math.cos(angle) * voidRadius * (0.8 + smoothBloom * 0.2);
+        const baseY = Math.sin(angle) * voidRadius * (0.8 + smoothBloom * 0.2);
+
+        const controlLeftX = baseX + Math.cos(angle - 0.6 + curl) * width;
+        const controlLeftY = baseY + Math.sin(angle - 0.6 + curl) * width;
+        const controlRightX = baseX + Math.cos(angle + 0.6 - curl) * width;
+        const controlRightY = baseY + Math.sin(angle + 0.6 - curl) * width;
+
+        ctx.strokeStyle = 'rgba(25, 25, 25, 0.45)';
+        ctx.lineWidth = 0.9;
+        ctx.beginPath();
+        ctx.moveTo(baseX, baseY);
+        ctx.bezierCurveTo(controlLeftX, controlLeftY, tipX, tipY, controlRightX, controlRightY);
+        ctx.stroke();
+
+        const textures = 3;
+        ctx.strokeStyle = 'rgba(25, 25, 25, 0.3)';
+        ctx.lineWidth = 0.4;
+        for (let i = 1; i <= textures; i++) {
+          const t = i / (textures + 1);
+          ctx.beginPath();
+          ctx.moveTo(baseX, baseY);
+          const midX = controlLeftX + (tipX - controlLeftX) * t;
+          const midY = controlLeftY + (tipY - controlLeftY) * t;
+          ctx.lineTo(midX, midY);
+          ctx.stroke();
+        }
+      });
+
+      ctx.restore();
+    };
+
+    let lastTimestamp = performance.now();
+
+    const animate = (timestamp: number) => {
+      const delta = Math.min(0.05, (timestamp - lastTimestamp) / 1000);
+      lastTimestamp = timestamp;
+
       ctx.fillStyle = '#F0EEE6';
       ctx.fillRect(0, 0, width, height);
-      
-      time += 1;
-      
-      // Update void spaces
-      voidSpaces.forEach(space => space.update());
-      
-      // Update flowers
-      voidFlowers.forEach(flower => flower.update(time));
-      
-      // Remove withered flowers and create new ones
-      voidFlowers = voidFlowers.filter(flower => flower.bloomPhase > 0.01 || !flower.isReversing);
-      
-      if (voidFlowers.length < 6 && Math.random() < 0.003) {
-        const x = width * (0.2 + Math.random() * 0.6);
-        const y = height * (0.2 + Math.random() * 0.6);
-        const voidRadius = 8 + Math.random() * 15;
-        voidFlowers.push(new VoidFlower(x, y, voidRadius));
-      }
-      
-      // Draw void connections
-      ctx.strokeStyle = 'rgba(80, 80, 80, 0.05)';
-      ctx.lineWidth = 0.3;
-      ctx.setLineDash([1, 4]);
-      
-      for (let i = 0; i < voidSpaces.length; i++) {
-        for (let j = i + 1; j < voidSpaces.length; j++) {
-          const s1 = voidSpaces[i];
-          const s2 = voidSpaces[j];
-          const distance = Math.sqrt((s1.x - s2.x) ** 2 + (s1.y - s2.y) ** 2);
-          
-          if (distance < 100) {
-            ctx.beginPath();
-            ctx.moveTo(s1.x, s1.y);
-            ctx.lineTo(s2.x, s2.y);
-            ctx.stroke();
-          }
-        }
-      }
-      ctx.setLineDash([]);
-      
-      // Draw void spaces
-      voidSpaces.forEach(space => space.draw(ctx));
-      
-      // Draw flowers
-      voidFlowers.forEach(flower => flower.draw(ctx));
-      
-      // Draw garden philosophy text
-      ctx.font = '10px serif';
-      ctx.fillStyle = 'rgba(60, 60, 60, 0.3)';
-      ctx.textAlign = 'center';
-      ctx.fillText('Form is Emptiness', width / 2, height - 30);
-      ctx.fillText('Emptiness is Form', width / 2, height - 15);
-      
-      animationId = requestAnimationFrame(animate);
+
+      drawBackground();
+
+      voids.forEach(voidBubble => {
+        updateVoid(voidBubble, delta);
+        drawVoid(voidBubble);
+      });
+
+      flowers.forEach(flower => {
+        updateFlower(flower, delta);
+        drawFlower(flower);
+      });
+
+      animationRef.current = requestAnimationFrame(animate);
     };
-    
-    initializeGarden();
-    animate();
-    
+
+    init();
+    animationRef.current = requestAnimationFrame(animate);
+
     return () => {
-      if (animationId) {
-        cancelAnimationFrame(animationId);
+      if (animationRef.current !== null) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
       }
-      voidFlowers = [];
-      voidSpaces = [];
     };
   }, [width, height]);
-  
+
   return (
-    <div style={{
-      width: `${width}px`,
-      height: `${height}px`,
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: '#F0EEE6',
-      overflow: 'hidden',
-      borderRadius: '8px'
-    }}>
-      <canvas ref={canvasRef} width={width} height={height} />
+    <div
+      style={{
+        width: `${width}px`,
+        height: `${height}px`,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#F0EEE6',
+        overflow: 'hidden',
+        borderRadius: '8px',
+      }}
+    >
+      <canvas ref={canvasRef} style={{ width: '100%', height: '100%' }} />
     </div>
   );
 };

@@ -5,7 +5,7 @@ import { VisualProps } from '../../types';
 // visualization: Fibonacci spirals that grow and branch organically like living plants
 
 const FibonacciGrowth: React.FC<VisualProps> = ({ width, height }) => {
-  const canvasRef = useRef(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -19,9 +19,20 @@ const FibonacciGrowth: React.FC<VisualProps> = ({ width, height }) => {
     // Fibonacci sequence and golden ratio
     const phi = (1 + Math.sqrt(5)) / 2;
     let time = 0;
-    
+
+    type Branch = {
+      x: number;
+      y: number;
+      angle: number;
+      length: number;
+      maxLength: number;
+      generation: number;
+      age: number;
+      growth: number;
+    };
+
     // Growth system
-    const branches = [];
+    const branches: Branch[] = [];
     const maxBranches = 12;
     
     // Initialize main stems
@@ -35,13 +46,18 @@ const FibonacciGrowth: React.FC<VisualProps> = ({ width, height }) => {
         generation: 0,
         age: Math.random() * 20,
         growth: 0.8 + Math.random() * 0.4,
-        children: []
       });
     }
 
-    let animationId = null;
+    let animationId: number | null = null;
 
-    const drawFibonacciSpiral = (centerX, centerY, scale, rotation, alpha) => {
+    const drawFibonacciSpiral = (
+      centerX: number,
+      centerY: number,
+      scale: number,
+      rotation: number,
+      alpha: number
+    ) => {
       ctx.save();
       ctx.translate(centerX, centerY);
       ctx.rotate(rotation);
@@ -70,7 +86,7 @@ const FibonacciGrowth: React.FC<VisualProps> = ({ width, height }) => {
       ctx.restore();
     };
 
-    const drawLeaf = (x, y, size, angle, alpha) => {
+    const drawLeaf = (x: number, y: number, size: number, angle: number, alpha: number) => {
       ctx.save();
       ctx.translate(x, y);
       ctx.rotate(angle);
@@ -92,7 +108,7 @@ const FibonacciGrowth: React.FC<VisualProps> = ({ width, height }) => {
       ctx.restore();
     };
 
-    const growBranch = (branch) => {
+    const growBranch = (branch: Branch) => {
       if (branch.length < branch.maxLength) {
         branch.length += branch.growth;
         branch.age += 0.1;
@@ -109,8 +125,9 @@ const FibonacciGrowth: React.FC<VisualProps> = ({ width, height }) => {
           // Create new branches at golden ratio angles
           const branchAngle1 = branch.angle + Math.PI / phi;
           const branchAngle2 = branch.angle - Math.PI / phi;
-          
-          if (Math.random() > 0.3) {
+          let hasBranched = false;
+
+          if (Math.random() > 0.3 && branches.length < maxBranches) {
             branches.push({
               x: tipX,
               y: tipY,
@@ -120,11 +137,11 @@ const FibonacciGrowth: React.FC<VisualProps> = ({ width, height }) => {
               generation: branch.generation + 1,
               age: 0,
               growth: branch.growth * 0.8,
-              children: []
             });
+            hasBranched = true;
           }
-          
-          if (Math.random() > 0.5) {
+
+          if (Math.random() > 0.5 && branches.length < maxBranches) {
             branches.push({
               x: tipX,
               y: tipY,
@@ -134,11 +151,13 @@ const FibonacciGrowth: React.FC<VisualProps> = ({ width, height }) => {
               generation: branch.generation + 1,
               age: 0,
               growth: branch.growth * 0.8,
-              children: []
             });
+            hasBranched = true;
           }
-          
-          branch.age = 0; // Reset age after branching
+
+          if (hasBranched) {
+            branch.age = 0; // Reset age only after successfully branching
+          }
         }
       }
     };

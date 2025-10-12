@@ -22,8 +22,9 @@ const PopcornMapWeave: React.FC<VisualProps> = ({ width, height }) => {
     const cx = width*0.5, cy = height*0.5; const scale = Math.min(width,height)*0.22;
 
     const render = ()=>{
-      ctx.fillStyle='rgba(240,238,230,0.05)'; ctx.fillRect(0,0,width,height);
-      ctx.fillStyle='rgba(20,20,20,0.05)';
+      ctx.fillStyle='rgba(240,238,230,0.01)'; ctx.fillRect(0,0,width,height);
+      // Soft pencil-like dark grey with higher opacity for pencil effect
+      ctx.fillStyle='rgba(25,25,28,0.5)';
       for(let i=0;i<22000;i++){
         const xn = x - h*Math.sin(y + Math.tan(3*y));
         const yn = y - h*Math.sin(x + Math.tan(3*x));

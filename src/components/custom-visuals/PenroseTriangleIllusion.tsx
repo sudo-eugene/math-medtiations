@@ -10,6 +10,10 @@ const PenroseTriangleIllusion: React.FC<VisualProps> = ({ width: containerWidth,
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    canvas.style.whiteSpace = 'pre';
+    canvas.style.display = 'inline-block';
+    canvas.style.textAlign = 'center';
+
     const charWidth = fontSize * 0.6;
     const charHeight = fontSize * 1.2;
 
@@ -31,11 +35,11 @@ const PenroseTriangleIllusion: React.FC<VisualProps> = ({ width: containerWidth,
     }
 
     function render() {
-      let html = '';
+      const lines = new Array(height);
       for (let y = 0; y < height; y++) {
-        html += grid[y].join('') + '<br>';
+        lines[y] = grid[y].join('');
       }
-      canvas.innerHTML = html;
+      canvas.textContent = lines.join('\n');
     }
 
     function rotate(x: number, y: number, angle: number) {
@@ -122,7 +126,7 @@ const PenroseTriangleIllusion: React.FC<VisualProps> = ({ width: containerWidth,
       if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
       }
-      if (canvas) canvas.innerHTML = '';
+      if (canvas) canvas.textContent = '';
     };
   }, [containerWidth, containerHeight]);
 
@@ -148,6 +152,8 @@ const PenroseTriangleIllusion: React.FC<VisualProps> = ({ width: containerWidth,
           letterSpacing: '0.05em',
           color: 'rgba(0,0,0,0.85)',
           userSelect: 'none',
+          maxWidth: '100%',
+          maxHeight: '100%',
         }}
       />
     </div>

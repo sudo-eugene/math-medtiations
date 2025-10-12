@@ -87,10 +87,6 @@ const CauchyResidueFlow: React.FC<VisualProps> = ({ width, height }) => {
         ctx.stroke();
       }
 
-      ctx.strokeStyle = 'rgba(20,20,20,0.12)';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(width * 0.1, height * 0.1, width * 0.8, height * 0.8);
-
       rafRef.current = requestAnimationFrame(render);
     };
 

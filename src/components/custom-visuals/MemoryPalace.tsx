@@ -5,23 +5,41 @@ import { VisualProps } from '../../types';
 // visualization: Architectural spaces that construct themselves from thought, then dissolve back into potential
 
 const MemoryPalace: React.FC<VisualProps> = ({ width, height }) => {
-  const canvasRef = useRef(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const animationRef = useRef<number | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    
-    canvas.width = width;
-    canvas.height = height;
-    
+
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    ctx.scale(dpr, dpr);
+
     let time = 0;
-    let animationId;
-    let rooms = [];
+    let rooms: MemoryRoom[] = [];
     
     class MemoryRoom {
-      constructor(x, y, w, h, depth) {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      depth: number;
+      construction: number;
+      targetConstruction: number;
+      phase: number;
+      buildSpeed: number;
+      walls: ReturnType<MemoryRoom['generateWalls']>;
+      memories: ReturnType<MemoryRoom['generateMemories']>;
+      isBuilding: boolean;
+      buildDelay: number;
+      age: number;
+      private dissolveTimeout: number | null;
+
+      constructor(x: number, y: number, w: number, h: number, depth: number) {
         this.x = x;
         this.y = y;
         this.width = w;
@@ -30,14 +48,15 @@ const MemoryPalace: React.FC<VisualProps> = ({ width, height }) => {
         this.construction = 0; // 0 to 1, how built it is
         this.targetConstruction = 0;
         this.phase = Math.random() * Math.PI * 2;
-        this.buildSpeed = 0.008 + Math.random() * 0.005;
+        this.buildSpeed = 0.009 + Math.random() * 0.006;
         this.walls = this.generateWalls();
         this.memories = this.generateMemories();
         this.isBuilding = true;
-        this.buildDelay = Math.random() * 200;
+        this.buildDelay = Math.random() * 120;
         this.age = 0;
+        this.dissolveTimeout = null;
       }
-      
+
       generateWalls() {
         const walls = [];
         const segments = 6 + Math.floor(Math.random() * 4);
@@ -57,6 +76,13 @@ const MemoryPalace: React.FC<VisualProps> = ({ width, height }) => {
           });
         }
         return walls;
+      }
+
+      cleanup() {
+        if (this.dissolveTimeout !== null) {
+          clearTimeout(this.dissolveTimeout);
+          this.dissolveTimeout = null;
+        }
       }
       
       generateMemories() {
@@ -89,12 +115,12 @@ const MemoryPalace: React.FC<VisualProps> = ({ width, height }) => {
           this.targetConstruction = 1;
           this.construction += (this.targetConstruction - this.construction) * this.buildSpeed;
           
-          if (this.construction > 0.95) {
+          if (this.construction > 0.92) {
             this.isBuilding = false;
             // Start dissolution after some time
-            setTimeout(() => {
+            this.dissolveTimeout = window.setTimeout(() => {
               this.targetConstruction = 0;
-              this.buildSpeed = 0.003; // Slower dissolution
+              this.buildSpeed = 0.0035; // Slower dissolution
             }, 3000 + Math.random() * 2000);
           }
         }
@@ -108,7 +134,7 @@ const MemoryPalace: React.FC<VisualProps> = ({ width, height }) => {
       draw(ctx) {
         if (this.construction < 0.05) return;
         
-        const alpha = this.construction * 0.6;
+        const alpha = Math.max(0.22, this.construction * 0.65);
         
         // Draw room structure
         this.walls.forEach((wall, index) => {
@@ -117,8 +143,8 @@ const MemoryPalace: React.FC<VisualProps> = ({ width, height }) => {
           
           const wallAlpha = Math.min(wallConstruction, 1) * wall.opacity * alpha;
           
-          ctx.strokeStyle = `rgba(60, 60, 60, ${wallAlpha})`;
-          ctx.lineWidth = 1 + wallConstruction * 0.5;
+          ctx.strokeStyle = `rgba(40, 40, 40, ${wallAlpha})`;
+          ctx.lineWidth = 0.9 + wallConstruction * 0.7;
           ctx.beginPath();
           ctx.moveTo(wall.x1, wall.y1);
           ctx.lineTo(wall.x2, wall.y2);
@@ -130,7 +156,7 @@ const MemoryPalace: React.FC<VisualProps> = ({ width, height }) => {
             const x = wall.x1 + (wall.x2 - wall.x1) * t;
             const y = wall.y1 + (wall.y2 - wall.y1) * t;
             
-            ctx.fillStyle = `rgba(80, 80, 80, ${wallAlpha})`;
+            ctx.fillStyle = `rgba(30, 30, 30, ${Math.min(0.9, wallAlpha + 0.1)})`;
             ctx.beginPath();
             ctx.arc(x, y, 2, 0, Math.PI * 2);
             ctx.fill();
@@ -147,8 +173,8 @@ const MemoryPalace: React.FC<VisualProps> = ({ width, height }) => {
           
           if (memory.type === 'knowledge') {
             // Draw as geometric shapes
-            ctx.strokeStyle = `rgba(70, 70, 70, ${memoryAlpha})`;
-            ctx.lineWidth = 0.8;
+            ctx.strokeStyle = `rgba(30, 30, 30, ${Math.min(0.9, memoryAlpha + 0.2)})`;
+            ctx.lineWidth = 0.9;
             ctx.beginPath();
             const sides = 6;
             for (let s = 0; s <= sides; s++) {
@@ -161,13 +187,13 @@ const MemoryPalace: React.FC<VisualProps> = ({ width, height }) => {
             ctx.stroke();
           } else {
             // Draw as organic shapes
-            ctx.fillStyle = `rgba(50, 50, 50, ${memoryAlpha * 0.3})`;
+            ctx.fillStyle = `rgba(30, 30, 30, ${memoryAlpha * 0.45})`;
             ctx.beginPath();
             ctx.arc(memory.x, memory.y, size, 0, Math.PI * 2);
             ctx.fill();
             
-            ctx.strokeStyle = `rgba(60, 60, 60, ${memoryAlpha})`;
-            ctx.lineWidth = 0.5;
+            ctx.strokeStyle = `rgba(40, 40, 40, ${Math.min(0.8, memoryAlpha + 0.15)})`;
+            ctx.lineWidth = 0.6;
             ctx.stroke();
           }
         });
@@ -181,8 +207,8 @@ const MemoryPalace: React.FC<VisualProps> = ({ width, height }) => {
             
             if (distance < 60 && this.construction > 0.7) {
               const connectionAlpha = alpha * 0.2 * (1 - distance / 60);
-              ctx.strokeStyle = `rgba(70, 70, 70, ${connectionAlpha})`;
-              ctx.lineWidth = 0.3;
+              ctx.strokeStyle = `rgba(30, 30, 30, ${Math.min(0.6, connectionAlpha + 0.1)})`;
+              ctx.lineWidth = 0.35;
               ctx.setLineDash([2, 4]);
               ctx.beginPath();
               ctx.moveTo(m1.x, m1.y);
@@ -194,6 +220,10 @@ const MemoryPalace: React.FC<VisualProps> = ({ width, height }) => {
         }
       }
     }
+
+    const destroyRoom = (room: MemoryRoom) => {
+      room.cleanup();
+    };
     
     const initializePalace = () => {
       rooms = [];
@@ -216,11 +246,19 @@ const MemoryPalace: React.FC<VisualProps> = ({ width, height }) => {
       
       // Update rooms
       rooms.forEach(room => room.update(time));
-      
+
       // Remove completely dissolved rooms and create new ones
-      rooms = rooms.filter(room => room.construction > 0.01);
+      const activeRooms: MemoryRoom[] = [];
+      rooms.forEach(room => {
+        if (room.construction > 0.01) {
+          activeRooms.push(room);
+        } else {
+          destroyRoom(room);
+        }
+      });
+      rooms = activeRooms;
       
-      if (rooms.length < 3 && Math.random() < 0.01) {
+      if (rooms.length < 3 && Math.random() < 0.02) {
         const x = width * (0.2 + Math.random() * 0.6);
         const y = height * (0.2 + Math.random() * 0.6);
         const size = 40 + Math.random() * 60;
@@ -253,16 +291,18 @@ const MemoryPalace: React.FC<VisualProps> = ({ width, height }) => {
         ctx.setLineDash([]);
       }
       
-      animationId = requestAnimationFrame(animate);
+      animationRef.current = requestAnimationFrame(animate);
     };
-    
+
     initializePalace();
     animate();
-    
+
     return () => {
-      if (animationId) {
-        cancelAnimationFrame(animationId);
+      if (animationRef.current !== null) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
       }
+      rooms.forEach(destroyRoom);
       rooms = [];
     };
   }, [width, height]);

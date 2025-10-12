@@ -21,7 +21,7 @@ const CycloidPetalOrbits: React.FC<VisualProps> = ({ width, height }) => {
 
     const petals = 6;
     const samples = 360;
-    const baseRadius = Math.min(width, height) * 0.18;
+    const baseRadius = Math.min(width, height) * 0.15;
     const cx = width / 2;
     const cy = height / 2;
 

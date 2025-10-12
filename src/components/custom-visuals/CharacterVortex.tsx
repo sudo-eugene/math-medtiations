@@ -8,7 +8,8 @@ interface CharacterVortexProps extends VisualProps {
 }
 
 const CharacterVortex: React.FC<CharacterVortexProps> = ({ width, height, text = '' }) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -22,8 +23,8 @@ const CharacterVortex: React.FC<CharacterVortexProps> = ({ width, height, text =
 
     const centerX = width / 2;
     const centerY = height / 2;
-    const baseText = (text && text.trim().length) ? text : '·•○●·•○●|';
-    const chars = baseText.split('').filter(c => c.trim().length);
+    const baseText = (text && text.trim().length) ? text : '·•○●|∞◦○';
+    const chars = baseText.split('').filter(Boolean);
     let charIndex = 0;
 
     interface Particle {
@@ -34,74 +35,103 @@ const CharacterVortex: React.FC<CharacterVortexProps> = ({ width, height, text =
       vy: number;
       alpha: number;
       rotation: number;
+      age: number;
     }
 
     const particles: Particle[] = [];
+    const maxRadius = Math.min(width, height) * 0.55;
 
-    function spawn(p: Particle) {
-      // words returning to silence
+    const spawn = (p: Particle) => {
       const char = chars[charIndex % chars.length] || '';
       charIndex++;
 
-      const side = Math.floor(Math.random() * 4);
-      if (side === 0) { p.x = Math.random() * width; p.y = 0; }
-      else if (side === 1) { p.x = width; p.y = Math.random() * height; }
-      else if (side === 2) { p.x = Math.random() * width; p.y = height; }
-      else { p.x = 0; p.y = Math.random() * height; }
+      const angle = Math.random() * Math.PI * 2;
+      const startRadius = maxRadius * (0.8 + Math.random() * 0.4);
+      const nx = Math.cos(angle);
+      const ny = Math.sin(angle);
 
-      const angle = Math.atan2(centerY - p.y, centerX - p.x);
-      const speed = 2 + Math.random();
-      p.vx = Math.cos(angle) * speed;
-      p.vy = Math.sin(angle) * speed;
-      p.alpha = 1;
-      p.rotation = 0.1 + Math.random() * 0.05;
+      p.x = centerX + nx * startRadius + (Math.random() - 0.5) * 14;
+      p.y = centerY + ny * startRadius + (Math.random() - 0.5) * 14;
+
+      const inwardSpeed = -(1.6 + Math.random() * 0.6);
+      const tangentialSpeed = (0.5 + Math.random()) * (Math.random() > 0.5 ? 1 : -1);
+      p.vx = nx * inwardSpeed - ny * tangentialSpeed;
+      p.vy = ny * inwardSpeed + nx * tangentialSpeed;
+      p.alpha = 0.1;
+      p.rotation = 0.012 + Math.random() * 0.02;
       p.char = char;
-    }
+      p.age = 0;
+    };
 
-    for (let i = 0; i < Math.max(chars.length, 20); i++) {
-      const p: Particle = { char: '', x: 0, y: 0, vx: 0, vy: 0, alpha: 1, rotation: 0.1 };
+    for (let i = 0; i < Math.max(chars.length * 2, 60); i++) {
+      const p: Particle = { char: '', x: 0, y: 0, vx: 0, vy: 0, alpha: 1, rotation: 0.02, age: 0 };
       spawn(p);
       particles.push(p);
     }
 
-    let raf: number;
+    ctx.font = '20px "IBM Plex Mono", "Fira Code", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
 
-    function animate() {
+    const animate = () => {
       ctx.fillStyle = '#F0EEE6';
       ctx.fillRect(0, 0, width, height);
 
       particles.forEach(p => {
-        const angleToCenter = Math.atan2(centerY - p.y, centerX - p.x);
-        p.vx += Math.cos(angleToCenter) * 0.05;
-        p.vy += Math.sin(angleToCenter) * 0.05;
+        const dx = centerX - p.x;
+        const dy = centerY - p.y;
+        const dist = Math.hypot(dx, dy) || 1;
+
+        const attraction = Math.min(0.05, 0.0009 * dist * dist);
+        p.vx += (dx / dist) * attraction;
+        p.vy += (dy / dist) * attraction;
 
         const cos = Math.cos(p.rotation);
         const sin = Math.sin(p.rotation);
         const vx = p.vx * cos - p.vy * sin;
         const vy = p.vx * sin + p.vy * cos;
-        p.vx = vx;
-        p.vy = vy;
+        p.vx = vx * 0.984;
+        p.vy = vy * 0.984;
 
         p.x += p.vx;
         p.y += p.vy;
-        p.alpha *= 0.985;
+        p.age += 1;
 
-        ctx.fillStyle = `rgba(50,50,50,${Math.max(0.25, p.alpha)})`;
-        ctx.font = '18px monospace';
+        if (p.alpha < 0.9) {
+          p.alpha += 0.02;
+        }
+        if (dist < maxRadius * 0.45) {
+          p.alpha *= 0.985;
+        }
+        if (dist < maxRadius * 0.2) {
+          p.alpha *= 0.96;
+        }
+
+        ctx.fillStyle = `rgba(45,45,45,${Math.min(1, Math.max(0.15, p.alpha))})`;
         ctx.fillText(p.char, p.x, p.y);
 
-        const dist = Math.hypot(centerX - p.x, centerY - p.y);
-        if (p.alpha < 0.02 || dist < 10) {
+        if (
+          dist < 14 ||
+          p.alpha < 0.05 ||
+          p.x < -20 || p.x > width + 20 ||
+          p.y < -20 || p.y > height + 20 ||
+          p.age > 1200
+        ) {
           spawn(p);
         }
       });
 
-      raf = requestAnimationFrame(animate);
-    }
+      rafRef.current = requestAnimationFrame(animate);
+    };
 
     animate();
 
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+    };
   }, [width, height, text]);
 
   return (
@@ -113,4 +143,3 @@ const CharacterVortex: React.FC<CharacterVortexProps> = ({ width, height, text =
 };
 
 export default CharacterVortex;
-

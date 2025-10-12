@@ -12,6 +12,9 @@ const NonEuclideanRippleMaze: React.FC<VisualProps> = ({ width: containerWidth, 
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    canvas.style.whiteSpace = 'pre';
+    canvas.style.display = 'inline-block';
+
     const charWidth = fontSize * 0.6;
     const charHeight = fontSize * 1.2;
     const cols = Math.floor(containerWidth / charWidth);
@@ -57,8 +60,9 @@ const NonEuclideanRippleMaze: React.FC<VisualProps> = ({ width: containerWidth, 
         }
       }
 
-      let html = '';
+      const lines = new Array(rows);
       for (let y = 0; y < rows; y++) {
+        let line = '';
         for (let x = 0; x < cols; x++) {
           const nx = (x / cols) * mazeW;
           const ny = (y / rows) * mazeH;
@@ -69,16 +73,17 @@ const NonEuclideanRippleMaze: React.FC<VisualProps> = ({ width: containerWidth, 
           let mx = Math.floor((waveX % mazeW + mazeW) % mazeW);
           let my = Math.floor((waveY % mazeH + mazeH) % mazeH);
 
-          let ch = baseMaze[my][mx];
+          const row = baseMaze[my] || '';
+          let ch = row[mx] ?? ' ';
           if (ch === '#' && extraOpenings.some(o => o.x === mx && o.y === my)) {
             ch = ' ';
           }
-          html += ch;
+          line += ch;
         }
-        html += '<br>';
+        lines[y] = line;
       }
 
-      canvas.innerHTML = html;
+      canvas.textContent = lines.join('\n');
       animationId = requestAnimationFrame(draw);
     };
 
@@ -86,7 +91,7 @@ const NonEuclideanRippleMaze: React.FC<VisualProps> = ({ width: containerWidth, 
 
     return () => {
       if (animationId) cancelAnimationFrame(animationId);
-      canvas.innerHTML = '';
+      canvas.textContent = '';
     };
   }, [containerWidth, containerHeight]);
 
@@ -113,6 +118,9 @@ const NonEuclideanRippleMaze: React.FC<VisualProps> = ({ width: containerWidth, 
           color: 'rgba(0,0,0,0.85)',
           userSelect: 'none',
           whiteSpace: 'pre',
+          textAlign: 'center',
+          maxWidth: '100%',
+          maxHeight: '100%',
         }}
       />
     </div>
@@ -120,4 +128,3 @@ const NonEuclideanRippleMaze: React.FC<VisualProps> = ({ width: containerWidth, 
 };
 
 export default NonEuclideanRippleMaze;
-

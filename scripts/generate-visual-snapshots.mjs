@@ -30,6 +30,15 @@ if (visualArg) {
 const CANVAS_SETTLE_MS = 2000;
 const EXTRA_WAIT_MS = {
   28: 10000,
+  42: 12000,
+  48: 10000,
+  71: 3200,
+  92: 1500,
+  219: 15000,
+  232: 500,
+  231: 1000,
+  333: 5000,
+  340: 1
 };
 
 const NAVIGATION_WAIT_UNTIL = 'domcontentloaded';
@@ -78,7 +87,7 @@ async function generateSnapshots() {
       : Array.from({ length: NUM_VISUALS }, (_, index) => index + 1);
 
   for (const i of visualsToCapture) {
-    const url = `${BASE_URL}/snapshot/${i}`;
+    const url = `${BASE_URL}/snapshot/${i}?bg=white`;
     console.log(`Navigating to ${url}`);
     try {
       const navigationTimeout = BASE_NAVIGATION_TIMEOUT_MS + (EXTRA_NAVIGATION_TIMEOUT_MS[i] ?? 0);

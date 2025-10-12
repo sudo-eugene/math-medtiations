@@ -5,6 +5,13 @@ import { VisualProps } from '../../types';
 // mirroring balanced inhalation and exhalation.
 const FractalBreathTree: React.FC<VisualProps> = ({ width, height }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const isWhiteSnapshot = (() => {
+    if (typeof window === 'undefined') {
+      return false;
+    }
+    const params = new URLSearchParams(window.location.search);
+    return window.location.pathname.includes('/snapshot') && params.get('bg') === 'white';
+  })();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -34,7 +41,9 @@ const FractalBreathTree: React.FC<VisualProps> = ({ width, height }) => {
       const endX = x + Math.cos(angle + sway) * length;
       const endY = y + Math.sin(angle + sway) * length;
 
-      ctx.strokeStyle = `rgba(34,139,34,${(1 - depth / maxDepth) * breath})`;
+      const branchAlpha = (1 - depth / maxDepth) * breath;
+      const branchShade = isWhiteSnapshot ? 0 : 245;
+      ctx.strokeStyle = `rgba(${branchShade},${branchShade},${branchShade},${branchAlpha})`;
       ctx.lineWidth = Math.max(1, (maxDepth - depth) / 2);
       ctx.beginPath();
       ctx.moveTo(x, y);
@@ -49,6 +58,10 @@ const FractalBreathTree: React.FC<VisualProps> = ({ width, height }) => {
     let frameId: number;
     const render = () => {
       ctx.clearRect(0, 0, width, height);
+      if (isWhiteSnapshot) {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+      }
       drawBranch(width / 2, height, height / 4, -Math.PI / 2, 0);
       time += 0.02;
       frameId = requestAnimationFrame(render);
@@ -56,10 +69,19 @@ const FractalBreathTree: React.FC<VisualProps> = ({ width, height }) => {
 
     render();
     return () => cancelAnimationFrame(frameId);
-  }, [width, height]);
+  }, [width, height, isWhiteSnapshot]);
 
   return (
-    <div style={{ width: `${width}px`, height: `${height}px`, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+    <div
+      style={{
+        width: `${width}px`,
+        height: `${height}px`,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: isWhiteSnapshot ? '#ffffff' : 'transparent',
+      }}
+    >
       <canvas ref={canvasRef} width={width} height={height} />
     </div>
   );

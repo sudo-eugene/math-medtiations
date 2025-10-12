@@ -1,6 +1,6 @@
-// Themes: aggregation growth, fractal dendrites, diffusion-limited structures
-// Visualisation: Aggregating particles form fractal dendritic structures through random walks
-// Unique mechanism: Diffusion-limited aggregation (DLA) with random walker particle growth
+// Themes: organic growth, natural gathering, graceful emergence, interconnected flourishing
+// Visualisation: Particles gather and bloom into organic fractal patterns like crystal flowers
+// Unique mechanism: Diffusion-limited aggregation transformed into meditation on growth
 
 import React, { useRef, useEffect } from 'react';
 import { VisualProps } from '../../types';
@@ -132,8 +132,8 @@ const BrownianTree: React.FC<VisualProps> = ({ width, height }) => {
     }
 
     const render = (t: number) => {
-      // Trails with translucent clear
-      ctx.fillStyle = 'rgba(240,238,230,0.04)';
+      // Gentle fade for organic trails
+      ctx.fillStyle = 'rgba(240,238,230,0.03)';
       ctx.fillRect(0, 0, width, height);
 
       const time = t * 0.001;
@@ -202,38 +202,44 @@ const BrownianTree: React.FC<VisualProps> = ({ width, height }) => {
       // Age particles
       particles.forEach(particle => particle.age += 0.02);
 
-      // Draw stuck particles (the growing tree)
+      // Draw organic growth structure
       particles.forEach(particle => {
         if (!particle.stuck) return;
         
-        const pulse = Math.sin(particle.age + particle.x * 0.01) * 0.2 + 0.8;
-        const generationColor = Math.min(255, 60 + particle.generation * 8);
+        const breathe = Math.sin(particle.age + time * 1.2 + particle.x * 0.01) * 0.15 + 1;
+        const generationDepth = Math.min(1, particle.generation / 30);
+        const baseTone = 80 + generationDepth * 35;
         const size = 3 + Math.min(5, particle.generation * 0.3);
         
-        // Particle glow based on generation
-        const gradient = ctx.createRadialGradient(
+        // Ethereal outer glow
+        const outerGlow = ctx.createRadialGradient(
           particle.x, particle.y, 0,
-          particle.x, particle.y, size * 2
+          particle.x, particle.y, size * 2.5 * breathe
         );
-        gradient.addColorStop(0, `rgba(${generationColor},${generationColor},${generationColor},0.8)`);
-        gradient.addColorStop(1, `rgba(${generationColor},${generationColor},${generationColor},0)`);
+        const glowIntensity = 0.15 + generationDepth * 0.15;
+        outerGlow.addColorStop(0, `rgba(${baseTone}, ${baseTone}, ${baseTone}, ${glowIntensity})`);
+        outerGlow.addColorStop(1, `rgba(${baseTone}, ${baseTone}, ${baseTone}, 0)`);
         
-        ctx.fillStyle = gradient;
+        ctx.fillStyle = outerGlow;
         ctx.beginPath();
-        ctx.arc(particle.x, particle.y, size * 2 * pulse, 0, Math.PI * 2);
+        ctx.arc(particle.x, particle.y, size * 2.5 * breathe, 0, Math.PI * 2);
         ctx.fill();
         
-        // Central particle
-        ctx.fillStyle = `rgba(${Math.max(40, generationColor - 20)},${Math.max(40, generationColor - 20)},${Math.max(40, generationColor - 20)},0.9)`;
+        // Soft core
+        const coreGradient = ctx.createRadialGradient(
+          particle.x, particle.y, 0,
+          particle.x, particle.y, size * breathe
+        );
+        coreGradient.addColorStop(0, `rgba(${baseTone - 10}, ${baseTone - 10}, ${baseTone - 10}, 0.7)`);
+        coreGradient.addColorStop(1, `rgba(${baseTone - 10}, ${baseTone - 10}, ${baseTone - 10}, 0.2)`);
+        
+        ctx.fillStyle = coreGradient;
         ctx.beginPath();
-        ctx.arc(particle.x, particle.y, size * pulse, 0, Math.PI * 2);
+        ctx.arc(particle.x, particle.y, size * breathe, 0, Math.PI * 2);
         ctx.fill();
       });
 
-      // Draw connections between nearby stuck particles
-      ctx.strokeStyle = 'rgba(70,70,70,0.3)';
-      ctx.lineWidth = 1;
-      
+      // Draw soft connections between nearby particles
       for (let i = 0; i < particles.length; i++) {
         if (!particles[i].stuck) continue;
         
@@ -245,43 +251,40 @@ const BrownianTree: React.FC<VisualProps> = ({ width, height }) => {
           const dist = Math.sqrt(dx * dx + dy * dy);
           
           if (dist < 20 && Math.abs(particles[i].generation - particles[j].generation) <= 1) {
-            const alpha = Math.max(0, (20 - dist) / 20) * 0.3;
-            ctx.globalAlpha = alpha;
+            const pulse = Math.sin(time * 1.5 + i * 0.1) * 0.05 + 0.95;
+            const alpha = Math.max(0, (20 - dist) / 20) * 0.12 * pulse;
+            const avgGeneration = (particles[i].generation + particles[j].generation) / 2;
+            const tone = 80 + Math.min(1, avgGeneration / 30) * 30;
+            
+            ctx.strokeStyle = `rgba(${tone}, ${tone}, ${tone}, ${alpha})`;
+            ctx.lineWidth = 0.8;
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
             ctx.stroke();
-            ctx.globalAlpha = 1;
           }
         }
       }
 
-      // Draw active walkers
+      // Draw ethereal wandering particles
       walkers.forEach(walker => {
         const lifeRatio = walker.life / 3000;
-        const alpha = lifeRatio * 0.6;
+        const alpha = lifeRatio * 0.3;
+        const size = 1.5 + lifeRatio * 1;
         
-        ctx.fillStyle = `rgba(100,80,80,${alpha})`;
+        // Soft glow around walker
+        const walkerGlow = ctx.createRadialGradient(
+          walker.x, walker.y, 0,
+          walker.x, walker.y, size * 3
+        );
+        walkerGlow.addColorStop(0, `rgba(95, 95, 95, ${alpha * 0.6})`);
+        walkerGlow.addColorStop(1, `rgba(95, 95, 95, 0)`);
+        
+        ctx.fillStyle = walkerGlow;
         ctx.beginPath();
-        ctx.arc(walker.x, walker.y, 2, 0, Math.PI * 2);
+        ctx.arc(walker.x, walker.y, size * 3, 0, Math.PI * 2);
         ctx.fill();
-        
-        // Trail
-        ctx.strokeStyle = `rgba(80,60,60,${alpha * 0.5})`;
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(walker.x - walker.vx * 3, walker.y - walker.vy * 3);
-        ctx.lineTo(walker.x, walker.y);
-        ctx.stroke();
       });
-
-      // Display statistics
-      const maxGeneration = Math.max(...particles.filter(p => p.stuck).map(p => p.generation));
-      ctx.font = '11px serif';
-      ctx.fillStyle = 'rgba(60,60,60,0.8)';
-      ctx.fillText(`Particles: ${particles.filter(p => p.stuck).length}`, 10, 25);
-      ctx.fillText(`Max Generation: ${maxGeneration}`, 10, 40);
-      ctx.fillText(`Active Walkers: ${walkers.length}`, 10, 55);
 
       // Reset if tree gets too large
       if (particles.filter(p => p.stuck).length > 400) {
@@ -321,9 +324,9 @@ const BrownianTree: React.FC<VisualProps> = ({ width, height }) => {
 // Differs from others by: Implements diffusion-limited aggregation (DLA) with random walking particles forming fractal dendritic structures - no other visual grows fractal trees through particle aggregation
 
 const metadata = {
-  themes: "aggregation growth, fractal dendrites, diffusion-limited structures",
-  visualisation: "Aggregating particles form fractal dendritic structures through random walks",
-  promptSuggestion: "1. Adjust walker spawn rate and lifetime\n2. Vary sticking probability and conditions\n3. Control fractal growth visualization"
+  themes: "organic growth, natural gathering, graceful emergence, interconnected flourishing",
+  visualisation: "Particles gather and bloom into organic fractal patterns like crystal flowers",
+  promptSuggestion: "1. Adjust wandering particle flow\n2. Vary growth patterns\n3. Control organic structure visualization"
 };
 (BrownianTree as any).metadata = metadata;
 

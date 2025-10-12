@@ -13,17 +13,43 @@ const StandardMapTwist: React.FC<VisualProps> = ({ width, height }) => {
     canvas.width=width; canvas.height=height; ctx.fillStyle='#F0EEE6'; ctx.fillRect(0,0,width,height);
 
     let s = 66779933 >>> 0; const rnd = ()=> (s=(1664525*s+1013904223)>>>0, s/4294967296);
-    let theta = rnd()*Math.PI*2; let p = (rnd()*2-1)*0.2; const K = 0.9;
+    
+    // Multiple trajectories for richer chaotic patterns
+    const trajectories = Array.from({ length: 12 }, () => ({
+      theta: rnd() * Math.PI * 2,
+      p: rnd() * Math.PI * 2,
+      K: 0.8 + rnd() * 0.6 // Vary K for different chaotic behaviors (0.8-1.4)
+    }));
+    
+    const TWO_PI = Math.PI * 2;
+    const mod = (n: number) => ((n % TWO_PI) + TWO_PI) % TWO_PI;
+    
     const render = ()=>{
-      ctx.fillStyle='rgba(240,238,230,0.05)'; ctx.fillRect(0,0,width,height);
-      ctx.fillStyle='rgba(20,20,20,0.05)';
-      for (let i=0;i<22000;i++){
-        p = p + K*Math.sin(theta); theta = theta + p; // implicit mod 2π for theta visualization via sin/cos
-        // map to square via unit circle embedding
-        const x = (Math.cos(theta)+1)*0.5; const y = (Math.sin(theta)+1)*0.5;
-        const px = (x*width)|0; const py = (y*height)|0;
-        ctx.fillRect(px, py, 1, 1);
-      }
+      ctx.fillStyle='rgba(240,238,230,0.008)'; ctx.fillRect(0,0,width,height);
+      
+      // Soft pencil-like dark grey with varied opacity for depth
+      trajectories.forEach((traj, idx) => {
+        // Vary opacity between trajectories for layered pencil effect
+        const opacity = 0.4 + (idx / trajectories.length) * 0.2;
+        ctx.fillStyle=`rgba(25,25,28,${opacity})`;
+        
+        for (let i=0;i<4000;i++){
+          // Standard map iteration
+          traj.p = mod(traj.p + traj.K * Math.sin(traj.theta)); 
+          traj.theta = mod(traj.theta + traj.p);
+          
+          // Map both theta and p to canvas (proper torus visualization)
+          const x = traj.theta / TWO_PI; 
+          const y = traj.p / TWO_PI;
+          const px = (x * width) | 0; 
+          const py = (y * height) | 0;
+          
+          // Vary particle size slightly for more organic pencil feel
+          const size = 1 + (i % 15 === 0 ? 1 : 0);
+          ctx.fillRect(px, py, size, size);
+        }
+      });
+      
       raf.current = requestAnimationFrame(render);
     };
     raf.current = requestAnimationFrame(render);

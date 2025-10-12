@@ -1,6 +1,7 @@
-// Themes: invisible obstacles, flow meditation, fluid consciousness
-// Visualisation: Smoke-like patterns flow around invisible obstacles using fluid simulation
-// Unique mechanism: Lattice Boltzmann method for computational fluid dynamics with obstacle interaction
+// Themes: fluid calligraphy, invisible currents, poetic flow
+// Visualisation: Pencil-soft ribbons drift through a handcrafted vector field, breathing like fluid ink
+// Unique mechanism: Procedural curl-noise flow guided by drifting vortices with layered particle trails
+// Differs from others by: Generative flow field blending curl noise with moving vortices for meditative fluid calligraphy
 
 import React, { useRef, useEffect } from 'react';
 import { VisualProps } from '../../types';
@@ -17,272 +18,168 @@ const FluidDynamics: React.FC<VisualProps> = ({ width, height }) => {
     canvas.width = width;
     canvas.height = height;
 
-    // Background
     ctx.fillStyle = '#F0EEE6';
     ctx.fillRect(0, 0, width, height);
 
-    // PRNG for deterministic behavior
-    let seed = 34892;
-    const random = () => {
+    let seed = 1357901;
+    const rnd = () => {
       seed = (seed * 16807) % 2147483647;
       return (seed - 1) / 2147483646;
     };
 
-    // Lattice Boltzmann fluid simulation
-    const gridWidth = Math.floor(width / 4);
-    const gridHeight = Math.floor(height / 4);
-    
-    // Velocity distributions (9 directions)
-    const f = Array(gridWidth).fill(null).map(() => 
-      Array(gridHeight).fill(null).map(() => new Array(9).fill(0))
-    );
-    const fNew = Array(gridWidth).fill(null).map(() => 
-      Array(gridHeight).fill(null).map(() => new Array(9).fill(0))
-    );
-    
-    // Macroscopic variables
-    const rho = Array(gridWidth).fill(null).map(() => Array(gridHeight).fill(1));
-    const ux = Array(gridWidth).fill(null).map(() => Array(gridHeight).fill(0));
-    const uy = Array(gridWidth).fill(null).map(() => Array(gridHeight).fill(0));
-    
-    // Obstacle map
-    const obstacle = Array(gridWidth).fill(null).map(() => Array(gridHeight).fill(false));
-    
-    // LBM direction vectors
-    const ex = [0, 1, 0, -1, 0, 1, -1, -1, 1];
-    const ey = [0, 0, 1, 0, -1, 1, 1, -1, -1];
-    const w = [4/9, 1/9, 1/9, 1/9, 1/9, 1/36, 1/36, 1/36, 1/36];
-    
-    const omega = 1.7; // Relaxation parameter
-    
-    // Initialize obstacles
-    const initObstacles = () => {
-      for (let i = 0; i < 6; i++) {
-        const cx = Math.floor(random() * gridWidth);
-        const cy = Math.floor(random() * gridHeight);
-        const radius = 8 + random() * 15;
-        
-        for (let x = 0; x < gridWidth; x++) {
-          for (let y = 0; y < gridHeight; y++) {
-            const dx = x - cx;
-            const dy = y - cy;
-            if (dx * dx + dy * dy < radius * radius) {
-              obstacle[x][y] = true;
-            }
-          }
-        }
-      }
-    };
-    
-    // Initialize fluid
-    const initFluid = () => {
-      for (let x = 0; x < gridWidth; x++) {
-        for (let y = 0; y < gridHeight; y++) {
-          if (!obstacle[x][y]) {
-            const rho0 = 1.0;
-            const ux0 = 0.1 + random() * 0.05; // Base flow velocity
-            const uy0 = (random() - 0.5) * 0.02;
-            
-            rho[x][y] = rho0;
-            ux[x][y] = ux0;
-            uy[x][y] = uy0;
-            
-            // Initialize equilibrium distribution
-            for (let i = 0; i < 9; i++) {
-              const cu = ex[i] * ux0 + ey[i] * uy0;
-              const u2 = ux0 * ux0 + uy0 * uy0;
-              f[x][y][i] = w[i] * rho0 * (1 + 3 * cu + 4.5 * cu * cu - 1.5 * u2);
-            }
-          }
-        }
+    const particleCount = Math.floor((width * height) / 9000);
+    const particles = Array.from({ length: particleCount }, () => {
+      const x = rnd() * width;
+      const y = rnd() * height;
+      return {
+        x,
+        y,
+        px: x,
+        py: y,
+        vx: 0,
+        vy: 0,
+        life: rnd() * 180,
+        speedMod: 0.6 + rnd() * 0.6,
+        shade: 0.32 + rnd() * 0.25
+      };
+    });
+
+    type Vortex = { baseX: number; baseY: number; radius: number; strength: number; phase: number };
+    const vortices: Vortex[] = Array.from({ length: 4 }, (_, i) => ({
+      baseX: width * (0.2 + 0.18 * i),
+      baseY: height * (0.25 + 0.18 * i),
+      radius: Math.min(width, height) * (0.18 + 0.04 * rnd()),
+      strength: 0.45 + 0.25 * rnd(),
+      phase: rnd() * Math.PI * 2
+    }));
+
+    const wrap = (p: { x: number; y: number; px: number; py: number }) => {
+      let wrapped = false;
+      if (p.x < -10) { p.x = width + (p.x % width); wrapped = true; }
+      if (p.x > width + 10) { p.x = p.x % width; wrapped = true; }
+      if (p.y < -10) { p.y = height + (p.y % height); wrapped = true; }
+      if (p.y > height + 10) { p.y = p.y % height; wrapped = true; }
+      if (wrapped) {
+        p.px = p.x;
+        p.py = p.y;
       }
     };
 
-    // Equilibrium distribution function
-    const equilibrium = (rho: number, ux: number, uy: number, i: number): number => {
-      const cu = ex[i] * ux + ey[i] * uy;
-      const u2 = ux * ux + uy * uy;
-      return w[i] * rho * (1 + 3 * cu + 4.5 * cu * cu - 1.5 * u2);
+    const flowField = (x: number, y: number, t: number) => {
+      const nx = x / width - 0.5;
+      const ny = y / height - 0.5;
+      const time = t * 0.12;
+
+      let angle = Math.sin((nx * 3.1 + ny * 2.7) + time * 0.7);
+      angle += Math.cos((ny * 4.2 - nx * 3.4) - time * 0.5) * 0.7;
+      angle += Math.sin((nx + ny) * 5.0 + time * 0.9) * 0.35;
+
+      let vx = Math.cos(angle) * 18;
+      let vy = Math.sin(angle) * 18;
+
+      vortices.forEach((vortex, idx) => {
+        const drift = 0.08;
+        const vxOffset = Math.sin(time * 0.4 + vortex.phase + idx) * vortex.radius * 0.12;
+        const vyOffset = Math.cos(time * 0.32 + vortex.phase * 1.3) * vortex.radius * 0.12;
+        const cx = vortex.baseX + vxOffset;
+        const cy = vortex.baseY + vyOffset;
+        const dx = x - cx;
+        const dy = y - cy;
+        const distSq = dx * dx + dy * dy + 0.0001;
+        const influence = Math.exp(-distSq / (vortex.radius * vortex.radius)) * vortex.strength;
+        vx += (-dy * influence * drift);
+        vy += (dx * influence * drift);
+        const breathing = Math.sin(time * 0.6 + vortex.phase) * 0.4;
+        vx += dx * influence * 0.02 * breathing;
+        vy += dy * influence * 0.02 * breathing;
+      });
+
+      return { vx, vy };
     };
 
-    // Collision step
-    const collide = () => {
-      for (let x = 0; x < gridWidth; x++) {
-        for (let y = 0; y < gridHeight; y++) {
-          if (!obstacle[x][y]) {
-            // Calculate macroscopic variables
-            rho[x][y] = 0;
-            ux[x][y] = 0;
-            uy[x][y] = 0;
-            
-            for (let i = 0; i < 9; i++) {
-              rho[x][y] += f[x][y][i];
-              ux[x][y] += ex[i] * f[x][y][i];
-              uy[x][y] += ey[i] * f[x][y][i];
-            }
-            
-            ux[x][y] /= rho[x][y];
-            uy[x][y] /= rho[x][y];
-            
-            // Collision with relaxation
-            for (let i = 0; i < 9; i++) {
-              const feq = equilibrium(rho[x][y], ux[x][y], uy[x][y], i);
-              f[x][y][i] += omega * (feq - f[x][y][i]);
-            }
-          }
-        }
-      }
+    const contourField = (x: number, y: number, t: number) => {
+      const nx = x / width;
+      const ny = y / height;
+      return Math.sin(nx * 3.5 + t * 0.1) + Math.cos(ny * 4.1 - t * 0.08);
     };
 
-    // Streaming step
-    const stream = () => {
-      // Copy current state
-      for (let x = 0; x < gridWidth; x++) {
-        for (let y = 0; y < gridHeight; y++) {
-          for (let i = 0; i < 9; i++) {
-            fNew[x][y][i] = f[x][y][i];
-          }
-        }
-      }
-      
-      // Stream to neighboring cells
-      for (let x = 0; x < gridWidth; x++) {
-        for (let y = 0; y < gridHeight; y++) {
-          for (let i = 1; i < 9; i++) {
-            const nx = x + ex[i];
-            const ny = y + ey[i];
-            
-            if (nx >= 0 && nx < gridWidth && ny >= 0 && ny < gridHeight) {
-              if (!obstacle[nx][ny]) {
-                f[nx][ny][i] = fNew[x][y][i];
-              } else {
-                // Bounce back from obstacles
-                const opposite = [0, 3, 4, 1, 2, 7, 8, 5, 6];
-                f[x][y][opposite[i]] = fNew[x][y][i];
-              }
-            }
-          }
-        }
-      }
-    };
-
-    // Apply boundary conditions
-    const boundaries = () => {
-      // Left boundary - constant inflow
-      for (let y = 0; y < gridHeight; y++) {
-        if (!obstacle[0][y]) {
-          const rho0 = 1.0;
-          const ux0 = 0.1;
-          const uy0 = 0.0;
-          
-          rho[0][y] = rho0;
-          ux[0][y] = ux0;
-          uy[0][y] = uy0;
-          
-          for (let i = 0; i < 9; i++) {
-            f[0][y][i] = equilibrium(rho0, ux0, uy0, i);
-          }
-        }
-      }
-      
-      // Right boundary - outflow
-      for (let y = 0; y < gridHeight; y++) {
-        if (!obstacle[gridWidth-1][y]) {
-          for (let i = 0; i < 9; i++) {
-            f[gridWidth-1][y][i] = f[gridWidth-2][y][i];
-          }
-        }
-      }
-    };
-
-    initObstacles();
-    initFluid();
-
-    const render = (t: number) => {
-      // Trails with translucent clear
-      ctx.fillStyle = 'rgba(240,238,230,0.1)';
-      ctx.fillRect(0, 0, width, height);
-
-      // Run fluid simulation steps
-      collide();
-      stream();
-      boundaries();
-
-      // Visualize fluid
-      const imageData = ctx.createImageData(width, height);
-      const data = imageData.data;
-
-      for (let x = 0; x < gridWidth; x++) {
-        for (let y = 0; y < gridHeight; y++) {
-          const pixelX = x * 4;
-          const pixelY = y * 4;
-          
-          if (!obstacle[x][y]) {
-            // Visualize velocity magnitude and curl
-            const speed = Math.sqrt(ux[x][y] * ux[x][y] + uy[x][y] * uy[x][y]);
-            const intensity = Math.min(255, speed * 2000);
-            
-            // Calculate vorticity (curl)
-            let curl = 0;
-            if (x > 0 && x < gridWidth-1 && y > 0 && y < gridHeight-1) {
-              curl = (uy[x+1][y] - uy[x-1][y]) - (ux[x][y+1] - ux[x][y-1]);
-            }
-            const vorticity = Math.abs(curl) * 1000;
-            
-            // Fill 4x4 pixel block
-            for (let dx = 0; dx < 4; dx++) {
-              for (let dy = 0; dy < 4; dy++) {
-                const px = pixelX + dx;
-                const py = pixelY + dy;
-                if (px < width && py < height) {
-                  const idx = (py * width + px) * 4;
-                  data[idx] = Math.min(120, 60 + intensity);     // R
-                  data[idx + 1] = Math.min(120, 60 + intensity); // G
-                  data[idx + 2] = Math.min(120, 60 + intensity); // B
-                  data[idx + 3] = Math.min(255, 100 + intensity + vorticity); // A
-                }
-              }
-            }
-          }
-        }
-      }
-
-      ctx.putImageData(imageData, 0, 0);
-
-      // Draw obstacles with subtle indication
-      ctx.fillStyle = 'rgba(50,50,50,0.3)';
-      for (let x = 0; x < gridWidth; x++) {
-        for (let y = 0; y < gridHeight; y++) {
-          if (obstacle[x][y]) {
-            ctx.fillRect(x * 4, y * 4, 4, 4);
-          }
-        }
-      }
-
-      // Draw streamlines
-      ctx.strokeStyle = 'rgba(70,70,70,0.4)';
-      ctx.lineWidth = 1;
-      
-      for (let i = 0; i < 8; i++) {
-        let x = 5;
-        let y = 10 + i * (gridHeight / 8);
-        
+    const drawContours = (t: number) => {
+      const layers = 6;
+      ctx.strokeStyle = 'rgba(25,25,28,0.08)';
+      ctx.lineWidth = 0.8;
+      for (let l = 0; l < layers; l++) {
+        const iso = -1 + (l / (layers - 1)) * 2;
         ctx.beginPath();
-        ctx.moveTo(x * 4, y * 4);
-        
-        for (let step = 0; step < 50 && x < gridWidth-1 && y >= 1 && y < gridHeight-1; step++) {
-          if (!obstacle[Math.floor(x)][Math.floor(y)]) {
-            const gridX = Math.floor(x);
-            const gridY = Math.floor(y);
-            x += ux[gridX][gridY] * 20;
-            y += uy[gridX][gridY] * 20;
-            ctx.lineTo(x * 4, y * 4);
-          } else {
-            break;
+        let started = false;
+        const step = Math.max(18, Math.min(width, height) / 60);
+        for (let y = step * 0.5; y < height; y += step) {
+          for (let x = step * 0.5; x < width; x += step) {
+            const value = contourField(x, y, t);
+            if (Math.abs(value - iso) < 0.08) {
+              if (!started) {
+                ctx.moveTo(x, y);
+                started = true;
+              } else {
+                ctx.lineTo(x, y);
+              }
+            }
           }
         }
         ctx.stroke();
       }
+    };
+
+    const render = (timeMs: number) => {
+      const t = timeMs * 0.001;
+      ctx.fillStyle = 'rgba(240,238,230,0.018)';
+      ctx.fillRect(0, 0, width, height);
+
+      drawContours(t);
+
+      ctx.lineWidth = 0.9;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      particles.forEach((p, idx) => {
+        const flow = flowField(p.x, p.y, t + idx * 0.02);
+        const speed = p.speedMod * (0.45 + 0.2 * Math.sin(t * 0.7 + idx * 0.13));
+        const viscosity = 0.18;
+        const targetVx = flow.vx * speed * 0.012;
+        const targetVy = flow.vy * speed * 0.012;
+        p.vx = p.vx * (1 - viscosity) + targetVx * viscosity;
+        p.vy = p.vy * (1 - viscosity) + targetVy * viscosity;
+
+        const nx = p.x + p.vx;
+        const ny = p.y + p.vy;
+
+        ctx.strokeStyle = `rgba(25,25,28,${0.32 + p.shade * Math.abs(Math.sin(t * 0.6 + idx))})`;
+        ctx.beginPath();
+        ctx.moveTo(p.px, p.py);
+        ctx.lineTo(nx, ny);
+        ctx.stroke();
+
+        p.px = p.x;
+        p.py = p.y;
+        p.x = nx;
+        p.y = ny;
+        p.life -= 1;
+
+        wrap(p);
+
+        if (p.life <= 0) {
+          const rx = rnd() * width;
+          const ry = rnd() * height;
+          p.x = rx;
+          p.y = ry;
+          p.px = rx;
+          p.py = ry;
+          p.vx = 0;
+          p.vy = 0;
+          p.life = 180 + rnd() * 120;
+          p.speedMod = 0.6 + rnd() * 0.6;
+          p.shade = 0.3 + rnd() * 0.3;
+        }
+      });
 
       rafRef.current = requestAnimationFrame(render);
     };
@@ -302,12 +199,10 @@ const FluidDynamics: React.FC<VisualProps> = ({ width, height }) => {
   );
 };
 
-// Differs from others by: Implements computational fluid dynamics using Lattice Boltzmann method - no other visual simulates actual fluid flow physics
-
 const metadata = {
-  themes: "invisible obstacles, flow meditation, fluid consciousness",
-  visualisation: "Smoke-like patterns flow around invisible obstacles using fluid simulation",
-  promptSuggestion: "1. Adjust fluid viscosity and flow speed\n2. Vary obstacle shapes and positions\n3. Control streamline visualization"
+  themes: "fluid calligraphy, invisible currents, poetic flow",
+  visualisation: "Pencil-soft ribbons drift through a handcrafted vector field, breathing like fluid ink",
+  promptSuggestion: "1. Layer multiple vortices\n2. Modulate flow with slow breathing\n3. Let trails wrap softly"
 };
 (FluidDynamics as any).metadata = metadata;
 
