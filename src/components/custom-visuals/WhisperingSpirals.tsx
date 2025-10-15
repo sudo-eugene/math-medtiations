@@ -44,9 +44,9 @@ const WhisperingSpirals: React.FC<VisualProps> = ({ width, height }) => {
       ctx.fillStyle = '#F0EEE6';
       ctx.fillRect(0, 0, width, height);
       const cx = width / 2, cy = height / 2;
-      drawFamily(cx, cy, 0.08 + 0.01 * Math.sin(t), 1.7, 0.42);
-      drawFamily(cx, cy, 0.06 + 0.01 * Math.cos(t * 0.7), 2.1, 0.3);
-      drawFamily(cx, cy, 0.1 + 0.008 * Math.sin(t * 0.9), 1.2, 0.22);
+      drawFamily(cx, cy, 0.16 + 0.02 * Math.sin(t), 1.7, 0.42);
+      drawFamily(cx, cy, 0.12 + 0.02 * Math.cos(t * 0.7), 2.1, 0.3);
+      drawFamily(cx, cy, 0.2 + 0.016 * Math.sin(t * 0.9), 1.2, 0.22);
       raf = requestAnimationFrame(render);
     };
 

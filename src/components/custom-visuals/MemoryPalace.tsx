@@ -21,6 +21,8 @@ const MemoryPalace: React.FC<VisualProps> = ({ width, height }) => {
 
     let time = 0;
     let rooms: MemoryRoom[] = [];
+    const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
+    const canvasPadding = Math.min(width, height) * 0.05;
     
     class MemoryRoom {
       x: number;
@@ -40,19 +42,21 @@ const MemoryPalace: React.FC<VisualProps> = ({ width, height }) => {
       private dissolveTimeout: number | null;
 
       constructor(x: number, y: number, w: number, h: number, depth: number) {
-        this.x = x;
-        this.y = y;
         this.width = w;
         this.height = h;
         this.depth = depth;
-        this.construction = 0; // 0 to 1, how built it is
-        this.targetConstruction = 0;
+        const horizontalMargin = this.width * 0.5;
+        const verticalMargin = this.height * 0.5;
+        this.x = clamp(x, canvasPadding + horizontalMargin, width - canvasPadding - horizontalMargin);
+        this.y = clamp(y, canvasPadding + verticalMargin, height - canvasPadding - verticalMargin);
+        this.construction = 0.05; // 0 to 1, how built it is
+        this.targetConstruction = 0.05;
         this.phase = Math.random() * Math.PI * 2;
-        this.buildSpeed = 0.009 + Math.random() * 0.006;
+        this.buildSpeed = 0.012 + Math.random() * 0.008;
         this.walls = this.generateWalls();
         this.memories = this.generateMemories();
         this.isBuilding = true;
-        this.buildDelay = Math.random() * 120;
+        this.buildDelay = Math.random() * 60;
         this.age = 0;
         this.dissolveTimeout = null;
       }
@@ -66,11 +70,15 @@ const MemoryPalace: React.FC<VisualProps> = ({ width, height }) => {
           const nextAngle = ((i + 1) / segments) * Math.PI * 2;
           const radius = this.width * 0.3;
           
+          const rawX1 = this.x + Math.cos(angle) * radius;
+          const rawY1 = this.y + Math.sin(angle) * radius;
+          const rawX2 = this.x + Math.cos(nextAngle) * radius;
+          const rawY2 = this.y + Math.sin(nextAngle) * radius;
           walls.push({
-            x1: this.x + Math.cos(angle) * radius,
-            y1: this.y + Math.sin(angle) * radius,
-            x2: this.x + Math.cos(nextAngle) * radius,
-            y2: this.y + Math.sin(nextAngle) * radius,
+            x1: clamp(rawX1, canvasPadding, width - canvasPadding),
+            y1: clamp(rawY1, canvasPadding, height - canvasPadding),
+            x2: clamp(rawX2, canvasPadding, width - canvasPadding),
+            y2: clamp(rawY2, canvasPadding, height - canvasPadding),
             opacity: Math.random() * 0.4 + 0.2,
             buildOrder: i
           });
@@ -93,9 +101,11 @@ const MemoryPalace: React.FC<VisualProps> = ({ width, height }) => {
           const angle = Math.random() * Math.PI * 2;
           const distance = Math.random() * this.width * 0.2;
           
+          const rawX = this.x + Math.cos(angle) * distance;
+          const rawY = this.y + Math.sin(angle) * distance;
           memories.push({
-            x: this.x + Math.cos(angle) * distance,
-            y: this.y + Math.sin(angle) * distance,
+            x: clamp(rawX, canvasPadding, width - canvasPadding),
+            y: clamp(rawY, canvasPadding, height - canvasPadding),
             size: 2 + Math.random() * 4,
             type: Math.random() > 0.5 ? 'knowledge' : 'experience',
             intensity: Math.random(),
@@ -228,11 +238,12 @@ const MemoryPalace: React.FC<VisualProps> = ({ width, height }) => {
     const initializePalace = () => {
       rooms = [];
       const numRooms = 4 + Math.floor(Math.random() * 3);
+      const maxRoomSize = Math.min(width, height) * 0.35;
       
       for (let i = 0; i < numRooms; i++) {
+        const size = Math.min(maxRoomSize, 40 + Math.random() * 60);
         const x = width * (0.2 + Math.random() * 0.6);
         const y = height * (0.2 + Math.random() * 0.6);
-        const size = 40 + Math.random() * 60;
         
         rooms.push(new MemoryRoom(x, y, size, size, i));
       }
@@ -259,9 +270,9 @@ const MemoryPalace: React.FC<VisualProps> = ({ width, height }) => {
       rooms = activeRooms;
       
       if (rooms.length < 3 && Math.random() < 0.02) {
+        const size = Math.min(Math.min(width, height) * 0.35, 40 + Math.random() * 60);
         const x = width * (0.2 + Math.random() * 0.6);
         const y = height * (0.2 + Math.random() * 0.6);
-        const size = 40 + Math.random() * 60;
         rooms.push(new MemoryRoom(x, y, size, size, 0));
       }
       
