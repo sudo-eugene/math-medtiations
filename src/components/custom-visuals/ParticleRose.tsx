@@ -20,8 +20,9 @@ const ParticleRose: React.FC<VisualProps> = ({ width, height }) => {
     
     const centerX = width / 2;
     const centerY = height / 2;
-    const PARTICLE_COUNT = 8000;
+    const PARTICLE_COUNT = 7500;
     const goldenRatio = (1 + Math.sqrt(5)) / 2;
+    const maxBloomRadius = Math.min(width, height) * 0.95;
     let time = 0;
     
     class RoseParticle {
@@ -34,9 +35,10 @@ const ParticleRose: React.FC<VisualProps> = ({ width, height }) => {
         this.t = 0;
         this.age = 0;
         this.opacity = 0;
-        this.size = 0.3 + Math.random() * 0.7;
-        this.petalNumber = Math.floor(Math.random() * 8) + 1;
-        this.spiralSpeed = 0.008 + Math.random() * 0.004;
+        this.size = 0.16 + Math.random() * 0.35;
+        // Use only even petal numbers for perfect symmetry (4, 6, or 8 petals)
+        this.petalNumber = (Math.floor(Math.random() * 3) + 2) * 2;
+        this.spiralSpeed = 0.022 + Math.random() * 0.012;
         this.phase = Math.random() * Math.PI * 2;
       }
       
@@ -45,18 +47,20 @@ const ParticleRose: React.FC<VisualProps> = ({ width, height }) => {
         this.t += this.spiralSpeed;
         
         // Golden ratio spiral with rose curve modulation
-        const radius = Math.sqrt(this.t) * 4;
+        const radius = Math.sqrt(this.t) * 18;
         const angle = this.t * goldenRatio + this.phase;
         
         // Rose curve equation: r = a * cos(k*θ)
-        const roseCurve = Math.cos(this.petalNumber * angle) * 0.8;
-        const finalRadius = radius * (1 + roseCurve);
+        const roseCurve = Math.cos(this.petalNumber * angle) * 0.55;
+        const bloomScale = 2.1;
+        const rawRadius = radius * (1 + roseCurve) * bloomScale;
+        const finalRadius = Math.min(maxBloomRadius, rawRadius);
         
         this.x = centerX + Math.cos(angle) * finalRadius;
         this.y = centerY + Math.sin(angle) * finalRadius;
         
         // Fade in and out
-        const maxAge = 800;
+        const maxAge = 460;
         if (this.age < 100) {
           this.opacity = this.age / 100;
         } else if (this.age > maxAge - 100) {
@@ -66,7 +70,7 @@ const ParticleRose: React.FC<VisualProps> = ({ width, height }) => {
         }
         
         // Reset when too old or too far
-        if (this.age > maxAge || finalRadius > Math.min(width, height) * 0.4) {
+        if (this.age > maxAge || rawRadius > maxBloomRadius + 15) {
           this.reset();
         }
       }
@@ -90,7 +94,7 @@ const ParticleRose: React.FC<VisualProps> = ({ width, height }) => {
     particlesRef.current = particles;
     
     const animate = () => {
-      ctx.fillStyle = 'rgba(240, 238, 230, 0.08)';
+      ctx.fillStyle = 'rgba(240, 238, 230, 0.045)';
       ctx.fillRect(0, 0, width, height);
       
       time += 1;
@@ -101,17 +105,17 @@ const ParticleRose: React.FC<VisualProps> = ({ width, height }) => {
       });
       
       // Draw connecting lines between nearby particles (petals)
-      ctx.strokeStyle = 'rgba(70, 70, 70, 0.1)';
-      ctx.lineWidth = 0.5;
+      ctx.strokeStyle = 'rgba(70, 70, 70, 0.06)';
+      ctx.lineWidth = 0.32;
       
-      for (let i = 0; i < particles.length; i += 20) {
-        for (let j = i + 20; j < particles.length; j += 20) {
+      for (let i = 0; i < particles.length; i += 28) {
+        for (let j = i + 28; j < particles.length; j += 28) {
           const p1 = particles[i];
           const p2 = particles[j];
           
           if (p1.opacity > 0.5 && p2.opacity > 0.5) {
             const dist = Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
-            if (dist < 40) {
+            if (dist < 32) {
               ctx.beginPath();
               ctx.moveTo(p1.x, p1.y);
               ctx.lineTo(p2.x, p2.y);

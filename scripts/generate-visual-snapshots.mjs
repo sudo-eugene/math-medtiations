@@ -29,11 +29,17 @@ if (visualArg) {
 // Time to wait for canvas to render before capturing (ms)
 const CANVAS_SETTLE_MS = 2000;
 const EXTRA_WAIT_MS = {
+  23: 10,
+  35: 10,
   28: 10000,
   42: 12000,
   48: 10000,
+  49: 10,
   71: 3200,
   92: 1500,
+  132: 3000,
+  145: 5000,
+  154: 15000,
   219: 15000,
   232: 500,
   231: 1000,
