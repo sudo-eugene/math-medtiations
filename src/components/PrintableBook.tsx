@@ -26,6 +26,26 @@ const PrintableBook = () => {
   const [loading, setLoading] = useState(false);
   useVisualBackgroundOverride('#ffffff');
 
+  // Function to convert canvas to grayscale
+  const convertToGrayscale = (canvas: HTMLCanvasElement): HTMLCanvasElement => {
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return canvas;
+    
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imageData.data;
+    
+    for (let i = 0; i < data.length; i += 4) {
+      const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+      data[i] = gray;     // red
+      data[i + 1] = gray; // green
+      data[i + 2] = gray; // blue
+      // data[i + 3] is alpha, leave it unchanged
+    }
+    
+    ctx.putImageData(imageData, 0, 0);
+    return canvas;
+  };
+
   const downloadPdf = async () => {
     setLoading(true);
     const bookElement = document.getElementById('book-container');
@@ -38,13 +58,15 @@ const PrintableBook = () => {
     bookElement.classList.add('force-render-all');
 
     const pages = bookElement.querySelectorAll('.page');
-    const CHUNK_SIZE = 25; // Process pages in smaller chunks to avoid memory issues
+    const CHUNK_SIZE = 20; // Process pages in smaller chunks to avoid memory issues
     
     let pdf: jsPDF | null = null;
     
     try {
       for (let chunkStart = 0; chunkStart < pages.length; chunkStart += CHUNK_SIZE) {
         const chunkEnd = Math.min(chunkStart + CHUNK_SIZE, pages.length);
+        
+        console.log(`Processing pages ${chunkStart + 1} to ${chunkEnd} of ${pages.length}...`);
         
         // Process this chunk of pages
         for (let i = chunkStart; i < chunkEnd; i++) {
@@ -55,17 +77,23 @@ const PrintableBook = () => {
             pdf = new jsPDF('portrait', 'mm', 'a6');
           }
           
+          // HIGH QUALITY SETTINGS for sharp text
           const canvas = await html2canvas(page, {
-            scale: 2, // Keep high quality
+            scale: 4, // Very high resolution for sharp text
             useCORS: true,
             backgroundColor: '#ffffff',
-            logging: false, // Reduce console noise
+            logging: false,
             allowTaint: false,
             removeContainer: true,
+            windowWidth: page.scrollWidth,
+            windowHeight: page.scrollHeight,
           });
           
-          // Convert canvas to JPEG with compression to reduce memory usage
-          const imgData = canvas.toDataURL('image/jpeg', 0.95);
+          // Convert to grayscale
+          const grayscaleCanvas = convertToGrayscale(canvas);
+          
+          // Use PNG for better text quality (lossless)
+          const imgData = grayscaleCanvas.toDataURL('image/png');
           
           if (i > 0 && pdf) {
             pdf.addPage();
@@ -74,7 +102,7 @@ const PrintableBook = () => {
           if (pdf) {
             const pageWidth = pdf.internal.pageSize.getWidth();
             const pageHeight = pdf.internal.pageSize.getHeight();
-            pdf.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight);
+            pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
           }
           
           // Force garbage collection hints
@@ -84,11 +112,12 @@ const PrintableBook = () => {
         
         // Small delay between chunks to allow garbage collection
         if (chunkEnd < pages.length) {
-          await new Promise(resolve => setTimeout(resolve, 100));
+          await new Promise(resolve => setTimeout(resolve, 200));
         }
       }
       
       if (pdf) {
+        console.log('Saving PDF...');
         pdf.save('math-meditations-book.pdf');
       }
     } catch (error) {
@@ -162,7 +191,7 @@ const PrintableBook = () => {
             <div className="content flex flex-col justify-center h-full">
               {p.type === 'cover' ? (
                 p.imageUrl ? (
-                  <img src={p.imageUrl} alt="Cover Page" className="w-full h-full object-cover" />
+                  <img src={p.imageUrl} alt="Cover Page" className="absolute inset-0 w-full h-full object-cover" />
                 ) : (
                   <div className="flex flex-col justify-center text-left h-full">
                     <p className="text-lg mb-4 text-center">An Artwork Inspired by<br /> Mathematics, Code and Grace</p>
