@@ -93,3 +93,35 @@ These scripts are intended for development purposes and help manage the visual c
 ## Environment Variables
 
 - `VITE_ALLOWED_HOST`: Domain name allowed to access the development server (required for cloudflared tunnels)
+
+## Docker Deployment
+
+This project includes a lightweight Docker setup for production deployment using Nginx.
+
+### Build and Run with Docker Compose
+
+1. Build and start the container:
+   ```bash
+   docker-compose up -d --build
+   ```
+
+2. The application will be available at `http://localhost:2846`
+
+### Manual Docker Build
+
+1. Build the image:
+   ```bash
+   docker build -t math-meditations .
+   ```
+
+2. Run the container:
+   ```bash
+   docker run -d -p 2846:80 math-meditations
+   ```
+
+### Architecture
+
+The Docker setup uses a multi-stage build process:
+1. **Build Stage**: Uses Node.js Alpine image to install dependencies and build the Vite application.
+2. **Production Stage**: Uses Nginx Alpine image to serve the static assets.
+3. **Configuration**: Includes a custom `nginx.conf` to handle React Router's SPA routing (redirecting all requests to index.html).
