@@ -6,7 +6,7 @@ import MathVisual from './MathVisual.tsx';
 
 const devMode = true;
 
-const BookPage = () => {
+const DailyQuotes = () => {
   const { day } = useParams();
   const navigate = useNavigate();
   const pageNumber = parseInt(day, 10);
@@ -22,7 +22,7 @@ const BookPage = () => {
   const quotes = isAdvancedMode ? advancedQuotes : easyQuotes;
 
   if (isNaN(pageNumber) || pageNumber < 1 || pageNumber > quotes.length) {
-    return <Navigate to="/book/1" replace />;
+    return <Navigate to="/daily-quotes/1" replace />;
   }
 
   useEffect(() => {
@@ -51,7 +51,7 @@ const BookPage = () => {
         if (currentPage >= 1 && currentPage <= quotes.length) {
           setVisiblePage(currentPage);
           if (currentPage !== pageNumber) {
-            navigate(`/book/${currentPage}`, { replace: true });
+            navigate(`/daily-quotes/${currentPage}`, { replace: true });
           }
         }
       }, 150);
@@ -87,7 +87,7 @@ const BookPage = () => {
   const handleTodayClick = () => {
     const today = getCurrentDayOfYear();
     const targetDay = Math.min(today, quotes.length);
-    navigate(`/book/${targetDay}`);
+    navigate(`/daily-quotes/${targetDay}`);
   };
 
   return (
@@ -131,7 +131,7 @@ const BookPage = () => {
             <Link
               key={index}
               ref={el => pageLinkRefs.current[pageNum] = el}
-              to={`/book/${pageNum}`}
+              to={`/daily-quotes/${pageNum}`}
               className={`my-1 text-neutral-500 hover:text-white transition ${pageNumber === pageNum ? 'font-bold text-white' : ''}`}>
               {pageNum}
             </Link>
@@ -180,4 +180,4 @@ const BookPage = () => {
   );
 };
 
-export default BookPage;
+export default DailyQuotes;

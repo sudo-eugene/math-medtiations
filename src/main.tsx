@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
 import './index.css';
 import GeometryGallery from '../geometry_web_gallery_500_presets.jsx';
-import BookPage from './components/BookPage.tsx';
+import DailyQuotes from './components/DailyQuotes.tsx';
 import Root from './components/Root.tsx';
 import PrintableBook from './components/PrintableBook.tsx';
 import Snapshot from './components/Snapshot.tsx';
@@ -15,11 +15,11 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Navigate to="/book/1" replace />,
+        element: <Navigate to="/daily-quotes/1" replace />,
       },
       {
-        path: 'book/:day',
-        element: <BookPage />,
+        path: 'daily-quotes/:day',
+        element: <DailyQuotes />,
       },
       {
         path: 'gallery',

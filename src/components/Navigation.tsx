@@ -10,14 +10,14 @@ const Navigation = () => {
       <div className="mx-auto px-4 py-3 flex items-center gap-6">
         <div className="text-lg font-semibold tracking-wide text-neutral-100">Gratitude Meditations</div>
         <nav className="hidden lg:flex items-center gap-4 text-sm">
-          <NavLink to="/book/1" className={getLinkClassName}>
-            Book
+          <NavLink to="/daily-quotes/1" className={getLinkClassName}>
+            Daily Quotes
           </NavLink>
-          <NavLink to="/gallery" className={getLinkClassName}>
+          {/* <NavLink to="/gallery" className={getLinkClassName}>
             Gallery
-          </NavLink>
+          </NavLink> */}
           <NavLink to="/print" className={getLinkClassName}>
-            Print
+            Printable Book
           </NavLink>
         </nav>
       </div>
