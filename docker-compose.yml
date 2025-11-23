@@ -4,6 +4,6 @@ services:
   app:
     build: .
     ports:
-      - "2846:80"
+      - "127.0.0.1:2846:80"
     restart: always
     container_name: math-meditations
