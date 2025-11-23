@@ -3,6 +3,7 @@ import { useParams, Link, Navigate, useNavigate } from 'react-router-dom';
 import easyQuotes from '../../quotes-easy.json';
 import advancedQuotes from '../../quotes-advanced.json';
 import MathVisual from './MathVisual.tsx';
+import SEO from './SEO.tsx';
 
 const devMode = true;
 
@@ -92,6 +93,11 @@ const DailyQuotes = () => {
 
   return (
     <div className="flex h-[calc(100vh-57px)] bg-neutral-950 text-neutral-100 relative">
+      <SEO 
+        title="Daily Gratitude & Math Meditations | Generative Art Journey"
+        description="Discover a daily sanctuary of mathematical beauty and gratitude. Experience unique generative art, meditative quotes, and interactive geometry to calm your mind."
+        keywords="math art, generative art, gratitude journal, meditation, mindfulness, creative coding, fractal art, daily quotes"
+      />
       {/* Toggle Switch - Top Left */}
       <div className="absolute top-4 left-16 z-10 flex items-center gap-2 lg:gap-3">
         <span className={`text-xs lg:text-sm font-medium transition-colors ${!isAdvancedMode ? 'text-white' : 'text-neutral-500'}`}>

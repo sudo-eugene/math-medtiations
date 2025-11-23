@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import './index.css';
 import GeometryGallery from '../geometry_web_gallery_500_presets.jsx';
 import DailyQuotes from './components/DailyQuotes.tsx';
@@ -39,6 +40,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <HelmetProvider>
+      <RouterProvider router={router} />
+    </HelmetProvider>
   </React.StrictMode>
 );

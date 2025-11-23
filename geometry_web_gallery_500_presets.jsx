@@ -438,6 +438,12 @@ export default function GeometryGallery() {
 
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-100">
+      <SEO
+        title="Interactive Geometry Gallery | 500+ Math Fractals & Attractors"
+        description="Dive into an infinite collection of mathematical beauty. Explore Mandelbrot sets, Julia fractals, chaotic attractors, and flow fields in our interactive geometry gallery."
+        keywords="fractal gallery, mandelbrot set, julia set, chaos theory, interactive math, webgl art, algorithm visualization, math art, creative coding"
+        url="/gallery"
+      />
       <header className="sticky top-0 z-40 backdrop-blur bg-neutral-950/80 border-b border-neutral-900">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-2">
           <div className="text-lg font-semibold tracking-wide">Geometry Gallery</div>

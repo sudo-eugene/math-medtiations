@@ -4,6 +4,7 @@ import html2canvas from 'html2canvas';
 import quotes from '../../quotes-easy.json';
 import MathVisual, { customVisuals, devMode, getPresetForQuote } from './MathVisual';
 import { useVisualBackgroundOverride } from '../utils/visualBackgroundOverride';
+import SEO from './SEO';
 
 const formatVisualName = (rawName: string) => {
   const withoutExtension = rawName.replace(/\.tsx?$/i, '');
@@ -180,6 +181,12 @@ const PrintableBook = () => {
 
   return (
     <div className="printable-book-container bg-white font-serif">
+      <SEO
+        title="Free Printable A6 Math Art Book | Generative Art Gratitude Journal"
+        description="Download a free, printable A6 book template featuring 365 days of mathematical art and gratitude quotes. Perfect for creating your own physical daily meditation journal."
+        keywords="printable book, A6 book template, free book pdf, math art book, gratitude journal printable, generative art print, DIY book binding, daily meditations pdf"
+        url="/print"
+      />
       <div className="controls p-4 bg-white shadow-md sticky top-0 z-10 flex items-center justify-center">
         <button onClick={downloadPdf} disabled={loading} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400">
           {loading ? 'Generating PDF...' : 'Download as A6 PDF'}
