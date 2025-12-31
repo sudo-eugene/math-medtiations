@@ -402,7 +402,7 @@ import CosineTorusFlocks from './custom-visuals/CosineTorusFlocks';
 import HilbertDriftField from './custom-visuals/HilbertDriftField';
 
 
-export const devMode = true;
+export const devMode = false;
 
 // Utility functions for rendering... (clamp, hslToRgb, nicePalette, worldToViewport - all remain the same)
 const clamp = (x, a, b) => Math.max(a, Math.min(b, x));

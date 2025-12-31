@@ -77,20 +77,7 @@ const DailyQuotes = () => {
     }
   }, [pageNumber]);
 
-  const getCurrentDayOfYear = () => {
-    const now = new Date();
-    const start = new Date(now.getFullYear(), 0, 0);
-    const diff = now - start;
-    const oneDay = 1000 * 60 * 60 * 24;
-    return Math.floor(diff / oneDay);
-  };
-
-  const handleTodayClick = () => {
-    const today = getCurrentDayOfYear();
-    const targetDay = Math.min(today, quotes.length);
-    navigate(`/daily-quotes/${targetDay}`);
-  };
-
+    
   return (
     <div className="flex h-[calc(100vh-57px)] bg-neutral-950 text-neutral-100 relative">
       <SEO 
@@ -122,12 +109,12 @@ const DailyQuotes = () => {
 
       {/* Today Button - Top Right */}
       <div className="absolute top-4 right-4 z-10">
-        <button
-          onClick={handleTodayClick}
+        <Link
+          to="/today"
           className="px-1.5 py-1 text-xs font-medium bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white rounded-md border border-neutral-700 hover:border-neutral-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-neutral-950"
         >
           Today
-        </button>
+        </Link>
       </div>
 
       <div ref={sidebarRef} className="w-12 flex flex-col items-center py-8 bg-neutral-950 border-r border-neutral-900 overflow-y-auto no-scrollbar">
