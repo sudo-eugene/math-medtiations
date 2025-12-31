@@ -1,7 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
-import TodayRedirect from './components/TodayRedirect.tsx';
+import TodayPage from './components/TodayRedirect.tsx';
 import { HelmetProvider } from 'react-helmet-async';
 import './index.css';
 import GeometryGallery from '../geometry_web_gallery_500_presets.jsx';
@@ -25,7 +25,7 @@ const router = createBrowserRouter([
       },
       {
         path: 'today',
-        element: <TodayRedirect />,
+        element: <TodayPage />,
       },
       {
         path: 'gallery',

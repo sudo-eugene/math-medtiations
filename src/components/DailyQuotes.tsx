@@ -7,10 +7,11 @@ import SEO from './SEO.tsx';
 
 const devMode = true;
 
-const DailyQuotes = () => {
+const DailyQuotes = ({ initialDay }: { initialDay?: number }) => {
   const { day } = useParams();
   const navigate = useNavigate();
-  const pageNumber = parseInt(day, 10);
+  const pageNumber = initialDay || parseInt(day, 10);
+  const isProxied = !!initialDay;
   const scrollContainerRef = useRef(null);
   const sidebarRef = useRef(null);
   const pageLinkRefs = useRef({});
@@ -51,7 +52,7 @@ const DailyQuotes = () => {
         
         if (currentPage >= 1 && currentPage <= quotes.length) {
           setVisiblePage(currentPage);
-          if (currentPage !== pageNumber) {
+          if (currentPage !== pageNumber && !isProxied) {
             navigate(`/daily-quotes/${currentPage}`, { replace: true });
           }
         }
